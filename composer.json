@@ -1,0 +1,23 @@
+{
+    "name": "danmichaelo/simplemarcparser",
+    "description": "A simple MARC21/XML parser",
+    "keywords": ["marc"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Dan Michael O. Heggø",
+            "email": "danmichaelo@gmail.com"
+        }
+    ],
+    "require": {
+        "danmichaelo/quitesimplexmlelement": "master-dev"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "3.7.*"
+    },
+    "autoload": {
+        "psr-0": {
+            "Danmichaelo\\SimpleMarcParser": "src/"
+        }
+    }
+}

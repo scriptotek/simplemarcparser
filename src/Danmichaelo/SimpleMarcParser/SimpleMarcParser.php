@@ -12,7 +12,7 @@ class SimpleMarcParser {
 
         $output = array();
 
-        $output['control_number'] = $record->text('marc:controlfield[@tag="001"]');
+        $output['record_id'] = $record->text('marc:controlfield[@tag="001"]');
         $output['authors'] = array();
         $output['subjects'] = array();
         $output['electronic'] = false;
@@ -92,7 +92,7 @@ class SimpleMarcParser {
                 case 491:
                     $output['series'] = array();
                     $output['series']['title'] = $node->text('marc:subfield[@code="a"]');
-                    $output['series']['objectid'] = $node->text('marc:subfield[@code="n"]');
+                    $output['series']['record_id'] = $node->text('marc:subfield[@code="n"]'); // Eksisterer denne egentlig??
                     $output['series']['volume'] = $node->text('marc:subfield[@code="v"]');
                     break;
 
@@ -161,9 +161,16 @@ class SimpleMarcParser {
                         // </marc:datafield>
                     $form = array(
                         'isbn' => $node->text('marc:subfield[@code="z"]'),
-                        'recordid' => preg_replace('/\(NO-TrBIB\)/', '', $node->text('marc:subfield[@code="w"]'))
+                        'record_id' => preg_replace('/\(NO-TrBIB\)/', '', $node->text('marc:subfield[@code="w"]'))
                     );
                     $output['other_form'] = $form;
+                    break;
+
+                case 830:
+                    $output['series'] = array();
+                    $output['series']['title'] = $node->text('marc:subfield[@code="a"]');
+                    $output['series']['record_id'] = preg_replace('/\(NO-TrBIB\)/', '', $node->text('marc:subfield[@code="w"]'));
+                    $output['series']['volume'] = $node->text('marc:subfield[@code="v"]');
                     break;
 
                 case 856:

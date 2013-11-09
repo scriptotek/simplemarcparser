@@ -38,7 +38,7 @@ class SimpleMarcParserTest extends \PHPUnit_Framework_TestCase {
             <marc:controlfield tag="001">12149361x</marc:controlfield>
         ');
 
-        $this->assertEquals('12149361x', $out['control_number']);
+        $this->assertEquals('12149361x', $out['record_id']);
     }
 
     public function testMarc020() {

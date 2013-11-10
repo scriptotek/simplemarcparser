@@ -164,6 +164,15 @@ class SimpleMarcParser {
                     $output['authors'][] = $author;
                     break;
 
+                case 773:
+                    $output['host_item'] = array();
+                    $output['host_item']['relationship'] = $node->text('marc:subfield[@code="i"]');
+                    $output['host_item']['title'] = $node->text('marc:subfield[@code="t"]');
+                    $output['host_item']['issn'] = $node->text('marc:subfield[@code="x"]');
+                    $output['host_item']['record_id'] = preg_replace('/\(NO-TrBIB\)/', '', $node->text('marc:subfield[@code="w"]'));
+                    $output['host_item']['volume'] = $node->text('marc:subfield[@code="v"]');
+                    break;
+
                 case 776:
                         // <marc:datafield tag="776" ind1="0" ind2=" ">
                         //     <marc:subfield code="z">9781107602175</marc:subfield>

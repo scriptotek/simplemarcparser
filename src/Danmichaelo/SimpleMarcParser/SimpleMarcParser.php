@@ -17,6 +17,7 @@ class SimpleMarcParser {
         $output['subjects'] = array();
         $output['series'] = array();
         $output['electronic'] = false;
+        $output['fulltext'] = array();
 
         foreach ($record->xpath('marc:datafield') as $node) {
             $marcfield = intval($node->attributes()->tag);
@@ -221,6 +222,13 @@ class SimpleMarcParser {
                     }
                     if (in_array($desc, array('Beskrivelse fra forlaget (kort)', 'Beskrivelse fra forlaget (lang)'))) {
                         $output['description'] = $node->text('marc:subfield[@code="u"]');
+                    }
+                    if (in_array($desc, array('Fulltekst','Fulltext'))) {
+                        $output['fulltext'][] = array(
+                            'url' => $node->text('marc:subfield[@code="u"]'),
+                            'provider' => $node->text('marc:subfield[@code="y"]'),
+                            'comment' => $node->text('marc:subfield[@code="z"]')
+                        );
                     }
                     break;
 

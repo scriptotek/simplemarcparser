@@ -78,4 +78,18 @@ class SimpleMarcParserTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('naturens kulturhistorie', $out['subtitle']);
     }
 
+    public function testMarc856fulltext() {
+        $out = $this->parseRecordData('
+            <marc:datafield tag="856" ind1="4" ind2="0">
+                <marc:subfield code="3">Fulltekst</marc:subfield>
+                <marc:subfield code="u">http://www.oecd-ilibrary.org/content/serial/1609753x</marc:subfield>
+                <marc:subfield code="y">OECD</marc:subfield>
+            </marc:datafield>
+        ');
+
+        $this->assertEquals(1, count($out['fulltext']));
+        $this->assertEquals('OECD', $out['fulltext'][0]['provider']);
+        $this->assertEquals('http://www.oecd-ilibrary.org/content/serial/1609753x', $out['fulltext'][0]['url']);
+    }
+
 }

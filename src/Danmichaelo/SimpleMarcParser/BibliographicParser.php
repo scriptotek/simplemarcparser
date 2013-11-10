@@ -100,6 +100,8 @@ class BibliographicParser {
                 case 300:
                     $output['pages'] = $node->text('marc:subfield[@code="a"]');
                     break;
+
+                /*
                 case 490:
                 case 491:
                     $serie = array(
@@ -109,6 +111,7 @@ class BibliographicParser {
                     );
                     $output['series'][] = $serie;
                     break;
+                */
 
                 case 505:
 

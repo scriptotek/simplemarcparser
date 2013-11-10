@@ -71,6 +71,16 @@ class SimpleMarcParser {
                     );
                     $output['authors'][] = $author;
                     break;
+
+                case 130:
+                    $author = array(
+                        'name' => $node->text('marc:subfield[@code="a"]'),
+                        'authority' => $node->text('marc:subfield[@code="0"]'),
+                        'role' => 'uniform'
+                    );
+                    $output['authors'][] = $author;
+                    break;
+
                 case 245:
                     $output['title'] = $node->text('marc:subfield[@code="a"]');
                     $output['subtitle'] = $node->text('marc:subfield[@code="b"]');

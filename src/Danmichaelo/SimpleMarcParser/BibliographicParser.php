@@ -2,7 +2,7 @@
 
 namespace Danmichaelo\SimpleMarcParser;
 
-class SimpleMarcParser {
+class BibliographicParser {
 
     public function __construct() {
 
@@ -212,23 +212,16 @@ class SimpleMarcParser {
                         //     <marc:subfield code="u">http://innhold.bibsys.no/bilde/forside/?size=mini&amp;id=9780521176835.jpg</marc:subfield>
                         //     <marc:subfield code="q">image/jpeg</marc:subfield>
                         // </marc:datafield>
-                    $desc = $node->text('marc:subfield[@code="3"]');
-                    if (in_array($desc, array('Cover image', 'Omslagsbilde'))) {
+                    $description = $node->text('marc:subfield[@code="3"]');
+                    if (in_array($description, array('Cover image', 'Omslagsbilde'))) {
                         $output['cover_image'] = $node->text('marc:subfield[@code="u"]');
 
                         // Silly hack to get larger images from Bibsys:
                         $output['cover_image'] = str_replace('mini','stor',$output['cover_image']);
                         $output['cover_image'] = str_replace('LITE','STOR',$output['cover_image']);
                     }
-                    if (in_array($desc, array('Beskrivelse fra forlaget (kort)', 'Beskrivelse fra forlaget (lang)'))) {
+                    if (in_array($description, array('Beskrivelse fra forlaget (kort)', 'Beskrivelse fra forlaget (lang)'))) {
                         $output['description'] = $node->text('marc:subfield[@code="u"]');
-                    }
-                    if (in_array($desc, array('Fulltekst','Fulltext'))) {
-                        $output['fulltext'][] = array(
-                            'url' => $node->text('marc:subfield[@code="u"]'),
-                            'provider' => $node->text('marc:subfield[@code="y"]'),
-                            'comment' => $node->text('marc:subfield[@code="z"]')
-                        );
                     }
                     break;
 

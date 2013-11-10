@@ -15,6 +15,7 @@ class SimpleMarcParser {
         $output['record_id'] = $record->text('marc:controlfield[@tag="001"]');
         $output['authors'] = array();
         $output['subjects'] = array();
+        $output['series'] = array();
         $output['electronic'] = false;
 
         foreach ($record->xpath('marc:datafield') as $node) {
@@ -100,10 +101,12 @@ class SimpleMarcParser {
                     break;
                 case 490:
                 case 491:
-                    $output['series'] = array();
-                    $output['series']['title'] = $node->text('marc:subfield[@code="a"]');
-                    $output['series']['record_id'] = $node->text('marc:subfield[@code="n"]'); // Eksisterer denne egentlig??
-                    $output['series']['volume'] = $node->text('marc:subfield[@code="v"]');
+                    $serie = array(
+                        'title' => $node->text('marc:subfield[@code="a"]'),
+                        'record_id' => $node->text('marc:subfield[@code="n"]'), // Eksisterer denne egentlig??
+                        'volume' => $node->text('marc:subfield[@code="v"]')
+                    );
+                    $output['series'][] = $serie;
                     break;
 
                 case 505:
@@ -186,10 +189,12 @@ class SimpleMarcParser {
                     break;
 
                 case 830:
-                    $output['series'] = array();
-                    $output['series']['title'] = $node->text('marc:subfield[@code="a"]');
-                    $output['series']['record_id'] = preg_replace('/\(NO-TrBIB\)/', '', $node->text('marc:subfield[@code="w"]'));
-                    $output['series']['volume'] = $node->text('marc:subfield[@code="v"]');
+                    $serie = array(
+                        'title' => $node->text('marc:subfield[@code="a"]'),
+                        'record_id' => preg_replace('/\(NO-TrBIB\)/', '', $node->text('marc:subfield[@code="w"]')),
+                        'volume' => $node->text('marc:subfield[@code="v"]')
+                    );
+                    $output['series'][] = $serie;
                     break;
 
                 case 856:

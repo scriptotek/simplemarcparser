@@ -18,32 +18,43 @@ class BibliographicParser {
         $output['series'] = array();
         $output['electronic'] = false;
         $output['fulltext'] = array();
+        $output['classifications'] = array();
 
         foreach ($record->xpath('marc:datafield') as $node) {
             $marcfield = intval($node->attributes()->tag);
             switch ($marcfield) {
+                /*
                 case 8:                                                             // ???
                     $output['form'] = $node->text('marc:subfield[@code="a"]');
                     break;
                 case 10:                                                            // ???
                     $output['lccn'] = $node->text('marc:subfield[@code="a"]');
                     break;
+                */
+
+                // 020 - International Standard Book Number (R)
                 case 20:                                                            // Test added
                     if (!isset($output['isbn'])) $output['isbn'] = array();
                     $isbn = explode(' ', $node->text('marc:subfield[@code="a"]'));
                     array_push($output['isbn'], $isbn[0]);
                     break;
+
+                // 082 - Dewey Decimal Classification Number (R)
                 case 82:                                                            // Test?
-                    if (!isset($output['klass'])) $output['klass'] = array();
-                    $klass = $node->text('marc:subfield[@code="a"]');
-                    $klass = preg_replace('/[^0-9.]/', '', $klass);
-                    foreach ($output['klass'] as $kitem) {
-                        if (($kitem['kode'] == $klass) && ($kitem['system'] == 'dewey')) {
-                            continue 3;
-                        }
+                    if (!isset($output['classifications'])) $output['classifications'] = array();
+                    $cl = array('system' => 'dewey');
+
+                    $map = array('a' => 'number', '2' => 'edition', 'q' => 'assigning_agency');
+                    foreach ($map as $key => $val) {
+                        $t = $node->text('marc:subfield[@code="' . $key . '"]');
+                        if (!empty($t)) $cl[$val] = $t;
                     }
-                    array_push($output['klass'], array('kode' => $klass, 'system' => 'dewey'));
+                    //$number = preg_replace('/[^0-9.]/', '', $number);
+
+                    $output['classifications'][] = $cl;
                     break;
+
+                /*
                 case 89:
                     if (!isset($output['klass'])) $output['klass'] = array();
                     $klass = $node->text('marc:subfield[@code="a"]');
@@ -55,6 +66,7 @@ class BibliographicParser {
                     }
                     array_push($output['klass'], array('kode' => $klass, 'system' => 'dewey'));
                     break;
+                */
 
                 case 100:
                     $author = array(

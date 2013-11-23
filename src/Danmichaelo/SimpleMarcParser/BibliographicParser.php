@@ -12,7 +12,7 @@ class BibliographicParser {
 
         $output = array();
 
-        $output['record_id'] = $record->text('marc:controlfield[@tag="001"]');
+        $output['id'] = $record->text('marc:controlfield[@tag="001"]');
         $output['authors'] = array();
         $output['subjects'] = array();
         $output['series'] = array();

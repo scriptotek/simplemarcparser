@@ -25,7 +25,7 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
             <marc:controlfield tag="001">12149361x</marc:controlfield>
         ');
 
-        $this->assertEquals('12149361x', $out['record_id']);
+        $this->assertEquals('12149361x', $out['id']);
     }
 
     public function testMarc020() {

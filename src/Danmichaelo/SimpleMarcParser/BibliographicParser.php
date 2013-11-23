@@ -148,7 +148,7 @@ class BibliographicParser {
 
                 case 650:
                     $emne = $node->text('marc:subfield[@code="a"]');
-                      $tmp = array('emne' => trim($emne, '.'));
+                      $tmp = array('term' => trim($emne, '.'));
 
                       $system = $node->text('marc:subfield[@code="2"]');
                       if ($system !== false) $tmp['system'] = $system;

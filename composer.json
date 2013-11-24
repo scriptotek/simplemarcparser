@@ -2,7 +2,7 @@
     "name": "danmichaelo/simplemarcparser",
     "description": "A simple MARC21/XML parser",
     "keywords": ["marc"],
-    "version": "0.3.0",
+    "version": "0.3.1",
     "license": "MIT",
     "authors": [
         {

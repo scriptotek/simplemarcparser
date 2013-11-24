@@ -51,7 +51,7 @@ class BibliographicParser {
                     );
                     foreach ($map as $key => $val) {
                         $t = $node->text('marc:subfield[@code="' . $key . '"]');
-                        if (!is_array($val)) $val = [$val];
+                        if (!is_array($val)) $val = array($val);
                         if (count($val) > 2) $t = preg_replace('/' . $val[1] . '/', $val[2], $t);
                         if (!empty($t)) $cl[$val[0]] = $t;
                     }

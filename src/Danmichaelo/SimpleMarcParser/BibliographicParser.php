@@ -45,7 +45,7 @@ class BibliographicParser {
                     $cl = array('system' => 'dewey');
 
                     $map = [
-                        'a' => ['number', '^.*?([0-9.]+)\/?([0-9.]*).*$', '\1\2'],
+                        'a' => array('number', '^.*?([0-9.]+)\/?([0-9.]*).*$', '\1\2'),
                         '2' => 'edition',
                         'q' => 'assigning_agency'
                     ];

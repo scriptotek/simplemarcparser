@@ -42,14 +42,14 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
     public function testMarc082() {
         $out = $this->parseRecordData('
             <marc:datafield tag="082" ind1="0" ind2="4">
-                <marc:subfield code="a">576.8</marc:subfield>
+                <marc:subfield code="a">333.914/02[U]</marc:subfield>
                 <marc:subfield code="2">23</marc:subfield>
             </marc:datafield>
         ');
 
         $klass = $out['classifications'][0];
         $this->assertEquals('dewey', $klass['system']);
-        $this->assertEquals('576.8', $klass['number']);
+        $this->assertEquals('333.91402', $klass['number']);
         $this->assertEquals('23', $klass['edition']);
         $this->assertArrayNotHasKey('assigning_agency', $klass);
     }

@@ -44,11 +44,11 @@ class BibliographicParser {
                     if (!isset($output['classifications'])) $output['classifications'] = array();
                     $cl = array('system' => 'dewey');
 
-                    $map = [
+                    $map = array(
                         'a' => array('number', '^.*?([0-9.]+)\/?([0-9.]*).*$', '\1\2'),
                         '2' => 'edition',
                         'q' => 'assigning_agency'
-                    ];
+                    );
                     foreach ($map as $key => $val) {
                         $t = $node->text('marc:subfield[@code="' . $key . '"]');
                         if (!is_array($val)) $val = [$val];

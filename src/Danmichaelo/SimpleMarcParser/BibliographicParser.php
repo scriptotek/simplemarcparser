@@ -82,9 +82,9 @@ class BibliographicParser {
                         'name' => $node->text('marc:subfield[@code="a"]'),
                         'role' => 'main'
                     );
-                    if (!empty($authority = $node->text('marc:subfield[@code="0"]'))) {
-                        $author['authority'] = $authority;
-                    }
+                    $authority = $node->text('marc:subfield[@code="0"]');
+                    if (!empty($authority)) $author['authority'] = $authority;
+
                     $output['authors'][] = $author;
                     break;
 
@@ -93,9 +93,8 @@ class BibliographicParser {
                         'name' => $node->text('marc:subfield[@code="a"]'),
                         'role' => 'corporate'
                     );
-                    if (!empty($authority = $node->text('marc:subfield[@code="0"]'))) {
-                        $author['authority'] = $authority;
-                    }
+                    $authority = $node->text('marc:subfield[@code="0"]');
+                    if (!empty($authority)) $author['authority'] = $authority;
 
                     $output['authors'][] = $author;
                     break;
@@ -105,9 +104,9 @@ class BibliographicParser {
                         'name' => $node->text('marc:subfield[@code="a"]'),
                         'role' => 'uniform'
                     );
-                    if (!empty($authority = $node->text('marc:subfield[@code="0"]'))) {
-                        $author['authority'] = $authority;
-                    }
+                    $authority = $node->text('marc:subfield[@code="0"]');
+                    if (!empty($authority)) $author['authority'] = $authority;
+
                     $output['authors'][] = $author;
                     break;
 
@@ -186,9 +185,9 @@ class BibliographicParser {
                         'name' => $node->text('marc:subfield[@code="a"]'),
                         'role' => 'added'
                     );
-                    if (!empty($authority = $node->text('marc:subfield[@code="0"]'))) {
-                        $author['authority'] = $authority;
-                    }
+                    $authority = $node->text('marc:subfield[@code="0"]');
+                    if (!empty($authority)) $author['authority'] = $authority;
+
                     $output['authors'][] = $author;
                     break;
 
@@ -197,9 +196,9 @@ class BibliographicParser {
                         'name' => $node->text('marc:subfield[@code="a"]'),
                         'role' => 'added_corporate'
                     );
-                    if (!empty($authority = $node->text('marc:subfield[@code="0"]'))) {
-                        $author['authority'] = $authority;
-                    }
+                    $authority = $node->text('marc:subfield[@code="0"]');
+                    if (!empty($authority)) $author['authority'] = $authority;
+
                     $output['authors'][] = $author;
                     break;
 

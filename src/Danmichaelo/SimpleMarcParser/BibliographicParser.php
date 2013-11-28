@@ -27,10 +27,12 @@ class BibliographicParser {
                 case 8:                                                             // ???
                     $output['form'] = $node->text('marc:subfield[@code="a"]');
                     break;
-                case 10:                                                            // ???
+                */
+
+                // 010 - Library of Congress Control Number (NR)
+                case 10:
                     $output['lccn'] = $node->text('marc:subfield[@code="a"]');
                     break;
-                */
 
                 // 020 - International Standard Book Number (R)
                 case 20:                                                            // Test added

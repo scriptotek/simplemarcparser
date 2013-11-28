@@ -28,6 +28,16 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('12149361x', $out['id']);
     }
 
+    public function testMarc010() {
+        $out = $this->parseRecordData('
+            <marc:datafield tag="010" ind1=" " ind2=" ">
+                <marc:subfield code="a">  2012011618</marc:subfield>
+            </marc:datafield>
+        ');
+
+        $this->assertEquals('2012011618', $out['lccn']);
+    }
+
     public function testMarc020() {
         $out = $this->parseRecordData('
             <marc:datafield tag="020" ind1=" " ind2=" ">

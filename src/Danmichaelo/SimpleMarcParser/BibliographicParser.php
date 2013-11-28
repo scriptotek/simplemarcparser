@@ -80,27 +80,34 @@ class BibliographicParser {
                 case 100:
                     $author = array(
                         'name' => $node->text('marc:subfield[@code="a"]'),
-                        'authority' => $node->text('marc:subfield[@code="0"]'),
                         'role' => 'main'
                     );
+                    if (!empty($authority = $node->text('marc:subfield[@code="0"]'))) {
+                        $author['authority'] = $authority;
+                    }
                     $output['authors'][] = $author;
                     break;
 
                 case 110:
                     $author = array(
                         'name' => $node->text('marc:subfield[@code="a"]'),
-                        'authority' => $node->text('marc:subfield[@code="0"]'),
                         'role' => 'corporate'
                     );
+                    if (!empty($authority = $node->text('marc:subfield[@code="0"]'))) {
+                        $author['authority'] = $authority;
+                    }
+
                     $output['authors'][] = $author;
                     break;
 
                 case 130:
                     $author = array(
                         'name' => $node->text('marc:subfield[@code="a"]'),
-                        'authority' => $node->text('marc:subfield[@code="0"]'),
                         'role' => 'uniform'
                     );
+                    if (!empty($authority = $node->text('marc:subfield[@code="0"]'))) {
+                        $author['authority'] = $authority;
+                    }
                     $output['authors'][] = $author;
                     break;
 
@@ -177,18 +184,22 @@ class BibliographicParser {
                 case 700:
                     $author = array(
                         'name' => $node->text('marc:subfield[@code="a"]'),
-                        'authority' => $node->text('marc:subfield[@code="0"]'),
                         'role' => 'added'
                     );
+                    if (!empty($authority = $node->text('marc:subfield[@code="0"]'))) {
+                        $author['authority'] = $authority;
+                    }
                     $output['authors'][] = $author;
                     break;
 
                 case 710:
                     $author = array(
                         'name' => $node->text('marc:subfield[@code="a"]'),
-                        'authority' => $node->text('marc:subfield[@code="0"]'),
                         'role' => 'added_corporate'
                     );
+                    if (!empty($authority = $node->text('marc:subfield[@code="0"]'))) {
+                        $author['authority'] = $authority;
+                    }
                     $output['authors'][] = $author;
                     break;
 

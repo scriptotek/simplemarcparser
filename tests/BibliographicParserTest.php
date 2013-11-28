@@ -109,6 +109,20 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('(NO-TrBIB)x12001130', $el['authority']);
     }
 
+    public function testMarc100b() {
+        $out = $this->parseRecordData('
+            <marc:datafield tag="100" ind1="1" ind2=" ">
+                <marc:subfield code="a">Bjerkestrand, Bernt</marc:subfield>
+            </marc:datafield>
+        ');
+
+        $this->assertCount(1, $out['authors']);
+
+        $el = $out['authors'][0];
+        $this->assertEquals('Bjerkestrand, Bernt', $el['name']);
+        $this->assertArrayNotHasKey('authority', $el);
+    }
+
     public function testMarc110() {
         $out = $this->parseRecordData('
            <marc:datafield tag="110" ind1="2" ind2=" ">

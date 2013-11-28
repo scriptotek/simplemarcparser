@@ -41,12 +41,24 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
     public function testMarc020() {
         $out = $this->parseRecordData('
             <marc:datafield tag="020" ind1=" " ind2=" ">
-                <marc:subfield code="a">9788243005129 (ib.)</marc:subfield>
+                <marc:subfield code="a">978-8243005129 (ib.)</marc:subfield>
                 <marc:subfield code="c">Nkr 339.00</marc:subfield>
             </marc:datafield>
         ');
 
-        $this->assertEquals('9788243005129', $out['isbn'][0]);
+        $this->assertCount(1, $out['isbn']);
+        $this->assertEquals('978-8243005129', $out['isbn'][0]);
+    }
+
+    public function testMarc020b() {
+        $out = $this->parseRecordData('
+            <marc:datafield tag="020" ind1=" " ind2=" ">
+                <marc:subfield code="z">9788243005129 (ib.)</marc:subfield>
+                <marc:subfield code="c">Nkr 339.00</marc:subfield>
+            </marc:datafield>
+        ');
+
+        $this->assertArrayNotHasKey('isbn', $out);
     }
 
     public function testMarc082() {

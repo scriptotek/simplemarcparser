@@ -36,9 +36,11 @@ class BibliographicParser {
 
                 // 020 - International Standard Book Number (R)
                 case 20:                                                            // Test added
+                    $isbn = $node->text('marc:subfield[@code="a"]');
+                    $isbn = preg_replace('/^([0-9\-]+).*$/', '\1', $isbn);
+                    if (empty($isbn)) break;
                     if (!isset($output['isbn'])) $output['isbn'] = array();
-                    $isbn = explode(' ', $node->text('marc:subfield[@code="a"]'));
-                    array_push($output['isbn'], $isbn[0]);
+                    array_push($output['isbn'], $isbn);
                     break;
 
                 // 082 - Dewey Decimal Classification Number (R)

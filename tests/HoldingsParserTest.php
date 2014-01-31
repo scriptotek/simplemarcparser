@@ -28,7 +28,29 @@ class HoldingsParserTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('12149361x', $out['id']);
     }
 
-    public function testMarc852() {
+    public function testMarc852full() {
+        $out = $this->parseRecordData('
+            <marc:datafield tag="852" ind1=" " ind2=" ">
+                <marc:subfield code="a">HIT</marc:subfield>
+                <marc:subfield code="b">HIT/BØ</marc:subfield>
+                <marc:subfield code="c">BØ</marc:subfield>
+                <marc:subfield code="h">633 A</marc:subfield>
+                <marc:subfield code="x">Tidligere eier: KJEMIBIB</marc:subfield>
+                <marc:subfield code="z">(tapt?)</marc:subfield>
+            </marc:datafield>
+        ');
+
+        $this->assertEquals('HIT', $out['location']);
+        $this->assertEquals('HIT/BØ', $out['sublocation']);
+        $this->assertEquals('BØ', $out['shelvinglocation']);
+        $this->assertEquals('633 A', $out['callcode']);
+        $this->assertCount(1, $out['public_notes']);
+        $this->assertCount(1, $out['nonpublic_notes']);
+        $this->assertEquals('Tidligere eier: KJEMIBIB', $out['nonpublic_notes'][0]);
+        $this->assertEquals('(tapt?)', $out['public_notes'][0]);
+    }
+
+    public function testMarc852minimal() {
         $out = $this->parseRecordData('
             <marc:datafield tag="852" ind1=" " ind2=" ">
                 <marc:subfield code="a">HIT</marc:subfield>
@@ -42,6 +64,8 @@ class HoldingsParserTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('HIT/BØ', $out['sublocation']);
         $this->assertEquals('BØ', $out['shelvinglocation']);
         $this->assertEquals('633 A', $out['callcode']);
+        $this->assertCount(0, $out['public_notes']);
+        $this->assertCount(0, $out['nonpublic_notes']);
     }
 
     public function testMarc856() {

@@ -85,4 +85,36 @@ class HoldingsParserTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('Elektronisk reproduksjon. Tilgjengelig på NBs lesesal', $ft['comment']);
     }
 
+    public function testMarc859f() {
+
+        $out = $this->parseRecordData('
+            <marc:datafield tag="859" ind1=" " ind2=" ">
+                <marc:subfield code="f">0</marc:subfield>
+            </marc:datafield>
+        ');
+        $this->assertNotContains('use_restrictions', $out);
+
+        foreach (HoldingsParser::$m859_f as $key => $value) {
+            $out = $this->parseRecordData('
+                <marc:datafield tag="859" ind1=" " ind2=" ">
+                    <marc:subfield code="f">' . $key . '</marc:subfield>
+                </marc:datafield>
+            ');
+            $this->assertEquals($value, $out['use_restrictions']);
+        }
+
+    }
+
+    public function testMarc859h() {
+
+        foreach (HoldingsParser::$m859_h as $key => $value) {
+            $out = $this->parseRecordData('
+                <marc:datafield tag="859" ind1=" " ind2=" ">
+                    <marc:subfield code="h">' . $key . '</marc:subfield>
+                </marc:datafield>
+            ');
+            $this->assertEquals($value, $out['circulation_status']);
+        }
+
+    }
 }

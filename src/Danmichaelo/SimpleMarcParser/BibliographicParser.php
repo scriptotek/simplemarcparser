@@ -111,12 +111,26 @@ class BibliographicParser {
                     $output['authors'][] = $author;
                     break;
 
+                // 245 : Title Statement (NR)
                 case 245:
                     $output['title'] = $node->text('marc:subfield[@code="a"]');
                     $output['subtitle'] = $node->text('marc:subfield[@code="b"]');
                     if (preg_match('/elektronisk ressurs/', $node->text('marc:subfield[@code="h"]'))) {
                         $output['electronic'] = true;
                     }
+
+                    // Number of part/section of a work (R)
+                    $part_no = $node->text('marc:subfield[@code="n"]');
+                    if ($part_no !== false) $output['part_no'] = $part_no;
+
+                    // Name of part/section of a work (R)
+                    $part_name = $node->text('marc:subfield[@code="o"]');
+                    if ($part_name !== false) $output['part_name'] = $part_name;
+
+                    // Medium (NR)
+                    $medium = $node->text('marc:subfield[@code="h"]');
+                    if ($medium !== false) $output['medium'] = $medium;
+
                     break;
                 case 250:
                     $output['edition'] = $node->text('marc:subfield[@code="a"]');

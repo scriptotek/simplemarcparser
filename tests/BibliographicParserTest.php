@@ -141,11 +141,26 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
                 <marc:subfield code="a">Evolusjon :</marc:subfield>
                 <marc:subfield code="b">naturens kulturhistorie</marc:subfield>
                 <marc:subfield code="c">Markus Lindholm</marc:subfield>
+                <marc:subfield code="h">[videoopptak]</marc:subfield>
             </marc:datafield>
         ');
 
         $this->assertEquals('Evolusjon :', $out['title']);
         $this->assertEquals('naturens kulturhistorie', $out['subtitle']);
+        $this->assertEquals('[videoopptak]', $out['medium']);
+    }
+
+    public function testMarc245part() {
+        $out1 = $this->parseRecordData('
+            <marc:datafield tag="245" ind1="0" ind2="0">
+                <marc:subfield code="a">No ordinary genius</marc:subfield>
+                <marc:subfield code="n">Part one</marc:subfield>
+            </marc:datafield>
+        ');
+        $out2 = $this->parseRecordData('');
+
+        $this->assertEquals('Part one', $out1['part_no']);
+        $this->assertArrayNotHasKey('part_no', $out2);
     }
 
     public function testMarc250() {

@@ -121,15 +121,15 @@ class BibliographicParser {
 
                     // Number of part/section of a work (R)
                     $part_no = $node->text('marc:subfield[@code="n"]');
-                    if ($part_no !== false) $output['part_no'] = $part_no;
+                    if ($part_no !== '') $output['part_no'] = $part_no;
 
                     // Name of part/section of a work (R)
                     $part_name = $node->text('marc:subfield[@code="o"]');
-                    if ($part_name !== false) $output['part_name'] = $part_name;
+                    if ($part_name !== '') $output['part_name'] = $part_name;
 
                     // Medium (NR)
                     $medium = $node->text('marc:subfield[@code="h"]');
-                    if ($medium !== false) $output['medium'] = $medium;
+                    if ($medium !== '') $output['medium'] = $medium;
 
                     break;
                 case 250:
@@ -181,16 +181,16 @@ class BibliographicParser {
                       $tmp = array('term' => trim($emne, '.'));
 
                       $system = $node->text('marc:subfield[@code="2"]');
-                      if ($system !== false) $tmp['system'] = $system;
+                      if ($system !== '') $tmp['system'] = $system;
 
                       $subdiv = $node->text('marc:subfield[@code="x"]');
-                      if ($subdiv !== false) $tmp['subdiv'] = trim($subdiv, '.');
+                      if ($subdiv !== '') $tmp['subdiv'] = trim($subdiv, '.');
 
                       $time = $node->text('marc:subfield[@code="y"]');
-                      if ($time !== false) $tmp['time'] = $time;
+                      if ($time !== '') $tmp['time'] = $time;
 
                       $geo = $node->text('marc:subfield[@code="z"]');
-                      if ($geo !== false) $tmp['geo'] = $geo;
+                      if ($geo !== '') $tmp['geo'] = $geo;
 
                       array_push($output['subjects'], $tmp);
                     break;

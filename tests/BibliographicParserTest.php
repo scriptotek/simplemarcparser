@@ -157,7 +157,11 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
                 <marc:subfield code="n">Part one</marc:subfield>
             </marc:datafield>
         ');
-        $out2 = $this->parseRecordData('');
+        $out2 = $this->parseRecordData('
+            <marc:datafield tag="245" ind1="0" ind2="0">
+                <marc:subfield code="a">No ordinary genius</marc:subfield>
+            </marc:datafield>
+        ');
 
         $this->assertEquals('Part one', $out1['part_no']);
         $this->assertArrayNotHasKey('part_no', $out2);

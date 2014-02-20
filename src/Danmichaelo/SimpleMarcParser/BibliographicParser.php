@@ -211,6 +211,7 @@ class BibliographicParser {
                     $output['host_item']['volume'] = $node->text('marc:subfield[@code="v"]');
                     break;
 
+                // 776 : Additional Physical Form Entry (R)
                 case 776:
                         // <marc:datafield tag="776" ind1="0" ind2=" ">
                         //     <marc:subfield code="z">9781107602175</marc:subfield>

@@ -154,17 +154,32 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
         $out1 = $this->parseRecordData('
             <marc:datafield tag="245" ind1="0" ind2="0">
                 <marc:subfield code="a">No ordinary genius</marc:subfield>
-                <marc:subfield code="n">Part one</marc:subfield>
             </marc:datafield>
         ');
         $out2 = $this->parseRecordData('
             <marc:datafield tag="245" ind1="0" ind2="0">
                 <marc:subfield code="a">No ordinary genius</marc:subfield>
+                <marc:subfield code="n">Part one</marc:subfield>
+            </marc:datafield>
+        ');
+        $out3 = $this->parseRecordData('
+            <marc:datafield tag="245" ind1="1" ind2="0">
+                <marc:subfield code="a">Verehrte An- und Abwesende!</marc:subfield>
+                <marc:subfield code="b">Originaltonaufnahmen 1921-1951</marc:subfield>
+                <marc:subfield code="n">CD1</marc:subfield>
+                <marc:subfield code="p">[1921-1941]</marc:subfield>
+                <marc:subfield code="h">[lydopptak]</marc:subfield>
             </marc:datafield>
         ');
 
-        $this->assertEquals('Part one', $out1['part_no']);
-        $this->assertArrayNotHasKey('part_no', $out2);
+        $this->assertArrayNotHasKey('part_no', $out1);
+        $this->assertArrayNotHasKey('part_name', $out1);
+        $this->assertArrayNotHasKey('part_name', $out2);
+
+        $this->assertEquals('Part one', $out2['part_no']);
+        $this->assertEquals('CD1', $out3['part_no']);
+        $this->assertEquals('[1921-1941]', $out3['part_name']);
+        $this->assertEquals('[lydopptak]', $out3['medium']);
     }
 
     public function testMarc250() {

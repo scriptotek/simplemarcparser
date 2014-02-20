@@ -119,15 +119,15 @@ class BibliographicParser {
                         $output['electronic'] = true;
                     }
 
-                    // Number of part/section of a work (R)
+                    // $n : Number of part/section of a work (R)
                     $part_no = $node->text('marc:subfield[@code="n"]');
                     if ($part_no !== '') $output['part_no'] = $part_no;
 
-                    // Name of part/section of a work (R)
-                    $part_name = $node->text('marc:subfield[@code="o"]');
+                    // $p : Name of part/section of a work (R)
+                    $part_name = $node->text('marc:subfield[@code="p"]');
                     if ($part_name !== '') $output['part_name'] = $part_name;
 
-                    // Medium (NR)
+                    // $h : Medium (NR)
                     $medium = $node->text('marc:subfield[@code="h"]');
                     if ($medium !== '') $output['medium'] = $medium;
 

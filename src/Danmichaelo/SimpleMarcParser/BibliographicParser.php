@@ -133,7 +133,7 @@ class BibliographicParser {
                 case 491:
                     $serie = array(
                         'title' => $node->text('marc:subfield[@code="a"]'),
-                        'record_id' => $node->text('marc:subfield[@code="n"]'), // Eksisterer denne egentlig??
+                        'id' => $node->text('marc:subfield[@code="n"]'), // Eksisterer denne egentlig??
                         'volume' => $node->text('marc:subfield[@code="v"]')
                     );
                     $output['series'][] = $serie;
@@ -207,7 +207,7 @@ class BibliographicParser {
                     $output['host_item']['relationship'] = $node->text('marc:subfield[@code="i"]');
                     $output['host_item']['title'] = $node->text('marc:subfield[@code="t"]');
                     $output['host_item']['issn'] = $node->text('marc:subfield[@code="x"]');
-                    $output['host_item']['record_id'] = preg_replace('/\(NO-TrBIB\)/', '', $node->text('marc:subfield[@code="w"]'));
+                    $output['host_item']['id'] = preg_replace('/\(NO-TrBIB\)/', '', $node->text('marc:subfield[@code="w"]'));
                     $output['host_item']['volume'] = $node->text('marc:subfield[@code="v"]');
                     break;
 
@@ -218,15 +218,16 @@ class BibliographicParser {
                         // </marc:datafield>
                     $form = array(
                         'isbn' => $node->text('marc:subfield[@code="z"]'),
-                        'record_id' => preg_replace('/\(NO-TrBIB\)/', '', $node->text('marc:subfield[@code="w"]'))
+                        'id' => preg_replace('/\(NO-TrBIB\)/', '', $node->text('marc:subfield[@code="w"]'))
                     );
                     $output['other_form'] = $form;
                     break;
 
+                // 830 : Series Added Entry – Uniform Title (R)
                 case 830:
                     $serie = array(
                         'title' => $node->text('marc:subfield[@code="a"]'),
-                        'record_id' => preg_replace('/\(NO-TrBIB\)/', '', $node->text('marc:subfield[@code="w"]')),
+                        'id' => preg_replace('/\(NO-TrBIB\)/', '', $node->text('marc:subfield[@code="w"]')),
                         'volume' => $node->text('marc:subfield[@code="v"]')
                     );
                     $output['series'][] = $serie;

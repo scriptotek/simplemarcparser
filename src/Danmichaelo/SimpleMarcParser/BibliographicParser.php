@@ -15,9 +15,9 @@ class BibliographicParser {
         $output['id'] = $record->text('marc:controlfield[@tag="001"]');
         $output['authors'] = array();
         $output['subjects'] = array();
-        $output['series'] = array();
+        $output['part_of'] = array();
         $output['electronic'] = false;
-        $output['is_series'] = false;
+        $output['series'] = false;
         $output['fulltext'] = array();
         $output['classifications'] = array();
 
@@ -232,7 +232,7 @@ class BibliographicParser {
                         'id' => preg_replace('/\(NO-TrBIB\)/', '', $node->text('marc:subfield[@code="w"]')),
                         'volume' => $node->text('marc:subfield[@code="v"]')
                     );
-                    $output['series'][] = $serie;
+                    $output['part_of'][] = $serie;
                     break;
 
                 case 856:
@@ -266,7 +266,7 @@ class BibliographicParser {
                 // Ref: http://ead.nb.admin.ch/web/marc21/dmarcb991.pdf
                 // Hvor i BIBSYSMARC kommer dette fra?
                 case 991:
-                    $output['is_series'] = true;
+                    $output['series'] = true;
                     break;
 
             }

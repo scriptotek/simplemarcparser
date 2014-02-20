@@ -244,14 +244,14 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertCount(2, $out['series']);
-        $this->assertEquals('Physica mathematica Universitatis Osloensis', $out['series'][0]['title']);
-        $this->assertEquals('32', $out['series'][0]['volume']);
-        $this->assertEquals('922367817', $out['series'][0]['id']);
+        $this->assertCount(2, $out['part_of']);
+        $this->assertEquals('Physica mathematica Universitatis Osloensis', $out['part_of'][0]['title']);
+        $this->assertEquals('32', $out['part_of'][0]['volume']);
+        $this->assertEquals('922367817', $out['part_of'][0]['id']);
 
-        $this->assertEquals('Report series (Universitetet i Oslo. Fysisk institutt) (trykt utg.)', $out['series'][1]['title']);
-        $this->assertEquals('94-13', $out['series'][1]['volume']);
-        $this->assertEquals('812037006', $out['series'][1]['id']);
+        $this->assertEquals('Report series (Universitetet i Oslo. Fysisk institutt) (trykt utg.)', $out['part_of'][1]['title']);
+        $this->assertEquals('94-13', $out['part_of'][1]['volume']);
+        $this->assertEquals('812037006', $out['part_of'][1]['id']);
     }
 
     public function testMarc956() {
@@ -275,8 +275,8 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertFalse($out1['is_series']);
-        $this->assertTrue($out2['is_series']);
+        $this->assertFalse($out1['series']);
+        $this->assertTrue($out2['series']);
     }
 
 }

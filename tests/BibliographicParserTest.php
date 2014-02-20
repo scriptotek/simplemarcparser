@@ -266,4 +266,17 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
         // TODO
     }
 
+    public function testMarc991() {
+        $out1 = $this->parseRecordData('');
+
+        $out2 = $this->parseRecordData('
+            <marc:datafield tag="991" ind1=" " ind2=" ">
+                <marc:subfield code="a">parts</marc:subfield>
+            </marc:datafield>
+        ');
+
+        $this->assertFalse($out1['is_series']);
+        $this->assertTrue($out2['is_series']);
+    }
+
 }

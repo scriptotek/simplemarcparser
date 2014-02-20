@@ -17,6 +17,7 @@ class BibliographicParser {
         $output['subjects'] = array();
         $output['series'] = array();
         $output['electronic'] = false;
+        $output['is_series'] = false;
         $output['fulltext'] = array();
         $output['classifications'] = array();
 
@@ -221,7 +222,7 @@ class BibliographicParser {
                         'isbn' => $node->text('marc:subfield[@code="z"]'),
                         'id' => preg_replace('/\(NO-TrBIB\)/', '', $node->text('marc:subfield[@code="w"]'))
                     );
-                    $output['other_form'] = $form;
+                    $output['other_form'] = $form; // TODO: Should be array!
                     break;
 
                 // 830 : Series Added Entry – Uniform Title (R)
@@ -259,6 +260,13 @@ class BibliographicParser {
                     if (in_array($description, array('Beskrivelse fra forlaget (kort)', 'Beskrivelse fra forlaget (lang)'))) {
                         $output['description'] = $node->text('marc:subfield[@code="u"]');
                     }
+                    break;
+
+                // 991 Kriterium für Sekundärsortierung (R) ???
+                // Ref: http://ead.nb.admin.ch/web/marc21/dmarcb991.pdf
+                // Hvor i BIBSYSMARC kommer dette fra?
+                case 991:
+                    $output['is_series'] = true;
                     break;
 
             }

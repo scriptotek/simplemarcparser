@@ -15,9 +15,10 @@ class BibliographicParser {
         $output['id'] = $record->text('marc:controlfield[@tag="001"]');
         $output['authors'] = array();
         $output['subjects'] = array();
-        $output['part_of'] = array();
+        $output['series'] = array();
         $output['electronic'] = false;
-        $output['series'] = false;
+        $output['is_series'] = false;
+        $output['is_multivolume'] = false;
         $output['fulltext'] = array();
         $output['classifications'] = array();
 
@@ -145,10 +146,8 @@ class BibliographicParser {
 
                 /*
                 case 490:
-                case 491:
                     $serie = array(
                         'title' => $node->text('marc:subfield[@code="a"]'),
-                        'id' => $node->text('marc:subfield[@code="n"]'), // Eksisterer denne egentlig??
                         'volume' => $node->text('marc:subfield[@code="v"]')
                     );
                     $output['series'][] = $serie;
@@ -221,12 +220,12 @@ class BibliographicParser {
                     break;
 
                 case 773:
-                    $output['host_item'] = array();
-                    $output['host_item']['relationship'] = $node->text('marc:subfield[@code="i"]');
-                    $output['host_item']['title'] = $node->text('marc:subfield[@code="t"]');
-                    $output['host_item']['issn'] = $node->text('marc:subfield[@code="x"]');
-                    $output['host_item']['id'] = preg_replace('/\(NO-TrBIB\)/', '', $node->text('marc:subfield[@code="w"]'));
-                    $output['host_item']['volume'] = $node->text('marc:subfield[@code="v"]');
+                    $output['part_of'] = array();
+                    $output['part_of']['relationship'] = $node->text('marc:subfield[@code="i"]');
+                    $output['part_of']['title'] = $node->text('marc:subfield[@code="t"]');
+                    $output['part_of']['issn'] = $node->text('marc:subfield[@code="x"]');
+                    $output['part_of']['id'] = preg_replace('/\(NO-TrBIB\)/', '', $node->text('marc:subfield[@code="w"]'));
+                    $output['part_of']['volume'] = $node->text('marc:subfield[@code="v"]');
                     break;
 
                 // 776 : Additional Physical Form Entry (R)
@@ -249,7 +248,7 @@ class BibliographicParser {
                         'id' => preg_replace('/\(NO-TrBIB\)/', '', $node->text('marc:subfield[@code="w"]')),
                         'volume' => $node->text('marc:subfield[@code="v"]')
                     );
-                    $output['part_of'][] = $serie;
+                    $output['series'][] = $serie;
                     break;
 
                 case 856:
@@ -283,7 +282,17 @@ class BibliographicParser {
                 // Ref: http://ead.nb.admin.ch/web/marc21/dmarcb991.pdf
                 // Hvor i BIBSYSMARC kommer dette fra?
                 case 991:
-                    $output['series'] = true;
+
+                    // Multi-volume work (flerbindsverk), parts linked through 773 w
+                    if ($node->text('marc:subfield[@code="a"]') == 'volumes') {
+                        $output['is_multivolume'] = true;
+                    }
+
+                    // Series (serier), parts linked through 830 w
+                    if ($node->text('marc:subfield[@code="a"]') == 'parts') {
+                        $output['is_series'] = true;
+                    }
+
                     break;
 
             }

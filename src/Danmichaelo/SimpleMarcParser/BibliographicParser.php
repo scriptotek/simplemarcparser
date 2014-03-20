@@ -200,10 +200,23 @@ class BibliographicParser {
                 case 700:
                     $author = array(
                         'name' => $node->text('marc:subfield[@code="a"]'),
-                        'role' => 'added'
                     );
+                    $author['role'] = $node->text('marc:subfield[@code="4"]') 
+                        ?: ($node->text('marc:subfield[@code="e"]') ?: 'added');
+
                     $authority = $node->text('marc:subfield[@code="0"]');
-                    if (!empty($authority)) $author['authority'] = $authority;
+                    if (!empty($authority)) {
+                        $author['authority'] = $authority;
+                        $asplit = explode(')', $authority);
+                        if (substr($authority, 1, 8) === 'NO-TrBIB') {
+                            $author['bibsys_identifier'] = substr($authority, strpos($authority, ')') + 1);
+                        }
+                    }
+
+                    $dates = $node->text('marc:subfield[@code="d"]');
+                    if (!empty($dates)) {
+                        $author['dates'] = $dates;
+                    }
 
                     $output['authors'][] = $author;
                     break;

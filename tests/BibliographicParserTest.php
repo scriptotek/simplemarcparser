@@ -229,7 +229,7 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testMarc700() {
-        $out = $this->parseRecordData('
+        $out1 = $this->parseRecordData('
             <marc:datafield tag="700" ind1="1" ind2=" ">
                 <marc:subfield code="a">Almås, Karl Andreas</marc:subfield>
                 <marc:subfield code="d">1952-</marc:subfield>
@@ -238,7 +238,11 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        // TODO
+        $this->assertCount(1, $out1['authors']);
+        $this->assertEquals('Almås, Karl Andreas', $out1['authors'][0]['name']);
+        $this->assertEquals('red.', $out1['authors'][0]['role']);
+        $this->assertEquals('1952-', $out1['authors'][0]['dates']);
+        $this->assertEquals('x90235102', $out1['authors'][0]['bibsys_identifier']);
     }
 
     public function testMarc710() {

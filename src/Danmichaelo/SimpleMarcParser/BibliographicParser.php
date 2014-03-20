@@ -146,7 +146,8 @@ class BibliographicParser {
                     break;
                 case 260:
                     $output['publisher'] = $node->text('marc:subfield[@code="b"]');
-                    $output['year'] = preg_replace('/[^0-9,]|,[0-9]*$/', '', current($node->xpath('marc:subfield[@code="c"]')));
+                    $y = preg_replace('/^.*?([0-9]{4}).*$/', '\1', current($node->xpath('marc:subfield[@code="c"]')));
+                    $output['year'] = $y ? intval($y) : null;
                     break;
                 case 300:
                     $output['pages'] = $node->text('marc:subfield[@code="a"]');

@@ -8,6 +8,17 @@ class BibliographicParser {
 
     }
 
+    private function parseAuthority(&$node, &$out) {
+        $authority = $node->text('marc:subfield[@code="0"]');
+        if (!empty($authority)) {
+            $out['authority'] = $authority;
+            $asplit = explode(')', $authority);
+            if (substr($authority, 1, 8) === 'NO-TrBIB') {
+                $out['bibsys_identifier'] = substr($authority, strpos($authority, ')') + 1);
+            }
+        }
+    }
+
     public function parse(\Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement $record) {
 
         $output = array();
@@ -84,8 +95,7 @@ class BibliographicParser {
                         'name' => $node->text('marc:subfield[@code="a"]'),
                         'role' => 'main'
                     );
-                    $authority = $node->text('marc:subfield[@code="0"]');
-                    if (!empty($authority)) $author['authority'] = $authority;
+                    $this->parseAuthority($node, $author);
 
                     $output['authors'][] = $author;
                     break;
@@ -95,8 +105,7 @@ class BibliographicParser {
                         'name' => $node->text('marc:subfield[@code="a"]'),
                         'role' => 'corporate'
                     );
-                    $authority = $node->text('marc:subfield[@code="0"]');
-                    if (!empty($authority)) $author['authority'] = $authority;
+                    $this->parseAuthority($node, $author);
 
                     $output['authors'][] = $author;
                     break;
@@ -106,8 +115,7 @@ class BibliographicParser {
                         'name' => $node->text('marc:subfield[@code="a"]'),
                         'role' => 'uniform'
                     );
-                    $authority = $node->text('marc:subfield[@code="0"]');
-                    if (!empty($authority)) $author['authority'] = $authority;
+                    $this->parseAuthority($node, $author);
 
                     $output['authors'][] = $author;
                     break;
@@ -204,14 +212,7 @@ class BibliographicParser {
                     $author['role'] = $node->text('marc:subfield[@code="4"]') 
                         ?: ($node->text('marc:subfield[@code="e"]') ?: 'added');
 
-                    $authority = $node->text('marc:subfield[@code="0"]');
-                    if (!empty($authority)) {
-                        $author['authority'] = $authority;
-                        $asplit = explode(')', $authority);
-                        if (substr($authority, 1, 8) === 'NO-TrBIB') {
-                            $author['bibsys_identifier'] = substr($authority, strpos($authority, ')') + 1);
-                        }
-                    }
+                    $this->parseAuthority($node, $author);
 
                     $dates = $node->text('marc:subfield[@code="d"]');
                     if (!empty($dates)) {
@@ -226,8 +227,7 @@ class BibliographicParser {
                         'name' => $node->text('marc:subfield[@code="a"]'),
                         'role' => 'added_corporate'
                     );
-                    $authority = $node->text('marc:subfield[@code="0"]');
-                    if (!empty($authority)) $author['authority'] = $authority;
+                    $this->parseAuthority($node, $author);
 
                     $output['authors'][] = $author;
                     break;

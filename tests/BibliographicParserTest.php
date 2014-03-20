@@ -106,7 +106,7 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
 
         $el = $out['authors'][0];
         $this->assertEquals('Bjerkestrand, Bernt', $el['name']);
-        $this->assertEquals('(NO-TrBIB)x12001130', $el['authority']);
+        $this->assertEquals('x12001130', $el['bibsys_identifier']);
     }
 
     public function testMarc100b() {

@@ -11,7 +11,7 @@
         }
     ],
     "require": {
-        "danmichaelo/quitesimplexmlelement": "master-dev"
+        "danmichaelo/quitesimplexmlelement": "dev-master"
     },
     "require-dev": {
         "phpunit/phpunit": "3.7.*",

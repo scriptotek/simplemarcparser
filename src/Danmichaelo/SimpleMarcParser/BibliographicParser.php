@@ -50,7 +50,7 @@ class BibliographicParser {
                 // 020 - International Standard Book Number (R)
                 case 20:                                                            // Test added
                     $isbn = $node->text('marc:subfield[@code="a"]');
-                    $isbn = preg_replace('/^([0-9\-]+).*$/', '\1', $isbn);
+                    $isbn = preg_replace('/^([0-9\-xX]+).*$/', '\1', $isbn);
                     if (empty($isbn)) break;
                     if (!isset($output['isbn'])) $output['isbn'] = array();
                     array_push($output['isbn'], $isbn);

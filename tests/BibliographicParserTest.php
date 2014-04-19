@@ -38,7 +38,8 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('2012011618', $out['lccn']);
     }
 
-    public function testMarc020() {
+    public function testIsbn() {
+        // Should strip off comments, but leave hyphens
         $out = $this->parseRecordData('
             <marc:datafield tag="020" ind1=" " ind2=" ">
                 <marc:subfield code="a">978-8243005129 (ib.)</marc:subfield>
@@ -50,7 +51,8 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('978-8243005129', $out['isbn'][0]);
     }
 
-    public function testMarc020b() {
+    public function testCanceledIsbn() {
+        // 020 $z : Cancelled/invalid ISBN
         $out = $this->parseRecordData('
             <marc:datafield tag="020" ind1=" " ind2=" ">
                 <marc:subfield code="z">9788243005129 (ib.)</marc:subfield>
@@ -59,6 +61,17 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
         ');
 
         $this->assertArrayNotHasKey('isbn', $out);
+    }
+
+    public function testIsbnWithX() {
+        // Test that X-s are preserved
+        $out = $this->parseRecordData('
+            <marc:datafield tag="020" ind1=" " ind2=" ">
+                <marc:subfield code="a">1-85723-457-X (h.)</marc:subfield>
+            </marc:datafield>
+        ');
+
+        $this->assertEquals('1-85723-457-X', $out['isbn'][0]);
     }
 
     public function testMarc082() {

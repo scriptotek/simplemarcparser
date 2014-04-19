@@ -149,6 +149,7 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testMarc245() {
+        // Colon should be trimmed off title
         $out = $this->parseRecordData('
             <marc:datafield tag="245" ind1="1" ind2="0">
                 <marc:subfield code="a">Evolusjon :</marc:subfield>
@@ -158,7 +159,7 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertEquals('Evolusjon :', $out['title']);
+        $this->assertEquals('Evolusjon', $out['title']);
         $this->assertEquals('naturens kulturhistorie', $out['subtitle']);
         $this->assertEquals('[videoopptak]', $out['medium']);
     }

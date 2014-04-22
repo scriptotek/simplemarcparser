@@ -240,15 +240,29 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testMarc650() {
-        $out = $this->parseRecordData('
+        $out1 = $this->parseRecordData('
             <marc:datafield tag="650" ind1=" " ind2="7">
                 <marc:subfield code="a">sjømat</marc:subfield>
-                <marc:subfield code="x">Norge</marc:subfield>
+                <marc:subfield code="z">Norge</marc:subfield>
                 <marc:subfield code="2">tekord</marc:subfield>
             </marc:datafield>
         ');
+        $out2 = $this->parseRecordData('
+            <marc:datafield tag="650" ind1=" " ind2="0">
+                <marc:subfield code="a">Optoelectronics industry</marc:subfield>
+                <marc:subfield code="x">Directories.</marc:subfield>
+            </marc:datafield>
+        ');
 
-        // TODO
+        $this->assertCount(1, $out1['subjects']);
+        $this->assertEquals('tekord', $out1['subjects'][0]['vocabulary']);
+        $this->assertEquals('sjømat', $out1['subjects'][0]['term']);
+        $this->assertEquals('Norge', $out1['subjects'][0]['subdivisions']['geographic']);
+
+        $this->assertCount(1, $out2['subjects']);
+        $this->assertEquals('lcsh', $out2['subjects'][0]['vocabulary']);
+        $this->assertEquals('Optoelectronics industry', $out2['subjects'][0]['term']);
+        $this->assertEquals('Directories', $out2['subjects'][0]['subdivisions']['topical']);
     }
 
     public function testMarc700() {

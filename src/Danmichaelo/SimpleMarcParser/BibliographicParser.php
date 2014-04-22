@@ -185,23 +185,43 @@ class BibliographicParser {
                     break;
 
                 case 650:
+                    $ind2 = $node->attr('ind2');
                     $emne = $node->text('marc:subfield[@code="a"]');
-                      $tmp = array();
+
+                      // topical, geographic, chronological, or form aspects
+                      $tmp = array('subdivisions' => array());
 
                       $term = trim($emne, '.');
                       if ($term !== '') $tmp['term'] = $term;
 
-                      $system = $node->text('marc:subfield[@code="2"]');
-                      if ($system !== '') $tmp['system'] = $system;
+                      $vocabularies = array(
+                          '0' => 'lcsh',
+                          '1' => 'lccsh', // LC subject headings for children's literature
+                          '2' => 'mesh', // Medical Subject Headings
+                          '3' => 'atg', // National Agricultural Library subject authority file (?)
+                          // 4 : unknown
+                          '5' => 'cash', // Canadian Subject Headings
+                          '6' => 'rvm', // Répertoire de vedettes-matière
+                      );
 
-                      $subdiv = $node->text('marc:subfield[@code="x"]');
-                      if ($subdiv !== '') $tmp['subdiv'] = trim($subdiv, '.');
+                      $voc = $node->text('marc:subfield[@code="2"]');
+                      if (isset($vocabularies[$ind2])) {
+                          $tmp['vocabulary'] = $vocabularies[$ind2];
+                      } else if (!empty($voc)) {
+                          $tmp['vocabulary'] = $voc;
+                      }
 
-                      $time = $node->text('marc:subfield[@code="y"]');
-                      if ($time !== '') $tmp['time'] = $time;
+                      $topical = $node->text('marc:subfield[@code="x"]');
+                      if ($topical !== '') $tmp['subdivisions']['topical'] = trim($topical, '.');
+
+                      $chrono = $node->text('marc:subfield[@code="y"]');
+                      if ($chrono !== '') $tmp['subdivisions']['chronological'] = $chrono;
 
                       $geo = $node->text('marc:subfield[@code="z"]');
-                      if ($geo !== '') $tmp['geo'] = $geo;
+                      if ($geo !== '') $tmp['subdivisions']['geographic'] = $geo;
+
+                      $form = $node->text('marc:subfield[@code="v"]');
+                      if ($form !== '') $tmp['subdivisions']['form'] = $form;
 
                       array_push($output['subjects'], $tmp);
                     break;

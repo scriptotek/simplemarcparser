@@ -1,6 +1,6 @@
-<?php
+<?php namespace Danmichaelo\SimpleMarcParser;
 
-namespace Danmichaelo\SimpleMarcParser;
+use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
 
 class BibliographicParser {
 
@@ -8,7 +8,7 @@ class BibliographicParser {
 
     }
 
-    public function parse(\Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement $record) {
+    public function parse(QuiteSimpleXmlElement $record) {
 
         $output = array();
 

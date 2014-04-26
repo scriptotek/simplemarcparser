@@ -18,8 +18,9 @@
         "satooshi/php-coveralls": "dev-master"
     },
     "autoload": {
-        "psr-0": {
-            "Danmichaelo\\SimpleMarcParser": "src/"
+        "psr-4": {
+            "Danmichaelo\\SimpleMarcParser\\": "src/"
         }
     }
+
 }

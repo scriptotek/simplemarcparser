@@ -1,6 +1,6 @@
-<?php
+<?php namespace Danmichaelo\SimpleMarcParser;
 
-namespace Danmichaelo\SimpleMarcParser;
+use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
 
 class HoldingsParser {
 
@@ -44,7 +44,7 @@ class HoldingsParser {
 
     }
 
-    public function parse(\Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement $record) {
+    public function parse(QuiteSimpleXmlElement $record) {
 
         $output = array();
 

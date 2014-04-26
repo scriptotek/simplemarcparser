@@ -38,7 +38,8 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('2012011618', $out['lccn']);
     }
 
-    public function testMarc020() {
+    public function testIsbn() {
+        // Should strip off comments, but leave hyphens
         $out = $this->parseRecordData('
             <marc:datafield tag="020" ind1=" " ind2=" ">
                 <marc:subfield code="a">978-8243005129 (ib.)</marc:subfield>
@@ -50,7 +51,8 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('978-8243005129', $out['isbn'][0]);
     }
 
-    public function testMarc020b() {
+    public function testCanceledIsbn() {
+        // 020 $z : Cancelled/invalid ISBN
         $out = $this->parseRecordData('
             <marc:datafield tag="020" ind1=" " ind2=" ">
                 <marc:subfield code="z">9788243005129 (ib.)</marc:subfield>
@@ -59,6 +61,17 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
         ');
 
         $this->assertArrayNotHasKey('isbn', $out);
+    }
+
+    public function testIsbnWithX() {
+        // Test that X-s are preserved
+        $out = $this->parseRecordData('
+            <marc:datafield tag="020" ind1=" " ind2=" ">
+                <marc:subfield code="a">1-85723-457-X (h.)</marc:subfield>
+            </marc:datafield>
+        ');
+
+        $this->assertEquals('1-85723-457-X', $out['isbn'][0]);
     }
 
     public function testMarc082() {
@@ -106,7 +119,7 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
 
         $el = $out['authors'][0];
         $this->assertEquals('Bjerkestrand, Bernt', $el['name']);
-        $this->assertEquals('(NO-TrBIB)x12001130', $el['authority']);
+        $this->assertEquals('x12001130', $el['bibsys_identifier']);
     }
 
     public function testMarc100b() {
@@ -136,6 +149,7 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testMarc245() {
+        // Colon should be trimmed off title
         $out = $this->parseRecordData('
             <marc:datafield tag="245" ind1="1" ind2="0">
                 <marc:subfield code="a">Evolusjon :</marc:subfield>
@@ -145,7 +159,7 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertEquals('Evolusjon :', $out['title']);
+        $this->assertEquals('Evolusjon', $out['title']);
         $this->assertEquals('naturens kulturhistorie', $out['subtitle']);
         $this->assertEquals('[videoopptak]', $out['medium']);
     }
@@ -192,16 +206,25 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
         // TODO
     }
 
-    public function testMarc260() {
-        $out = $this->parseRecordData('
+    public function testMarc260c() {
+        $out1 = $this->parseRecordData('
             <marc:datafield tag="260" ind1=" " ind2=" ">
-                <marc:subfield code="a">Drammen</marc:subfield>
-                <marc:subfield code="b">Vett &amp; viten</marc:subfield>
-                <marc:subfield code="c">2013</marc:subfield>
+                <marc:subfield code="c">c2013</marc:subfield>
+            </marc:datafield>
+        ');
+        $out2 = $this->parseRecordData('
+            <marc:datafield tag="260" ind1=" " ind2=" ">
+                <marc:subfield code="c">2009 [i.e. 2008]</marc:subfield>
+            </marc:datafield>
+        ');
+        $out3 = $this->parseRecordData('
+            <marc:datafield tag="260" ind1=" " ind2=" ">
             </marc:datafield>
         ');
 
-        // TODO
+        $this->assertEquals(2013, $out1['year']);
+        $this->assertEquals(2009, $out2['year']);
+        $this->assertNull($out3['year']);
     }
 
     public function testMarc300() {
@@ -217,19 +240,33 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testMarc650() {
-        $out = $this->parseRecordData('
+        $out1 = $this->parseRecordData('
             <marc:datafield tag="650" ind1=" " ind2="7">
                 <marc:subfield code="a">sjømat</marc:subfield>
-                <marc:subfield code="x">Norge</marc:subfield>
+                <marc:subfield code="z">Norge</marc:subfield>
                 <marc:subfield code="2">tekord</marc:subfield>
             </marc:datafield>
         ');
+        $out2 = $this->parseRecordData('
+            <marc:datafield tag="650" ind1=" " ind2="0">
+                <marc:subfield code="a">Optoelectronics industry</marc:subfield>
+                <marc:subfield code="x">Directories.</marc:subfield>
+            </marc:datafield>
+        ');
 
-        // TODO
+        $this->assertCount(1, $out1['subjects']);
+        $this->assertEquals('tekord', $out1['subjects'][0]['vocabulary']);
+        $this->assertEquals('sjømat', $out1['subjects'][0]['term']);
+        $this->assertEquals('Norge', $out1['subjects'][0]['subdivisions']['geographic']);
+
+        $this->assertCount(1, $out2['subjects']);
+        $this->assertEquals('lcsh', $out2['subjects'][0]['vocabulary']);
+        $this->assertEquals('Optoelectronics industry', $out2['subjects'][0]['term']);
+        $this->assertEquals('Directories', $out2['subjects'][0]['subdivisions']['topical']);
     }
 
     public function testMarc700() {
-        $out = $this->parseRecordData('
+        $out1 = $this->parseRecordData('
             <marc:datafield tag="700" ind1="1" ind2=" ">
                 <marc:subfield code="a">Almås, Karl Andreas</marc:subfield>
                 <marc:subfield code="d">1952-</marc:subfield>
@@ -238,7 +275,11 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        // TODO
+        $this->assertCount(1, $out1['authors']);
+        $this->assertEquals('Almås, Karl Andreas', $out1['authors'][0]['name']);
+        $this->assertEquals('red.', $out1['authors'][0]['role']);
+        $this->assertEquals('1952-', $out1['authors'][0]['dates']);
+        $this->assertEquals('x90235102', $out1['authors'][0]['bibsys_identifier']);
     }
 
     public function testMarc710() {

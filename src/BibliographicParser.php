@@ -8,6 +8,17 @@ class BibliographicParser {
 
     }
 
+    private function parseAuthority(&$node, &$out) {
+        $authority = $node->text('marc:subfield[@code="0"]');
+        if (!empty($authority)) {
+            $out['authority'] = $authority;
+            $asplit = explode(')', $authority);
+            if (substr($authority, 1, 8) === 'NO-TrBIB') {
+                $out['bibsys_identifier'] = substr($authority, strpos($authority, ')') + 1);
+            }
+        }
+    }
+
     public function parse(QuiteSimpleXmlElement $record) {
 
         $output = array();
@@ -39,7 +50,7 @@ class BibliographicParser {
                 // 020 - International Standard Book Number (R)
                 case 20:                                                            // Test added
                     $isbn = $node->text('marc:subfield[@code="a"]');
-                    $isbn = preg_replace('/^([0-9\-]+).*$/', '\1', $isbn);
+                    $isbn = preg_replace('/^([0-9\-xX]+).*$/', '\1', $isbn);
                     if (empty($isbn)) break;
                     if (!isset($output['isbn'])) $output['isbn'] = array();
                     array_push($output['isbn'], $isbn);
@@ -84,8 +95,7 @@ class BibliographicParser {
                         'name' => $node->text('marc:subfield[@code="a"]'),
                         'role' => 'main'
                     );
-                    $authority = $node->text('marc:subfield[@code="0"]');
-                    if (!empty($authority)) $author['authority'] = $authority;
+                    $this->parseAuthority($node, $author);
 
                     $output['authors'][] = $author;
                     break;
@@ -95,8 +105,7 @@ class BibliographicParser {
                         'name' => $node->text('marc:subfield[@code="a"]'),
                         'role' => 'corporate'
                     );
-                    $authority = $node->text('marc:subfield[@code="0"]');
-                    if (!empty($authority)) $author['authority'] = $authority;
+                    $this->parseAuthority($node, $author);
 
                     $output['authors'][] = $author;
                     break;
@@ -106,15 +115,14 @@ class BibliographicParser {
                         'name' => $node->text('marc:subfield[@code="a"]'),
                         'role' => 'uniform'
                     );
-                    $authority = $node->text('marc:subfield[@code="0"]');
-                    if (!empty($authority)) $author['authority'] = $authority;
+                    $this->parseAuthority($node, $author);
 
                     $output['authors'][] = $author;
                     break;
 
                 // 245 : Title Statement (NR)
                 case 245:
-                    $output['title'] = $node->text('marc:subfield[@code="a"]');
+                    $output['title'] = rtrim($node->text('marc:subfield[@code="a"]'), " \t\n\r\0\x0B:-");
                     $output['subtitle'] = $node->text('marc:subfield[@code="b"]');
                     if (preg_match('/elektronisk ressurs/', $node->text('marc:subfield[@code="h"]'))) {
                         $output['electronic'] = true;
@@ -138,7 +146,8 @@ class BibliographicParser {
                     break;
                 case 260:
                     $output['publisher'] = $node->text('marc:subfield[@code="b"]');
-                    $output['year'] = preg_replace('/[^0-9,]|,[0-9]*$/', '', current($node->xpath('marc:subfield[@code="c"]')));
+                    $y = preg_replace('/^.*?([0-9]{4}).*$/', '\1', current($node->xpath('marc:subfield[@code="c"]')));
+                    $output['year'] = $y ? intval($y) : null;
                     break;
                 case 300:
                     $output['pages'] = $node->text('marc:subfield[@code="a"]');
@@ -176,23 +185,43 @@ class BibliographicParser {
                     break;
 
                 case 650:
+                    $ind2 = $node->attr('ind2');
                     $emne = $node->text('marc:subfield[@code="a"]');
-                      $tmp = array();
+
+                      // topical, geographic, chronological, or form aspects
+                      $tmp = array('subdivisions' => array());
 
                       $term = trim($emne, '.');
                       if ($term !== '') $tmp['term'] = $term;
 
-                      $system = $node->text('marc:subfield[@code="2"]');
-                      if ($system !== '') $tmp['system'] = $system;
+                      $vocabularies = array(
+                          '0' => 'lcsh',
+                          '1' => 'lccsh', // LC subject headings for children's literature
+                          '2' => 'mesh', // Medical Subject Headings
+                          '3' => 'atg', // National Agricultural Library subject authority file (?)
+                          // 4 : unknown
+                          '5' => 'cash', // Canadian Subject Headings
+                          '6' => 'rvm', // Répertoire de vedettes-matière
+                      );
 
-                      $subdiv = $node->text('marc:subfield[@code="x"]');
-                      if ($subdiv !== '') $tmp['subdiv'] = trim($subdiv, '.');
+                      $voc = $node->text('marc:subfield[@code="2"]');
+                      if (isset($vocabularies[$ind2])) {
+                          $tmp['vocabulary'] = $vocabularies[$ind2];
+                      } else if (!empty($voc)) {
+                          $tmp['vocabulary'] = $voc;
+                      }
 
-                      $time = $node->text('marc:subfield[@code="y"]');
-                      if ($time !== '') $tmp['time'] = $time;
+                      $topical = $node->text('marc:subfield[@code="x"]');
+                      if ($topical !== '') $tmp['subdivisions']['topical'] = trim($topical, '.');
+
+                      $chrono = $node->text('marc:subfield[@code="y"]');
+                      if ($chrono !== '') $tmp['subdivisions']['chronological'] = $chrono;
 
                       $geo = $node->text('marc:subfield[@code="z"]');
-                      if ($geo !== '') $tmp['geo'] = $geo;
+                      if ($geo !== '') $tmp['subdivisions']['geographic'] = $geo;
+
+                      $form = $node->text('marc:subfield[@code="v"]');
+                      if ($form !== '') $tmp['subdivisions']['form'] = $form;
 
                       array_push($output['subjects'], $tmp);
                     break;
@@ -200,10 +229,16 @@ class BibliographicParser {
                 case 700:
                     $author = array(
                         'name' => $node->text('marc:subfield[@code="a"]'),
-                        'role' => 'added'
                     );
-                    $authority = $node->text('marc:subfield[@code="0"]');
-                    if (!empty($authority)) $author['authority'] = $authority;
+                    $author['role'] = $node->text('marc:subfield[@code="4"]') 
+                        ?: ($node->text('marc:subfield[@code="e"]') ?: 'added');
+
+                    $this->parseAuthority($node, $author);
+
+                    $dates = $node->text('marc:subfield[@code="d"]');
+                    if (!empty($dates)) {
+                        $author['dates'] = $dates;
+                    }
 
                     $output['authors'][] = $author;
                     break;
@@ -213,8 +248,7 @@ class BibliographicParser {
                         'name' => $node->text('marc:subfield[@code="a"]'),
                         'role' => 'added_corporate'
                     );
-                    $authority = $node->text('marc:subfield[@code="0"]');
-                    if (!empty($authority)) $author['authority'] = $authority;
+                    $this->parseAuthority($node, $author);
 
                     $output['authors'][] = $author;
                     break;

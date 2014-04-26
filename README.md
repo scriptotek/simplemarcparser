@@ -40,3 +40,10 @@ foreach ($record['subjects'] as $subject) {
 	print $subject['term'] . '(' . $subject['system'] . ')';
 }
 ```
+
+# Normalization
+
+Some light normalization is done.
+
+ - colon and hyphen trimmed from title (`How to catch a robot rat :` → `How to catch a robot rat`)
+ - year is converted to a integer by extracting the first four digit integer found (`c2013` → `2013`, `2009 [i.e. 2008]` → `2009` (not sure about this one..))

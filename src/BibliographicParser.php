@@ -268,11 +268,12 @@ class BibliographicParser {
                         //     <marc:subfield code="z">9781107602175</marc:subfield>
                         //     <marc:subfield code="w">(NO-TrBIB)132191512</marc:subfield>
                         // </marc:datafield>
-                    $form = array(
-                        'isbn' => $node->text('marc:subfield[@code="z"]'),
-                        'id' => preg_replace('/\(NO-TrBIB\)/', '', $node->text('marc:subfield[@code="w"]'))
-                    );
-                    $output['other_form'] = $form; // TODO: Should be array!
+                    $form = array();
+                    $isbn = $node->text('marc:subfield[@code="z"]');
+                    $id = preg_replace('/\(NO-TrBIB\)/', '', $node->text('marc:subfield[@code="w"]'));
+                    if (!empty($isbn)) $form['isbn'] = $isbn;
+                    if (!empty($id)) $form['id'] = $id;
+                    $output['other_form'] = $form;
                     break;
 
                 // 830 : Series Added Entry – Uniform Title (R)

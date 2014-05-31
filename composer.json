@@ -1,5 +1,5 @@
 {
-    "name": "danmichaelo/simplemarcparser",
+    "name": "scriptotek/simplemarcparser",
     "description": "A simple MARC21/XML parser",
     "keywords": ["marc"],
     "license": "MIT",

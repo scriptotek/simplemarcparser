@@ -96,7 +96,7 @@ class AuthorityParserTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('person', $out1['class']);
         $this->assertEquals(1933, $out1['birth']);
         $this->assertNull($out1['death']);
-        $this->assertEquals('Dagfinn Bakke', $out1['name']);
+        $this->assertEquals('Dagfinn Bakke', $out1['label']);
 
         $this->assertEquals(1828, $out2['birth']);
         $this->assertEquals(1906, $out2['death']);
@@ -112,7 +112,7 @@ class AuthorityParserTest extends \PHPUnit_Framework_TestCase {
         ');
 
         $this->assertEquals('topicalTerm', $out1['class']);
-        $this->assertEquals('Fotomikrografi : naturvitenskap', $out1['name']);
+        $this->assertEquals('Fotomikrografi : naturvitenskap', $out1['label']);
     }
 
     // 375 - Gender (R)

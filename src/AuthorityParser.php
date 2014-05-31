@@ -70,7 +70,9 @@ class AuthorityParser {
             $output['name'] = $field->text('marc:subfield[@code="a"]');
             $spl = explode(', ', $output['name']);
             if (count($spl) == 2) {
-                $output['name'] = $spl[1] . ' ' . $spl[0];
+                $output['label'] = $spl[1] . ' ' . $spl[0];
+            } else {
+                $output['label'] = $output['name'];
             }
             $bd = $field->text('marc:subfield[@code="d"]');
             $bd = explode('-', $bd);
@@ -96,20 +98,20 @@ class AuthorityParser {
         foreach ($record->xpath('marc:datafield[@tag="150"]') as $field) {
             $output['class'] = 'topicalTerm';
             $output['term'] = $field->text('marc:subfield[@code="a"]');
-            $name = $field->text('marc:subfield[@code="a"]');
+            $label = $field->text('marc:subfield[@code="a"]');
             foreach ($field->xpath('marc:subfield[@code="x"]') as $s) { 
-                $name .= ' : ' . $s;
+                $label .= ' : ' . $s;
             }
             foreach ($field->xpath('marc:subfield[@code="v"]') as $s) {
-                $name .= ' : ' . $s;
+                $label .= ' : ' . $s;
             }
             foreach ($field->xpath('marc:subfield[@code="y"]') as $s) {
-                $name .= ' : ' . $s;
+                $label .= ' : ' . $s;
             }
             foreach ($field->xpath('marc:subfield[@code="z"]') as $s) {
-                $name .= ' : ' . $s;
+                $label .= ' : ' . $s;
             }
-            $output['name'] = $name;
+            $output['label'] = $label;
             // TODO: ...
         }
 

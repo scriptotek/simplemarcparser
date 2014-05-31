@@ -1,10 +1,10 @@
 SimpleMarcParser
 ===============
 
-[![Build Status](https://travis-ci.org/danmichaelo/simplemarcparser.png?branch=master)](https://travis-ci.org/danmichaelo/simplemarcparser)
-[![Coverage Status](https://coveralls.io/repos/danmichaelo/simplemarcparser/badge.png?branch=master)](https://coveralls.io/r/danmichaelo/simplemarcparser?branch=master)
-[![Latest Stable Version](https://poser.pugx.org/danmichaelo/simplemarcparser/version.png)](https://packagist.org/packages/danmichaelo/simplemarcparser)
-[![Total Downloads](https://poser.pugx.org/danmichaelo/simplemarcparser/downloads.png)](https://packagist.org/packages/danmichaelo/simplemarcparser)
+[![Build Status](https://travis-ci.org/scriptotek/simplemarcparser.png?branch=master)](https://travis-ci.org/scriptotek/simplemarcparser)
+[![Coverage Status](https://coveralls.io/repos/scriptotek/simplemarcparser/badge.png?branch=master)](https://coveralls.io/r/scriptotek/simplemarcparser?branch=master)
+[![Latest Stable Version](https://poser.pugx.org/scriptotek/simplemarcparser/version.png)](https://packagist.org/packages/scriptotek/simplemarcparser)
+[![Total Downloads](https://poser.pugx.org/scriptotek/simplemarcparser/downloads.png)](https://packagist.org/packages/scriptotek/simplemarcparser)
 
 
 `SimpleMarcParser` is currently a minimal MARC21/XML parser for use with `QuiteSimpleXMLElement`.
@@ -15,7 +15,7 @@ SimpleMarcParser
 require_once('vendor/autoload.php');
 
 use Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement,
-    Danmichaelo\SimpleMarcParser\BibliographicParser;
+    Scriptotek\SimpleMarcParser\BibliographicParser;
 
 $data = file_get_contents('http://sru.bibsys.no/search/biblio?' . http_build_query(array(
 	'version' => '1.2',

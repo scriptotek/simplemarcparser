@@ -1,4 +1,4 @@
-<?php namespace Danmichaelo\SimpleMarcParser;
+<?php namespace Scriptotek\SimpleMarcParser;
 
 use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
 

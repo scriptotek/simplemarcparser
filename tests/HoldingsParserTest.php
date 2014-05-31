@@ -1,8 +1,8 @@
-<?php namespace Danmichaelo\SimpleMarcParser;
+<?php namespace Scriptotek\SimpleMarcParser;
 
 require 'vendor/autoload.php';
 use Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement;
-use Danmichaelo\SimpleMarcParser\HoldingsParser;
+use Scriptotek\SimpleMarcParser\HoldingsParser;
 
 class HoldingsParserTest extends \PHPUnit_Framework_TestCase {
 

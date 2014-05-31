@@ -1,8 +1,8 @@
-<?php namespace Danmichaelo\SimpleMarcParser;
+<?php namespace Scriptotek\SimpleMarcParser;
 
 require 'vendor/autoload.php';
 use Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement;
-use Danmichaelo\SimpleMarcParser\BibliographicParser;
+use Scriptotek\SimpleMarcParser\BibliographicParser;
 
 class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
 

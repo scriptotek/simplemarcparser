@@ -54,6 +54,7 @@ class AuthorityParser {
         $r = substr($f008, 11, 1);
         $output['vocabulary'] = isset(self::$vocabularies[$r]) ? self::$vocabularies[$r] : null;
 
+        // 040: 
         $source = $record->first('marc:datafield[@tag="040"]');
         if ($source) {
             $output['catalogingAgency'] = $source->text('marc:subfield[@code="a"]') ?: null;
@@ -62,7 +63,6 @@ class AuthorityParser {
             $output['modifyingAgency'] = $source->text('marc:subfield[@code="d"]') ?: null;
             $output['vocabulary'] = $source->text('marc:subfield[@code="f"]') ?: $output['vocabulary'];            
         }
-
 
         // 100: Personal name (NR)
         foreach ($record->xpath('marc:datafield[@tag="100"]') as $field) {
@@ -75,7 +75,7 @@ class AuthorityParser {
             $bd = $field->text('marc:subfield[@code="d"]');
             $bd = explode('-', $bd);
             $output['birth'] = $bd[0] ?: null;
-            $output['death'] = (count($bd) > 0 && $bd[1]) ? $bd[1] : null;
+            $output['death'] = (count($bd) > 1 && $bd[1]) ? $bd[1] : null;
         }
 
         // 110: Corporate Name (NR)

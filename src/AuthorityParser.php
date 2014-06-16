@@ -135,6 +135,11 @@ class AuthorityParser {
             ? $output['genders'][count($output['genders']) - 1]['value']  // assume sane ordering for now
             : null;
 
+        // 400: See From Tracing-Personal Name (R)
+        $output['nameVariants'] = array();
+        foreach ($record->xpath('marc:datafield[@tag="400"]') as $field) {
+            $output['nameVariants'][] = $field->text('marc:subfield[@code="a"]');
+        }
 
         // TODO: rest
 

@@ -143,4 +143,19 @@ class AuthorityParserTest extends \PHPUnit_Framework_TestCase {
         $this->assertNull($out2['gender']);
     }
 
+    // 400 - See From Tracing-Personal Name (R)
+    public function testMarc400() {
+        $out1 = $this->parseRecordData('
+          <marc:datafield tag="400" ind1="1" ind2=" ">
+            <marc:subfield code="a">Rishøi, Ingvild Hedemann</marc:subfield>
+          </marc:datafield>
+          <marc:datafield tag="400" ind1="1" ind2=" ">
+            <marc:subfield code="a">Hedemann Rishøi, Ingvild</marc:subfield>
+          </marc:datafield>
+        ');
+
+        $this->assertCount(2, $out1['nameVariants']);
+        $this->assertEquals('Rishøi, Ingvild Hedemann', $out1['nameVariants'][0]);
+        $this->assertEquals('Hedemann Rishøi, Ingvild', $out1['nameVariants'][1]);
+    }
 }

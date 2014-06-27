@@ -55,8 +55,6 @@ class BibliographicParser {
         $output['fulltext'] = array();
         $output['classifications'] = array();
         $output['notes'] = array();
-        $output['preceding'] = array();
-        $output['succeeding'] = array();
 
         foreach ($record->xpath('marc:datafield') as $node) {
             $marcfield = intval($node->attributes()->tag);
@@ -218,6 +216,23 @@ class BibliographicParser {
                     );
                     break;
 
+                // 580 : Complex Linking Note (R)
+                case 580:
+
+                    if ($record->has('marc:datafield[@tag="780"]')) {
+                        $output['preceding'] = isset($output['preceding']) ? $output['preceding'] : array();
+                        $output['preceding']['note'] = $node->text('marc:subfield[@code="a"]');
+
+                    } else if ($record->has('marc:datafield[@tag="785"]')) {
+                        $output['succeeding'] = isset($output['succeeding']) ? $output['succeeding'] : array();
+                        $output['succeeding']['note'] = $node->text('marc:subfield[@code="a"]');
+
+                    } else if ($record->has('marc:datafield[@tag="773"]')) {
+                        $output['part_of'] = isset($output['part_of']) ? $output['part_of'] : array();
+                        $output['part_of']['note'] = $node->text('marc:subfield[@code="a"]');
+                    }
+                    break;
+
                 case 650:
                     $ind2 = $node->attr('ind2');
                     $emne = $node->text('marc:subfield[@code="a"]');
@@ -287,8 +302,10 @@ class BibliographicParser {
                     $output['authors'][] = $author;
                     break;
 
+                // 773 : Host Item Entry (R)
+                // See also: 580
                 case 773:
-                    $output['part_of'] = array();
+                    $output['part_of'] = isset($output['part_of']) ? $output['part_of'] : array();
                     $output['part_of']['relationship'] = $node->text('marc:subfield[@code="i"]');
                     $output['part_of']['title'] = $node->text('marc:subfield[@code="t"]');
                     $output['part_of']['issn'] = $node->text('marc:subfield[@code="x"]');
@@ -313,24 +330,28 @@ class BibliographicParser {
                     //     <marc:subfield code="w">(NO-TrBIB)920713874</marc:subfield>
                     //     <marc:subfield code="g">nr 80(1961)</marc:subfield>
                     // </marc:datafield>
-                    $tmp = $this->parseRelationship($node);
-                    $ind2 = $node->attr('ind2');
+                    $output['preceding'] = isset($output['preceding']) ? $output['preceding'] : array();
 
+                    if (!isset($output['preceding']['items'])) {
+                        $output['preceding']['items'] = array();
+                    }
+                    $output['preceding']['items'][] = $this->parseRelationship($node);
+
+                    $ind2 = $node->attr('ind2');
                     $relationship_types = array(
                         '0' => 'Continues',
                         '1' => 'Continues in part',
                         '2' => 'Supersedes',
                         '3' => 'Supersedes in part',
-                        '4' => 'Formed by the union of ... and ...',
+                        '4' => 'Formed by the union of',  // ... and ...',
                         '5' => 'Absorbed',
                         '6' => 'Absorbed in part',
                         '7' => 'Separated from',
                     );
                     if (isset($relationship_types[$ind2])) {
-                        $tmp['relationship_type'] = $relationship_types[$ind2];
+                        $output['preceding']['relationship_type'] = $relationship_types[$ind2];
                     }
 
-                    $output['preceding'][] = $tmp;
                     break;
 
                 // 785 : Succeeding Entry (R)
@@ -340,9 +361,14 @@ class BibliographicParser {
                     //     <marc:subfield code="w">(NO-TrBIB)920713874</marc:subfield>
                     //     <marc:subfield code="g">nr 80(1961)</marc:subfield>
                     // </marc:datafield>
-                    $tmp = $this->parseRelationship($node);
-                    $ind2 = $node->attr('ind2');
+                    $output['succeeding'] = isset($output['succeeding']) ? $output['succeeding'] : array();
 
+                    if (!isset($output['succeeding']['items'])) {
+                        $output['succeeding']['items'] = array();
+                    }
+                    $output['succeeding']['items'][] = $this->parseRelationship($node);
+
+                    $ind2 = $node->attr('ind2');
                     $relationship_types = array(
                         '0' => 'Continued by',
                         '1' => 'Continued in part by',
@@ -350,15 +376,14 @@ class BibliographicParser {
                         '3' => 'Superseded in part by',
                         '4' => 'Absorbed by',
                         '5' => 'Absorbed in part by',
-                        '6' => 'Split into ... and ...',
-                        '7' => 'Merged with ... to form ...',
+                        '6' => 'Split into',  // ... and ...',
+                        '7' => 'Merged with',  // ... to form ...',
                         '8' => 'Changed back to',
                     );
-                    if (isset($relationship_types[$ind2])) {
-                        $tmp['relationship_type'] = $relationship_types[$ind2];
-                    }
 
-                    $output['succeeding'][] = $tmp;
+                    if (isset($relationship_types[$ind2])) {
+                        $output['succeeding']['relationship_type'] = $relationship_types[$ind2];
+                    }
                     break;
 
                 // 830 : Series Added Entry – Uniform Title (R)

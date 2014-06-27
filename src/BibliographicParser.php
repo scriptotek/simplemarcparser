@@ -32,6 +32,7 @@ class BibliographicParser {
         $output['is_multivolume'] = false;
         $output['fulltext'] = array();
         $output['classifications'] = array();
+        $output['notes'] = array();
 
         foreach ($record->xpath('marc:datafield') as $node) {
             $marcfield = intval($node->attributes()->tag);
@@ -141,9 +142,11 @@ class BibliographicParser {
                     if ($medium !== '') $output['medium'] = $medium;
 
                     break;
+
                 case 250:
                     $output['edition'] = $node->text('marc:subfield[@code="a"]');
                     break;
+
                 case 260:
                     $output['publisher'] = $node->text('marc:subfield[@code="b"]');
                     $y = preg_replace('/^.*?([0-9]{4}).*$/', '\1', current($node->xpath('marc:subfield[@code="c"]')));
@@ -162,6 +165,13 @@ class BibliographicParser {
                     $output['series'][] = $serie;
                     break;
                 */
+
+                // 500 : General Note (R)
+                case 500:
+
+                    // $a - General note (NR)
+                    $output['notes'][] = $node->text('marc:subfield[@code="a"]');
+                    break;
 
                 case 505:
 

@@ -103,6 +103,12 @@ class HoldingsParser {
                     }
 
                     break;
+
+                case 866:
+                    // 866: Textual Holdings-General Information
+                    $output['holdings'] = $node->text('marc:subfield[@code="a"]');
+
+                    break;
             }
         }
         return $output;

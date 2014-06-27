@@ -117,4 +117,16 @@ class HoldingsParserTest extends \PHPUnit_Framework_TestCase {
         }
 
     }
+
+    public function testMarc866() {
+
+        $out = $this->parseRecordData('
+            <marc:datafield tag="866" ind1="3" ind2="0">
+                <marc:subfield code="a">1(1969/70)-34(1997/99)</marc:subfield>
+            </marc:datafield>
+        ');
+        $this->assertEquals('1(1969/70)-34(1997/99)', $out['holdings']);
+
+    }
+
 }

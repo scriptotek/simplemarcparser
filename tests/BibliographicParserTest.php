@@ -314,6 +314,36 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('022991026', $out['other_form']['id']);
     }
 
+    public function testMarc780() {
+        $out = $this->parseRecordData('
+            <marc:datafield tag="780" ind1="0" ind2="0">
+                <marc:subfield code="w">(NO-TrBIB)920713874</marc:subfield>
+                <marc:subfield code="g">nr 80(1961)</marc:subfield>
+            </marc:datafield>
+        ');
+
+        $this->assertCount(0, $out['succeeding']);
+        $this->assertCount(1, $out['preceding']);
+        $this->assertEquals('Continues', $out['preceding'][0]['relationship_type']);
+        $this->assertEquals('920713874', $out['preceding'][0]['id']);
+        $this->assertEquals('nr 80(1961)', $out['preceding'][0]['related_parts']);
+    }
+
+    public function testMarc785() {
+        $out = $this->parseRecordData('
+            <marc:datafield tag="785" ind1="0" ind2="1">
+                <marc:subfield code="w">(NO-TrBIB)920713874</marc:subfield>
+                <marc:subfield code="g">nr 80(1961)</marc:subfield>
+            </marc:datafield>
+        ');
+
+        $this->assertCount(1, $out['succeeding']);
+        $this->assertCount(0, $out['preceding']);
+        $this->assertEquals('Continued in part by', $out['succeeding'][0]['relationship_type']);
+        $this->assertEquals('920713874', $out['succeeding'][0]['id']);
+        $this->assertEquals('nr 80(1961)', $out['succeeding'][0]['related_parts']);
+    }
+
     public function testMarc830() {
         $out = $this->parseRecordData('
             <marc:datafield tag="830" ind1=" " ind2=" ">

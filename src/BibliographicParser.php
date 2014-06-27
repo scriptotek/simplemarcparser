@@ -19,6 +19,28 @@ class BibliographicParser {
         }
     }
 
+    public function parseRelationship($node)
+    {
+        $rel = array();
+
+        $x = preg_replace('/\(.*?\)/', '', $node->text('marc:subfield[@code="w"]'));
+        if (!empty($x)) $rel['id'] = $x;
+
+        $x = $node->text('marc:subfield[@code="t"]');
+        if (!empty($x)) $rel['title'] = $x;
+
+        $x = $node->text('marc:subfield[@code="g"]');
+        if (!empty($x)) $rel['related_parts'] = $x;
+
+        $x = $node->text('marc:subfield[@code="x"]');
+        if (!empty($x)) $rel['issn'] = $x;
+
+        $x = $node->text('marc:subfield[@code="z"]');
+        if (!empty($x)) $rel['isbn'] = $x;
+
+        return $rel;
+    }
+
     public function parse(QuiteSimpleXmlElement $record) {
 
         $output = array();
@@ -33,6 +55,8 @@ class BibliographicParser {
         $output['fulltext'] = array();
         $output['classifications'] = array();
         $output['notes'] = array();
+        $output['preceding'] = array();
+        $output['succeeding'] = array();
 
         foreach ($record->xpath('marc:datafield') as $node) {
             $marcfield = intval($node->attributes()->tag);
@@ -278,12 +302,63 @@ class BibliographicParser {
                         //     <marc:subfield code="z">9781107602175</marc:subfield>
                         //     <marc:subfield code="w">(NO-TrBIB)132191512</marc:subfield>
                         // </marc:datafield>
-                    $form = array();
-                    $isbn = $node->text('marc:subfield[@code="z"]');
-                    $id = preg_replace('/\(NO-TrBIB\)/', '', $node->text('marc:subfield[@code="w"]'));
-                    if (!empty($isbn)) $form['isbn'] = $isbn;
-                    if (!empty($id)) $form['id'] = $id;
-                    $output['other_form'] = $form;
+                    $tmp = $this->parseRelationship($node);
+                    $output['other_form'] = $tmp;
+                    break;
+
+                // 780 : Preceding Entry (R)
+                // Information concerning the immediate predecessor of the target item
+                case 780:
+                    // <marc:datafield tag="780" ind1="0" ind2="0">
+                    //     <marc:subfield code="w">(NO-TrBIB)920713874</marc:subfield>
+                    //     <marc:subfield code="g">nr 80(1961)</marc:subfield>
+                    // </marc:datafield>
+                    $tmp = $this->parseRelationship($node);
+                    $ind2 = $node->attr('ind2');
+
+                    $relationship_types = array(
+                        '0' => 'Continues',
+                        '1' => 'Continues in part',
+                        '2' => 'Supersedes',
+                        '3' => 'Supersedes in part',
+                        '4' => 'Formed by the union of ... and ...',
+                        '5' => 'Absorbed',
+                        '6' => 'Absorbed in part',
+                        '7' => 'Separated from',
+                    );
+                    if (isset($relationship_types[$ind2])) {
+                        $tmp['relationship_type'] = $relationship_types[$ind2];
+                    }
+
+                    $output['preceding'][] = $tmp;
+                    break;
+
+                // 785 : Succeeding Entry (R)
+                // Information concerning the immediate successor to the target item
+                case 785:
+                    // <marc:datafield tag="785" ind1="0" ind2="0">
+                    //     <marc:subfield code="w">(NO-TrBIB)920713874</marc:subfield>
+                    //     <marc:subfield code="g">nr 80(1961)</marc:subfield>
+                    // </marc:datafield>
+                    $tmp = $this->parseRelationship($node);
+                    $ind2 = $node->attr('ind2');
+
+                    $relationship_types = array(
+                        '0' => 'Continued by',
+                        '1' => 'Continued in part by',
+                        '2' => 'Superseded by',
+                        '3' => 'Superseded in part by',
+                        '4' => 'Absorbed by',
+                        '5' => 'Absorbed in part by',
+                        '6' => 'Split into ... and ...',
+                        '7' => 'Merged with ... to form ...',
+                        '8' => 'Changed back to',
+                    );
+                    if (isset($relationship_types[$ind2])) {
+                        $tmp['relationship_type'] = $relationship_types[$ind2];
+                    }
+
+                    $output['succeeding'][] = $tmp;
                     break;
 
                 // 830 : Series Added Entry – Uniform Title (R)

@@ -7,8 +7,6 @@ class BibliographicRecord extends Record implements JsonableInterface {
 
     public function __construct(QuiteSimpleXmlElement $data) {
 
-        $output = array();
-
         $leader = $data->text('marc:leader');
         // Field 008/18-34 Configuration
         // If Leader/06 = a and Leader/07 = a, c, d, or m: Books
@@ -63,7 +61,6 @@ class BibliographicRecord extends Record implements JsonableInterface {
         $succeeding = array();
         $part_of = array();
         $other_form = array();
-        // $fulltext = array();
 
         $this->is_series = false;
         $this->is_multivolume = false;
@@ -473,7 +470,6 @@ class BibliographicRecord extends Record implements JsonableInterface {
         $this->subjects = $subjects;
         $this->classifications = $classifications;
         $this->notes = $notes;
-        // $this->fulltext = $fulltext;
     }
 
 }

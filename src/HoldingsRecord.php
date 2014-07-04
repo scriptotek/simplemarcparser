@@ -43,12 +43,11 @@ class HoldingsRecord extends Record implements JsonableInterface {
 
     public function __construct(QuiteSimpleXmlElement $data) {
 
-        $output = array();
+        $this->id = $data->text('marc:controlfield[@tag="001"]');  // Dokid
 
-        $output['id'] = $data->text('marc:controlfield[@tag="001"]');  // Dokid
-        $output['fulltext'] = array();
-        $output['nonpublic_notes'] = array();
-        $output['public_notes'] = array();
+        $fulltext = array();
+        $nonpublic_notes = array();
+        $public_notes = array();
 
         foreach ($data->xpath('marc:datafield') as $node) {
             $marcfield = intval($node->attributes()->tag);
@@ -56,16 +55,16 @@ class HoldingsRecord extends Record implements JsonableInterface {
 
                 case 852:
                     // http://www.loc.gov/marc/holdings/concise/hd852.html
-                    $output['location'] = $node->text('marc:subfield[@code="a"]');          // NR
-                    $output['sublocation'] = $node->text('marc:subfield[@code="b"]');       // R  (i praksis??)
-                    $output['shelvinglocation'] = $node->text('marc:subfield[@code="c"]');  // R  (i praksis??)
-                    $output['callcode'] = $node->text('marc:subfield[@code="h"]');          // NR
+                    $this->location = $node->text('marc:subfield[@code="a"]');          // NR
+                    $this->sublocation = $node->text('marc:subfield[@code="b"]');       // R  (i praksis??)
+                    $this->shelvinglocation = $node->text('marc:subfield[@code="c"]');  // R  (i praksis??)
+                    $this->callcode = $node->text('marc:subfield[@code="h"]');          // NR
 
                     if (($x = $node->text('marc:subfield[@code="x"]')) !== '') {     // R
-                        $output['nonpublic_notes'][] = $x;
+                        $nonpublic_notes[] = $x;
                     }
                     if (($x = $node->text('marc:subfield[@code="z"]')) !== '') {     // R
-                        $output['public_notes'][] = $x;
+                        $public_notes[] = $x;
                     }
 
                     break;
@@ -73,7 +72,7 @@ class HoldingsRecord extends Record implements JsonableInterface {
                 case 856:
                     $description = $node->text('marc:subfield[@code="3"]');
                     if (in_array($description, array('Fulltekst','Fulltext'))) {
-                        $output['fulltext'][] = array(
+                        $fulltext[] = array(
                             'url' => $node->text('marc:subfield[@code="u"]'),
                             'provider' => $node->text('marc:subfield[@code="y"]'),
                             'comment' => $node->text('marc:subfield[@code="z"]')
@@ -88,14 +87,14 @@ class HoldingsRecord extends Record implements JsonableInterface {
                     $x = $node->text('marc:subfield[@code="f"]');
                     if ($x !== '') {
                         if (isset(HoldingsRecord::$m859_f[$x])) {
-                            $output['use_restrictions'] = HoldingsRecord::$m859_f[$x];
+                            $this->use_restrictions = HoldingsRecord::$m859_f[$x];
                         }
                     }
 
                     $x = $node->text('marc:subfield[@code="h"]');
                     if ($x !== '') {
                         if (isset(HoldingsRecord::$m859_h[$x])) {
-                            $output['circulation_status'] = HoldingsRecord::$m859_h[$x];
+                            $this->circulation_status = HoldingsRecord::$m859_h[$x];
                         }
                     }
 
@@ -103,13 +102,15 @@ class HoldingsRecord extends Record implements JsonableInterface {
 
                 case 866:
                     // 866: Textual Holdings-General Information
-                    $output['holdings'] = $node->text('marc:subfield[@code="a"]');
+                    $this->holdings = $node->text('marc:subfield[@code="a"]');
 
                     break;
             }
         }
 
-        $this->data = $output;
+        $this->fulltext = $fulltext;
+        $this->nonpublic_notes = $nonpublic_notes;
+        $this->public_notes = $public_notes;
     }
 
 }

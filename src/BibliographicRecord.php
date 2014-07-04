@@ -2,50 +2,15 @@
 
 use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
 
-class BibliographicParser {
+class BibliographicRecord extends Record {
 
-    public function __construct() {
-
-    }
-
-    private function parseAuthority(&$node, &$out) {
-        $authority = $node->text('marc:subfield[@code="0"]');
-        if (!empty($authority)) {
-            $out['authority'] = $authority;
-            $asplit = explode(')', $authority);
-            if (substr($authority, 1, 8) === 'NO-TrBIB') {
-                $out['bibsys_identifier'] = substr($authority, strpos($authority, ')') + 1);
-            }
-        }
-    }
-
-    public function parseRelationship($node)
-    {
-        $rel = array();
-
-        $x = preg_replace('/\(.*?\)/', '', $node->text('marc:subfield[@code="w"]'));
-        if (!empty($x)) $rel['id'] = $x;
-
-        $x = $node->text('marc:subfield[@code="t"]');
-        if (!empty($x)) $rel['title'] = $x;
-
-        $x = $node->text('marc:subfield[@code="g"]');
-        if (!empty($x)) $rel['related_parts'] = $x;
-
-        $x = $node->text('marc:subfield[@code="x"]');
-        if (!empty($x)) $rel['issn'] = $x;
-
-        $x = $node->text('marc:subfield[@code="z"]');
-        if (!empty($x)) $rel['isbn'] = $x;
-
-        return $rel;
-    }
-
-    public function parse(QuiteSimpleXmlElement $record) {
+    public function __construct(QuiteSimpleXmlElement $data) {
 
         $output = array();
 
-        $output['id'] = $record->text('marc:controlfield[@tag="001"]');
+        $leader = $data->text('marc:leader');
+
+        $output['id'] = $data->text('marc:controlfield[@tag="001"]');
         $output['authors'] = array();
         $output['subjects'] = array();
         $output['series'] = array();
@@ -56,7 +21,7 @@ class BibliographicParser {
         $output['classifications'] = array();
         $output['notes'] = array();
 
-        foreach ($record->xpath('marc:datafield') as $node) {
+        foreach ($data->xpath('marc:datafield') as $node) {
             $marcfield = intval($node->attributes()->tag);
             switch ($marcfield) {
                 /*
@@ -228,15 +193,15 @@ class BibliographicParser {
                 // 580 : Complex Linking Note (R)
                 case 580:
 
-                    if ($record->has('marc:datafield[@tag="780"]')) {
+                    if ($data->has('marc:datafield[@tag="780"]')) {
                         $output['preceding'] = isset($output['preceding']) ? $output['preceding'] : array();
                         $output['preceding']['note'] = $node->text('marc:subfield[@code="a"]');
 
-                    } else if ($record->has('marc:datafield[@tag="785"]')) {
+                    } else if ($data->has('marc:datafield[@tag="785"]')) {
                         $output['succeeding'] = isset($output['succeeding']) ? $output['succeeding'] : array();
                         $output['succeeding']['note'] = $node->text('marc:subfield[@code="a"]');
 
-                    } else if ($record->has('marc:datafield[@tag="773"]')) {
+                    } else if ($data->has('marc:datafield[@tag="773"]')) {
                         $output['part_of'] = isset($output['part_of']) ? $output['part_of'] : array();
                         $output['part_of']['note'] = $node->text('marc:subfield[@code="a"]');
                     }
@@ -451,7 +416,8 @@ class BibliographicParser {
 
             }
         }
-        return $output;
+
+        $this->data = $output;
     }
 
 }

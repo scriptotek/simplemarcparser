@@ -2,9 +2,9 @@
 
 require 'vendor/autoload.php';
 use Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement;
-use Scriptotek\SimpleMarcParser\BibliographicParser;
+use Scriptotek\SimpleMarcParser\BibliographicRecord;
 
-class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
+class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
 
     private function parseRecordData($data)
     {
@@ -16,8 +16,7 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
             'marc' => 'http://www.loc.gov/MARC21/slim'
         ));
 
-        $parser = new BibliographicParser;
-        return $parser->parse($dom);
+        return new BibliographicRecord($dom);
     }
 
     public function testMarc001() {
@@ -25,7 +24,7 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
             <marc:controlfield tag="001">12149361x</marc:controlfield>
         ');
 
-        $this->assertEquals('12149361x', $out['id']);
+        $this->assertEquals('12149361x', $out->id);
     }
 
     public function testMarc010() {
@@ -35,7 +34,7 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertEquals('2012011618', $out['lccn']);
+        $this->assertEquals('2012011618', $out->lccn);
     }
 
     public function testIsbn() {
@@ -47,8 +46,8 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertCount(1, $out['isbn']);
-        $this->assertEquals('978-8243005129', $out['isbn'][0]);
+        $this->assertCount(1, $out->isbn);
+        $this->assertEquals('978-8243005129', $out->isbn[0]);
     }
 
     public function testCanceledIsbn() {
@@ -60,7 +59,7 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertArrayNotHasKey('isbn', $out);
+        $this->assertNull($out->isbn);
     }
 
     public function testIsbnWithX() {
@@ -71,7 +70,7 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertEquals('1-85723-457-X', $out['isbn'][0]);
+        $this->assertEquals('1-85723-457-X', $out->isbn[0]);
     }
 
     public function testMarc082() {
@@ -82,7 +81,7 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $klass = $out['classifications'][0];
+        $klass = $out->classifications[0];
         $this->assertEquals('dewey', $klass['system']);
         $this->assertEquals('333.91402', $klass['number']);
         $this->assertEquals('23', $klass['edition']);
@@ -98,7 +97,7 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $klass = $out['classifications'][0];
+        $klass = $out->classifications[0];
         $this->assertEquals('dewey', $klass['system']);
         $this->assertEquals('639.3', $klass['number']);
         $this->assertEquals('5/nor', $klass['edition']);
@@ -115,9 +114,9 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertCount(1, $out['authors']);
+        $this->assertCount(1, $out->authors);
 
-        $el = $out['authors'][0];
+        $el = $out->authors[0];
         $this->assertEquals('Bjerkestrand, Bernt', $el['name']);
         $this->assertEquals('x12001130', $el['bibsys_identifier']);
     }
@@ -129,9 +128,9 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertCount(1, $out['authors']);
+        $this->assertCount(1, $out->authors);
 
-        $el = $out['authors'][0];
+        $el = $out->authors[0];
         $this->assertEquals('Bjerkestrand, Bernt', $el['name']);
         $this->assertArrayNotHasKey('authority', $el);
     }
@@ -159,9 +158,9 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertEquals('Evolusjon', $out['title']);
-        $this->assertEquals('naturens kulturhistorie', $out['subtitle']);
-        $this->assertEquals('[videoopptak]', $out['medium']);
+        $this->assertEquals('Evolusjon', $out->title);
+        $this->assertEquals('naturens kulturhistorie', $out->subtitle);
+        $this->assertEquals('[videoopptak]', $out->medium);
     }
 
     public function testMarc245part() {
@@ -186,14 +185,14 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertArrayNotHasKey('part_no', $out1);
-        $this->assertArrayNotHasKey('part_name', $out1);
-        $this->assertArrayNotHasKey('part_name', $out2);
+        $this->assertNull($out1->part_no);
+        $this->assertNull($out1->part_name);
+        $this->assertNull($out2->part_name);
 
-        $this->assertEquals('Part one', $out2['part_no']);
-        $this->assertEquals('CD1', $out3['part_no']);
-        $this->assertEquals('[1921-1941]', $out3['part_name']);
-        $this->assertEquals('[lydopptak]', $out3['medium']);
+        $this->assertEquals('Part one', $out2->part_no);
+        $this->assertEquals('CD1', $out3->part_no);
+        $this->assertEquals('[1921-1941]', $out3->part_name);
+        $this->assertEquals('[lydopptak]', $out3->medium);
     }
 
     public function testMarc250() {
@@ -222,9 +221,9 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertEquals(2013, $out1['year']);
-        $this->assertEquals(2009, $out2['year']);
-        $this->assertNull($out3['year']);
+        $this->assertEquals(2013, $out1->year);
+        $this->assertEquals(2009, $out2->year);
+        $this->assertNull($out3->year);
     }
 
     public function testMarc300() {
@@ -243,11 +242,11 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertEquals('353 s.', $out1['extent']);
-        $this->assertEquals(353, $out1['pages']);
+        $this->assertEquals('353 s.', $out1->extent);
+        $this->assertEquals(353, $out1->pages);
 
-        $this->assertEquals('1 videoplate (DVD-video) (1 t 36 min)', $out2['extent']);
-        $this->assertArrayNotHasKey('pages', $out2);
+        $this->assertEquals('1 videoplate (DVD-video) (1 t 36 min)', $out2->extent);
+        $this->assertNull($out2->pages);
     }
 
     public function testMarc500() {
@@ -257,8 +256,8 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertCount(1, $out['notes']);
-        $this->assertEquals('Forts.som: Acoustical imaging. 8(1980)', $out['notes'][0]);
+        $this->assertCount(1, $out->notes);
+        $this->assertEquals('Forts.som: Acoustical imaging. 8(1980)', $out->notes[0]);
     }
 
     public function testMarc650() {
@@ -276,15 +275,15 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertCount(1, $out1['subjects']);
-        $this->assertEquals('tekord', $out1['subjects'][0]['vocabulary']);
-        $this->assertEquals('sjømat', $out1['subjects'][0]['term']);
-        $this->assertEquals('Norge', $out1['subjects'][0]['subdivisions']['geographic']);
+        $this->assertCount(1, $out1->subjects);
+        $this->assertEquals('tekord', $out1->subjects[0]['vocabulary']);
+        $this->assertEquals('sjømat', $out1->subjects[0]['term']);
+        $this->assertEquals('Norge', $out1->subjects[0]['subdivisions']['geographic']);
 
-        $this->assertCount(1, $out2['subjects']);
-        $this->assertEquals('lcsh', $out2['subjects'][0]['vocabulary']);
-        $this->assertEquals('Optoelectronics industry', $out2['subjects'][0]['term']);
-        $this->assertEquals('Directories', $out2['subjects'][0]['subdivisions']['topical']);
+        $this->assertCount(1, $out2->subjects);
+        $this->assertEquals('lcsh', $out2->subjects[0]['vocabulary']);
+        $this->assertEquals('Optoelectronics industry', $out2->subjects[0]['term']);
+        $this->assertEquals('Directories', $out2->subjects[0]['subdivisions']['topical']);
     }
 
     public function testMarc700() {
@@ -297,11 +296,11 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertCount(1, $out1['authors']);
-        $this->assertEquals('Almås, Karl Andreas', $out1['authors'][0]['name']);
-        $this->assertEquals('red.', $out1['authors'][0]['role']);
-        $this->assertEquals('1952-', $out1['authors'][0]['dates']);
-        $this->assertEquals('x90235102', $out1['authors'][0]['bibsys_identifier']);
+        $this->assertCount(1, $out1->authors);
+        $this->assertEquals('Almås, Karl Andreas', $out1->authors[0]['name']);
+        $this->assertEquals('red.', $out1->authors[0]['role']);
+        $this->assertEquals('1952-', $out1->authors[0]['dates']);
+        $this->assertEquals('x90235102', $out1->authors[0]['bibsys_identifier']);
     }
 
     public function testMarc710() {
@@ -322,7 +321,7 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertEquals('022991026', $out['other_form']['id']);
+        $this->assertEquals('022991026', $out->other_form['id']);
     }
 
     public function testPreceding() {
@@ -333,10 +332,10 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertEquals('Continues', $out['preceding']['relationship_type']);
-        $this->assertCount(1, $out['preceding']['items']);
-        $this->assertEquals('920713874', $out['preceding']['items'][0]['id']);
-        $this->assertEquals('nr 80(1961)', $out['preceding']['items'][0]['related_parts']);
+        $this->assertEquals('Continues', $out->preceding['relationship_type']);
+        $this->assertCount(1, $out->preceding['items']);
+        $this->assertEquals('920713874', $out->preceding['items'][0]['id']);
+        $this->assertEquals('nr 80(1961)', $out->preceding['items'][0]['related_parts']);
     }
 
     public function testComplexSucceeding() {
@@ -368,16 +367,16 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertEquals('Merged with', $out['succeeding']['relationship_type']);
+        $this->assertEquals('Merged with', $out->succeeding['relationship_type']);
         $this->assertEquals(
             'Slått sammen med: Comments on astrophysics : a journal of critical discussion of the current literature, 18(1995/96) og: Comments on condensed matter physics : a journal of critical discussion of the current literature, 18(1998) og: Comments on nuclear and particle physics : a journal of critical discussion of the current literature, 22(1998) og: Comments on plasma physics and controlled fusion : a journal of critical discussion of the current literature, 18(1999) til: Comments on modern physics (trykt utg.), 1(1999)',
-            $out['succeeding']['note']
+            $out->succeeding['note']
         );
-        $this->assertCount(5, $out['succeeding']['items']);
-        $this->assertEquals('841195196', $out['succeeding']['items'][0]['id']);
-        $this->assertEquals('18(1995/96)', $out['succeeding']['items'][0]['related_parts']);
-        $this->assertEquals('990840832', $out['succeeding']['items'][4]['id']);
-        $this->assertEquals('1(1999)', $out['succeeding']['items'][4]['related_parts']);
+        $this->assertCount(5, $out->succeeding['items']);
+        $this->assertEquals('841195196', $out->succeeding['items'][0]['id']);
+        $this->assertEquals('18(1995/96)', $out->succeeding['items'][0]['related_parts']);
+        $this->assertEquals('990840832', $out->succeeding['items'][4]['id']);
+        $this->assertEquals('1(1999)', $out->succeeding['items'][4]['related_parts']);
     }
 
     public function testMarc830() {
@@ -396,14 +395,14 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertCount(2, $out['series']);
-        $this->assertEquals('Physica mathematica Universitatis Osloensis', $out['series'][0]['title']);
-        $this->assertEquals('32', $out['series'][0]['volume']);
-        $this->assertEquals('922367817', $out['series'][0]['id']);
+        $this->assertCount(2, $out->series);
+        $this->assertEquals('Physica mathematica Universitatis Osloensis', $out->series[0]['title']);
+        $this->assertEquals('32', $out->series[0]['volume']);
+        $this->assertEquals('922367817', $out->series[0]['id']);
 
-        $this->assertEquals('Report series (Universitetet i Oslo. Fysisk institutt) (trykt utg.)', $out['series'][1]['title']);
-        $this->assertEquals('94-13', $out['series'][1]['volume']);
-        $this->assertEquals('812037006', $out['series'][1]['id']);
+        $this->assertEquals('Report series (Universitetet i Oslo. Fysisk institutt) (trykt utg.)', $out->series[1]['title']);
+        $this->assertEquals('94-13', $out->series[1]['volume']);
+        $this->assertEquals('812037006', $out->series[1]['id']);
     }
 
     public function testMarc956() {
@@ -433,14 +432,14 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertFalse($out1['is_series']);
-        $this->assertFalse($out1['is_multivolume']);
+        $this->assertFalse($out1->is_series);
+        $this->assertFalse($out1->is_multivolume);
 
-        $this->assertTrue($out2['is_series']);
-        $this->assertFalse($out2['is_multivolume']);
+        $this->assertTrue($out2->is_series);
+        $this->assertFalse($out2->is_multivolume);
 
-        $this->assertFalse($out3['is_series']);
-        $this->assertTrue($out3['is_multivolume']);
+        $this->assertFalse($out3->is_series);
+        $this->assertTrue($out3->is_multivolume);
 
     }
 

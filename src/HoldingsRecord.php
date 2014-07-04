@@ -2,7 +2,7 @@
 
 use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
 
-class HoldingsParser {
+class HoldingsRecord extends Record {
 
     // 859 $f: Use restrictions / Tilgjengelighet
     // Ref: http://www.bibsys.no/files/out/biblev/utlaanstatus-marc21.pdf
@@ -40,20 +40,16 @@ class HoldingsParser {
         '14' => 'Supplied (i.e. return not required'
     );
 
-    public function __construct() {
-
-    }
-
-    public function parse(QuiteSimpleXmlElement $record) {
+    public function __construct(QuiteSimpleXmlElement $data) {
 
         $output = array();
 
-        $output['id'] = $record->text('marc:controlfield[@tag="001"]');  // Dokid
+        $output['id'] = $data->text('marc:controlfield[@tag="001"]');  // Dokid
         $output['fulltext'] = array();
         $output['nonpublic_notes'] = array();
         $output['public_notes'] = array();
 
-        foreach ($record->xpath('marc:datafield') as $node) {
+        foreach ($data->xpath('marc:datafield') as $node) {
             $marcfield = intval($node->attributes()->tag);
             switch ($marcfield) {
 
@@ -90,15 +86,15 @@ class HoldingsParser {
                     // 859 $f: Use restrictions / Tilgjengelighet
                     $x = $node->text('marc:subfield[@code="f"]');
                     if ($x !== '') {
-                        if (isset(HoldingsParser::$m859_f[$x])) {
-                            $output['use_restrictions'] = HoldingsParser::$m859_f[$x];
+                        if (isset(HoldingsRecord::$m859_f[$x])) {
+                            $output['use_restrictions'] = HoldingsRecord::$m859_f[$x];
                         }
                     }
 
                     $x = $node->text('marc:subfield[@code="h"]');
                     if ($x !== '') {
-                        if (isset(HoldingsParser::$m859_h[$x])) {
-                            $output['circulation_status'] = HoldingsParser::$m859_h[$x];
+                        if (isset(HoldingsRecord::$m859_h[$x])) {
+                            $output['circulation_status'] = HoldingsRecord::$m859_h[$x];
                         }
                     }
 
@@ -111,7 +107,8 @@ class HoldingsParser {
                     break;
             }
         }
-        return $output;
+
+        $this->data = $output;
     }
 
 }

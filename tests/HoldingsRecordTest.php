@@ -2,9 +2,9 @@
 
 require 'vendor/autoload.php';
 use Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement;
-use Scriptotek\SimpleMarcParser\HoldingsParser;
+use Scriptotek\SimpleMarcParser\HoldingsRecord;
 
-class HoldingsParserTest extends \PHPUnit_Framework_TestCase {
+class HoldingsRecordTest extends \PHPUnit_Framework_TestCase {
 
     private function parseRecordData($data)
     {
@@ -16,8 +16,7 @@ class HoldingsParserTest extends \PHPUnit_Framework_TestCase {
             'marc' => 'http://www.loc.gov/MARC21/slim'
         ));
 
-        $parser = new HoldingsParser;
-        return $parser->parse($dom);
+        return new HoldingsRecord($dom);
     }
 
     public function testMarc001() {
@@ -25,7 +24,7 @@ class HoldingsParserTest extends \PHPUnit_Framework_TestCase {
             <marc:controlfield tag="001">12149361x</marc:controlfield>
         ');
 
-        $this->assertEquals('12149361x', $out['id']);
+        $this->assertEquals('12149361x', $out->id);
     }
 
     public function testMarc852full() {
@@ -40,14 +39,14 @@ class HoldingsParserTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertEquals('HIT', $out['location']);
-        $this->assertEquals('HIT/BØ', $out['sublocation']);
-        $this->assertEquals('BØ', $out['shelvinglocation']);
-        $this->assertEquals('633 A', $out['callcode']);
-        $this->assertCount(1, $out['public_notes']);
-        $this->assertCount(1, $out['nonpublic_notes']);
-        $this->assertEquals('Tidligere eier: KJEMIBIB', $out['nonpublic_notes'][0]);
-        $this->assertEquals('(tapt?)', $out['public_notes'][0]);
+        $this->assertEquals('HIT', $out->location);
+        $this->assertEquals('HIT/BØ', $out->sublocation);
+        $this->assertEquals('BØ', $out->shelvinglocation);
+        $this->assertEquals('633 A', $out->callcode);
+        $this->assertCount(1, $out->public_notes);
+        $this->assertCount(1, $out->nonpublic_notes);
+        $this->assertEquals('Tidligere eier: KJEMIBIB', $out->nonpublic_notes[0]);
+        $this->assertEquals('(tapt?)', $out->public_notes[0]);
     }
 
     public function testMarc852minimal() {
@@ -60,12 +59,12 @@ class HoldingsParserTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertEquals('HIT', $out['location']);
-        $this->assertEquals('HIT/BØ', $out['sublocation']);
-        $this->assertEquals('BØ', $out['shelvinglocation']);
-        $this->assertEquals('633 A', $out['callcode']);
-        $this->assertCount(0, $out['public_notes']);
-        $this->assertCount(0, $out['nonpublic_notes']);
+        $this->assertEquals('HIT', $out->location);
+        $this->assertEquals('HIT/BØ', $out->sublocation);
+        $this->assertEquals('BØ', $out->shelvinglocation);
+        $this->assertEquals('633 A', $out->callcode);
+        $this->assertCount(0, $out->public_notes);
+        $this->assertCount(0, $out->nonpublic_notes);
     }
 
     public function testMarc856() {
@@ -78,8 +77,8 @@ class HoldingsParserTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertEquals(1, count($out['fulltext']));
-        $ft = $out['fulltext'][0];
+        $this->assertEquals(1, count($out->fulltext));
+        $ft = $out->fulltext[0];
         $this->assertEquals('NB Digital', $ft['provider']);
         $this->assertEquals('http://urn.nb.no/URN:NBN:no-nb_digibok_2012071308172', $ft['url']);
         $this->assertEquals('Elektronisk reproduksjon. Tilgjengelig på NBs lesesal', $ft['comment']);
@@ -92,28 +91,28 @@ class HoldingsParserTest extends \PHPUnit_Framework_TestCase {
                 <marc:subfield code="f">0</marc:subfield>
             </marc:datafield>
         ');
-        $this->assertNotContains('use_restrictions', $out);
+        $this->assertNull($out->use_restrictions);
 
-        foreach (HoldingsParser::$m859_f as $key => $value) {
+        foreach (HoldingsRecord::$m859_f as $key => $value) {
             $out = $this->parseRecordData('
                 <marc:datafield tag="859" ind1=" " ind2=" ">
                     <marc:subfield code="f">' . $key . '</marc:subfield>
                 </marc:datafield>
             ');
-            $this->assertEquals($value, $out['use_restrictions']);
+            $this->assertEquals($value, $out->use_restrictions);
         }
 
     }
 
     public function testMarc859h() {
 
-        foreach (HoldingsParser::$m859_h as $key => $value) {
+        foreach (HoldingsRecord::$m859_h as $key => $value) {
             $out = $this->parseRecordData('
                 <marc:datafield tag="859" ind1=" " ind2=" ">
                     <marc:subfield code="h">' . $key . '</marc:subfield>
                 </marc:datafield>
             ');
-            $this->assertEquals($value, $out['circulation_status']);
+            $this->assertEquals($value, $out->circulation_status);
         }
 
     }
@@ -125,7 +124,7 @@ class HoldingsParserTest extends \PHPUnit_Framework_TestCase {
                 <marc:subfield code="a">1(1969/70)-34(1997/99)</marc:subfield>
             </marc:datafield>
         ');
-        $this->assertEquals('1(1969/70)-34(1997/99)', $out['holdings']);
+        $this->assertEquals('1(1969/70)-34(1997/99)', $out->holdings);
 
     }
 

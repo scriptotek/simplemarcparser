@@ -3,7 +3,7 @@
 use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
 use Carbon\Carbon;
 
-class AuthorityParser {
+class AuthorityRecord extends Record {
 
     // http://www.loc.gov/marc/authority/ad008.html
     public static $cat_rules = array(
@@ -25,37 +25,33 @@ class AuthorityParser {
         'v' => 'rvm', // Répertoire de vedettes-matière
     );
 
-    public function __construct() {
-
-    }
-
-    public function parse(QuiteSimpleXmlElement $record) {
+    public function __construct(QuiteSimpleXmlElement $data) {
 
         $output = array();
         $output['class'] = null;
 
         // 001: Control number
-        $output['id'] = $record->text('marc:controlfield[@tag="001"]');
+        $output['id'] = $data->text('marc:controlfield[@tag="001"]');
 
         // 003: MARC code for the agency whose system control number is 
         // contained in field 001 (Control Number)
         // See http://www.loc.gov/marc/authority/ecadorg.html
-        $output['agency'] = $record->text('marc:controlfield[@tag="003"]');
+        $output['agency'] = $data->text('marc:controlfield[@tag="003"]');
 
         // 005: Modified
-        $x = $record->text('marc:controlfield[@tag="005"]');
+        $x = $data->text('marc:controlfield[@tag="005"]');
         if (strlen($x) == 8) $output['modified'] = Carbon::createFromFormat('Ymd', $x);
         if (strlen($x) == 16) $output['modified'] = Carbon::createFromFormat('YmdHis', substr($x,0,14)); // skip decimal fraction
 
         // 008: Extract *some* information
-        $f008 = $record->text('marc:controlfield[@tag="008"]');
+        $f008 = $data->text('marc:controlfield[@tag="008"]');
         $r = substr($f008, 10, 1);
         $output['cataloging'] = isset(self::$cat_rules[$r]) ? self::$cat_rules[$r] : null;
         $r = substr($f008, 11, 1);
         $output['vocabulary'] = isset(self::$vocabularies[$r]) ? self::$vocabularies[$r] : null;
 
         // 040: 
-        $source = $record->first('marc:datafield[@tag="040"]');
+        $source = $data->first('marc:datafield[@tag="040"]');
         if ($source) {
             $output['catalogingAgency'] = $source->text('marc:subfield[@code="a"]') ?: null;
             $output['language'] = $source->text('marc:subfield[@code="b"]') ?: null;
@@ -65,7 +61,7 @@ class AuthorityParser {
         }
 
         // 100: Personal name (NR)
-        foreach ($record->xpath('marc:datafield[@tag="100"]') as $field) {
+        foreach ($data->xpath('marc:datafield[@tag="100"]') as $field) {
             $output['class'] = 'person';
             $output['name'] = $field->text('marc:subfield[@code="a"]');
             $spl = explode(', ', $output['name']);
@@ -81,13 +77,13 @@ class AuthorityParser {
         }
 
         // 110: Corporate Name (NR)
-        foreach ($record->xpath('marc:datafield[@tag="110"]') as $field) {
+        foreach ($data->xpath('marc:datafield[@tag="110"]') as $field) {
             $output['class'] = 'corporate';
             // TODO: ...
         }
 
         // 111: Meeting Name (NR)
-        foreach ($record->xpath('marc:datafield[@tag="111"]') as $field) {
+        foreach ($data->xpath('marc:datafield[@tag="111"]') as $field) {
             $output['class'] = 'meeting';
             // TODO: ...
         }
@@ -95,7 +91,7 @@ class AuthorityParser {
         // 130: Uniform title: Not interested for now
 
         // 150: Topical Term (NR)
-        foreach ($record->xpath('marc:datafield[@tag="150"]') as $field) {
+        foreach ($data->xpath('marc:datafield[@tag="150"]') as $field) {
             $output['class'] = 'topicalTerm';
             $output['term'] = $field->text('marc:subfield[@code="a"]');
             $label = $field->text('marc:subfield[@code="a"]');
@@ -120,7 +116,7 @@ class AuthorityParser {
 
         // 375: Gender (R)
         $output['genders'] = array();
-        foreach ($record->xpath('marc:datafield[@tag="375"]') as $field) {
+        foreach ($data->xpath('marc:datafield[@tag="375"]') as $field) {
             $gender = $field->text('marc:subfield[@code="a"]');
             $start = $field->text('marc:subfield[@code="s"]');
             $end = $field->text('marc:subfield[@code="e"]');
@@ -137,13 +133,13 @@ class AuthorityParser {
 
         // 400: See From Tracing-Personal Name (R)
         $output['nameVariants'] = array();
-        foreach ($record->xpath('marc:datafield[@tag="400"]') as $field) {
+        foreach ($data->xpath('marc:datafield[@tag="400"]') as $field) {
             $output['nameVariants'][] = $field->text('marc:subfield[@code="a"]');
         }
 
         // TODO: rest
 
-        return $output;
+        $this->data = $output;
     }
 
 }

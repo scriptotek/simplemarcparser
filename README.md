@@ -7,7 +7,8 @@ SimpleMarcParser
 [![Total Downloads](https://poser.pugx.org/scriptotek/simplemarcparser/downloads.png)](https://packagist.org/packages/scriptotek/simplemarcparser)
 
 
-`SimpleMarcParser` is currently a minimal MARC21/XML parser for use with `QuiteSimpleXMLElement`.
+`SimpleMarcParser` is currently a minimal MARC21/XML parser for use with `QuiteSimpleXMLElement`,
+with support for the MARC21 Bibliographic, Authority and Holdings formats.
 
 ## Example:
 
@@ -15,7 +16,7 @@ SimpleMarcParser
 require_once('vendor/autoload.php');
 
 use Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement,
-    Scriptotek\SimpleMarcParser\BibliographicParser;
+    Scriptotek\SimpleMarcParser\Parser;
 
 $data = file_get_contents('http://sru.bibsys.no/search/biblio?' . http_build_query(array(
 	'version' => '1.2',
@@ -31,12 +32,12 @@ $doc->registerXPathNamespaces(array(
         'd' => 'http://www.loc.gov/zing/srw/diagnostic/'
     ));
 
-$parser = new BibliographicParser;
+$parser = new Parser;
 $record = $parser->parse($doc->first('/srw:searchRetrieveResponse/srw:records/srw:record/srw:recordData/marc:record'));
 
-print $record['title'] . $record['subtitle'];
+print $record->title;
 
-foreach ($record['subjects'] as $subject) {
+foreach ($record->subjects as $subject) {
 	print $subject['term'] . '(' . $subject['system'] . ')';
 }
 ```
@@ -47,3 +48,5 @@ Some light normalization is done.
 
  - colon and hyphen trimmed from title (`How to catch a robot rat :` → `How to catch a robot rat`)
  - year is converted to a integer by extracting the first four digit integer found (`c2013` → `2013`, `2009 [i.e. 2008]` → `2009` (not sure about this one..))
+ - `pages` is a numeric value extracted from 300 $a. The raw value is stored in `extent`
+ - …

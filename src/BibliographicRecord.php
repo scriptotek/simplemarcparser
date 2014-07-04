@@ -1,8 +1,9 @@
 <?php namespace Scriptotek\SimpleMarcParser;
 
+use Illuminate\Support\Contracts\JsonableInterface;
 use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
 
-class BibliographicRecord extends Record {
+class BibliographicRecord extends Record implements JsonableInterface {
 
     public function __construct(QuiteSimpleXmlElement $data) {
 
@@ -10,29 +11,36 @@ class BibliographicRecord extends Record {
 
         $leader = $data->text('marc:leader');
 
-        $output['id'] = $data->text('marc:controlfield[@tag="001"]');
-        $output['authors'] = array();
-        $output['subjects'] = array();
-        $output['series'] = array();
-        $output['electronic'] = false;
-        $output['is_series'] = false;
-        $output['is_multivolume'] = false;
-        $output['fulltext'] = array();
-        $output['classifications'] = array();
-        $output['notes'] = array();
+        $this->id = $data->text('marc:controlfield[@tag="001"]');
+        $authors = array();
+        $subjects = array();
+        $classifications = array();
+        $series = array();
+        $notes = array();
+        $isbns = array();
+
+        // Relationships
+        $preceding = array();
+        $succeeding = array();
+        $part_of = array();
+        $other_form = array();
+        // $fulltext = array();
+
+        $this->is_series = false;
+        $this->is_multivolume = false;
 
         foreach ($data->xpath('marc:datafield') as $node) {
             $marcfield = intval($node->attributes()->tag);
             switch ($marcfield) {
                 /*
                 case 8:                                                             // ???
-                    $output['form'] = $node->text('marc:subfield[@code="a"]');
+                    $this->form = $node->text('marc:subfield[@code="a"]');
                     break;
                 */
 
                 // 010 - Library of Congress Control Number (NR)
                 case 10:
-                    $output['lccn'] = $node->text('marc:subfield[@code="a"]');
+                    $this->lccn = $node->text('marc:subfield[@code="a"]');
                     break;
 
                 // 020 - International Standard Book Number (R)
@@ -40,13 +48,11 @@ class BibliographicRecord extends Record {
                     $isbn = $node->text('marc:subfield[@code="a"]');
                     $isbn = preg_replace('/^([0-9\-xX]+).*$/', '\1', $isbn);
                     if (empty($isbn)) break;
-                    if (!isset($output['isbn'])) $output['isbn'] = array();
-                    array_push($output['isbn'], $isbn);
+                    array_push($isbns, $isbn);
                     break;
 
                 // 082 - Dewey Decimal Classification Number (R)
                 case 82:                                                            // Test?
-                    if (!isset($output['classifications'])) $output['classifications'] = array();
                     $cl = array('system' => 'dewey');
 
                     $map = array(
@@ -61,20 +67,20 @@ class BibliographicRecord extends Record {
                         if (!empty($t)) $cl[$val[0]] = $t;
                     }
 
-                    $output['classifications'][] = $cl;
+                    $classifications[] = $cl;
                     break;
 
                 /*
                 case 89:
-                    if (!isset($output['klass'])) $output['klass'] = array();
+                    if (!isset($this->klass)) $this->klass = array();
                     $klass = $node->text('marc:subfield[@code="a"]');
                     $klass = preg_replace('/[^0-9.]/', '', $klass);
-                    foreach ($output['klass'] as $kitem) {
+                    foreach ($this->klass as $kitem) {
                         if (($kitem['kode'] == $klass) && ($kitem['system'] == 'dewey')) {
                             continue 3;
                         }
                     }
-                    array_push($output['klass'], array('kode' => $klass, 'system' => 'dewey'));
+                    array_push($this->klass, array('kode' => $klass, 'system' => 'dewey'));
                     break;
                 */
 
@@ -85,7 +91,7 @@ class BibliographicRecord extends Record {
                     );
                     $this->parseAuthority($node, $author);
 
-                    $output['authors'][] = $author;
+                    $authors[] = $author;
                     break;
 
                 case 110:
@@ -95,7 +101,7 @@ class BibliographicRecord extends Record {
                     );
                     $this->parseAuthority($node, $author);
 
-                    $output['authors'][] = $author;
+                    $authors[] = $author;
                     break;
 
                 case 130:
@@ -105,54 +111,56 @@ class BibliographicRecord extends Record {
                     );
                     $this->parseAuthority($node, $author);
 
-                    $output['authors'][] = $author;
+                    $authors[] = $author;
                     break;
 
                 // 245 : Title Statement (NR)
                 case 245:
                     $title = rtrim($node->text('marc:subfield[@code="a"]'), " \t\n\r\0\x0B:-");
                     $subtitle = $node->text('marc:subfield[@code="b"]');
-                    $output['title'] = $title;
+                    $this->title = $title;
                     if (!empty($subtitle)) {
-                        $output['title'] .= ' : ' . $subtitle;
+                        $this->title .= ' : ' . $subtitle;
                     }
                     if (preg_match('/elektronisk ressurs/', $node->text('marc:subfield[@code="h"]'))) {
-                        $output['electronic'] = true;
+                        $this->electronic = true;
+                    } else {
+                        $this->electronic = false;
                     }
 
                     // $n : Number of part/section of a work (R)
                     $part_no = $node->text('marc:subfield[@code="n"]');
-                    if ($part_no !== '') $output['part_no'] = $part_no;
+                    if ($part_no !== '') $this->part_no = $part_no;
 
                     // $p : Name of part/section of a work (R)
                     $part_name = $node->text('marc:subfield[@code="p"]');
-                    if ($part_name !== '') $output['part_name'] = $part_name;
+                    if ($part_name !== '') $this->part_name = $part_name;
 
                     // $h : Medium (NR)
                     $medium = $node->text('marc:subfield[@code="h"]');
-                    if ($medium !== '') $output['medium'] = $medium;
+                    if ($medium !== '') $this->medium = $medium;
 
                     break;
 
                 case 250:
-                    $output['edition'] = $node->text('marc:subfield[@code="a"]');
+                    $this->edition = $node->text('marc:subfield[@code="a"]');
                     break;
 
                 case 260:
-                    $output['publisher'] = $node->text('marc:subfield[@code="b"]');
+                    $this->publisher = $node->text('marc:subfield[@code="b"]');
                     $y = preg_replace('/^.*?([0-9]{4}).*$/', '\1', current($node->xpath('marc:subfield[@code="c"]')));
-                    $output['year'] = $y ? intval($y) : null;
+                    $this->year = $y ? intval($y) : null;
                     break;
 
                 case 300:
-                    $output['extent'] = $node->text('marc:subfield[@code="a"]');
+                    $this->extent = $node->text('marc:subfield[@code="a"]');
                     preg_match(
                         '/([0-9]+) (s.|p.|pp.)/',
                         $node->text('marc:subfield[@code="a"]'),
                         $matches
                     );
                     if ($matches) {
-                        $output['pages'] = $matches[1];
+                        $this->pages = $matches[1];
                     }
                     break;
 
@@ -162,7 +170,7 @@ class BibliographicRecord extends Record {
                         'title' => $node->text('marc:subfield[@code="a"]'),
                         'volume' => $node->text('marc:subfield[@code="v"]')
                     );
-                    $output['series'][] = $serie;
+                    $this->series[] = $serie;
                     break;
                 */
 
@@ -170,7 +178,7 @@ class BibliographicRecord extends Record {
                 case 500:
 
                     // $a - General note (NR)
-                    $output['notes'][] = $node->text('marc:subfield[@code="a"]');
+                    $notes[] = $node->text('marc:subfield[@code="a"]');
                     break;
 
                 case 505:
@@ -179,7 +187,7 @@ class BibliographicRecord extends Record {
                     //     <subfield code="a">"The conceptual changes brought by modern physics are important, radical and fascinating, yet they are only vaguely understood by people working outside the field. Exploring the four pillars of modern physics - relativity, quantum mechanics, elementary particles and cosmology - this clear and lively account will interest anyone who has wondered what Einstein, Bohr, Schro&#x308;dinger and Heisenberg were really talking about. The book discusses quarks and leptons, antiparticles and Feynman diagrams, curved space-time, the Big Bang and the expanding Universe. Suitable for undergraduate students in non-science as well as science subjects, it uses problems and worked examples to help readers develop an understanding of what recent advances in physics actually mean"--</subfield>
                     //     <subfield code="c">Provided by publisher.</subfield>
                     // </datafield>
-                    $output['contents'] = $node->text('marc:subfield[@code="a"]');
+                    $this->contents = $node->text('marc:subfield[@code="a"]');
                     break;
 
                 case 520:
@@ -188,7 +196,7 @@ class BibliographicRecord extends Record {
                     //     <subfield code="a">"The conceptual changes brought by modern physics are important, radical and fascinating, yet they are only vaguely understood by people working outside the field. Exploring the four pillars of modern physics - relativity, quantum mechanics, elementary particles and cosmology - this clear and lively account will interest anyone who has wondered what Einstein, Bohr, Schro&#x308;dinger and Heisenberg were really talking about. The book discusses quarks and leptons, antiparticles and Feynman diagrams, curved space-time, the Big Bang and the expanding Universe. Suitable for undergraduate students in non-science as well as science subjects, it uses problems and worked examples to help readers develop an understanding of what recent advances in physics actually mean"--</subfield>
                     //     <subfield code="c">Provided by publisher.</subfield>
                     // </datafield>
-                    $output['summary'] = array(
+                    $this->summary = array(
                         'assigning_source' => $node->text('marc:subfield[@code="c"]'),
                         'text' => $node->text('marc:subfield[@code="a"]')
                     );
@@ -198,16 +206,13 @@ class BibliographicRecord extends Record {
                 case 580:
 
                     if ($data->has('marc:datafield[@tag="780"]')) {
-                        $output['preceding'] = isset($output['preceding']) ? $output['preceding'] : array();
-                        $output['preceding']['note'] = $node->text('marc:subfield[@code="a"]');
+                        $preceding['note'] = $node->text('marc:subfield[@code="a"]');
 
                     } else if ($data->has('marc:datafield[@tag="785"]')) {
-                        $output['succeeding'] = isset($output['succeeding']) ? $output['succeeding'] : array();
-                        $output['succeeding']['note'] = $node->text('marc:subfield[@code="a"]');
+                        $succeeding['note'] = $node->text('marc:subfield[@code="a"]');
 
                     } else if ($data->has('marc:datafield[@tag="773"]')) {
-                        $output['part_of'] = isset($output['part_of']) ? $output['part_of'] : array();
-                        $output['part_of']['note'] = $node->text('marc:subfield[@code="a"]');
+                        $part_of['note'] = $node->text('marc:subfield[@code="a"]');
                     }
                     break;
 
@@ -250,7 +255,7 @@ class BibliographicRecord extends Record {
                       $form = $node->text('marc:subfield[@code="v"]');
                       if ($form !== '') $tmp['subdivisions']['form'] = $form;
 
-                      array_push($output['subjects'], $tmp);
+                      array_push($subjects, $tmp);
                     break;
 
                 case 700:
@@ -267,7 +272,7 @@ class BibliographicRecord extends Record {
                         $author['dates'] = $dates;
                     }
 
-                    $output['authors'][] = $author;
+                    $authors[] = $author;
                     break;
 
                 case 710:
@@ -277,18 +282,18 @@ class BibliographicRecord extends Record {
                     );
                     $this->parseAuthority($node, $author);
 
-                    $output['authors'][] = $author;
+                    $authors[] = $author;
                     break;
 
                 // 773 : Host Item Entry (R)
                 // See also: 580
                 case 773:
-                    $output['part_of'] = isset($output['part_of']) ? $output['part_of'] : array();
-                    $output['part_of']['relationship'] = $node->text('marc:subfield[@code="i"]');
-                    $output['part_of']['title'] = $node->text('marc:subfield[@code="t"]');
-                    $output['part_of']['issn'] = $node->text('marc:subfield[@code="x"]');
-                    $output['part_of']['id'] = preg_replace('/\(NO-TrBIB\)/', '', $node->text('marc:subfield[@code="w"]'));
-                    $output['part_of']['volume'] = $node->text('marc:subfield[@code="v"]');
+                    $part_of = isset($part_of) ? $part_of : array();
+                    $part_of['relationship'] = $node->text('marc:subfield[@code="i"]');
+                    $part_of['title'] = $node->text('marc:subfield[@code="t"]');
+                    $part_of['issn'] = $node->text('marc:subfield[@code="x"]');
+                    $part_of['id'] = preg_replace('/\(NO-TrBIB\)/', '', $node->text('marc:subfield[@code="w"]'));
+                    $part_of['volume'] = $node->text('marc:subfield[@code="v"]');
                     break;
 
                 // 776 : Additional Physical Form Entry (R)
@@ -297,8 +302,7 @@ class BibliographicRecord extends Record {
                         //     <marc:subfield code="z">9781107602175</marc:subfield>
                         //     <marc:subfield code="w">(NO-TrBIB)132191512</marc:subfield>
                         // </marc:datafield>
-                    $tmp = $this->parseRelationship($node);
-                    $output['other_form'] = $tmp;
+                    $other_form = $this->parseRelationship($node);
                     break;
 
                 // 780 : Preceding Entry (R)
@@ -308,12 +312,11 @@ class BibliographicRecord extends Record {
                     //     <marc:subfield code="w">(NO-TrBIB)920713874</marc:subfield>
                     //     <marc:subfield code="g">nr 80(1961)</marc:subfield>
                     // </marc:datafield>
-                    $output['preceding'] = isset($output['preceding']) ? $output['preceding'] : array();
 
-                    if (!isset($output['preceding']['items'])) {
-                        $output['preceding']['items'] = array();
+                    if (!isset($preceding['items'])) {
+                        $preceding['items'] = array();
                     }
-                    $output['preceding']['items'][] = $this->parseRelationship($node);
+                    $preceding['items'][] = $this->parseRelationship($node);
 
                     $ind2 = $node->attr('ind2');
                     $relationship_types = array(
@@ -327,7 +330,7 @@ class BibliographicRecord extends Record {
                         '7' => 'Separated from',
                     );
                     if (isset($relationship_types[$ind2])) {
-                        $output['preceding']['relationship_type'] = $relationship_types[$ind2];
+                        $preceding['relationship_type'] = $relationship_types[$ind2];
                     }
 
                     break;
@@ -339,12 +342,11 @@ class BibliographicRecord extends Record {
                     //     <marc:subfield code="w">(NO-TrBIB)920713874</marc:subfield>
                     //     <marc:subfield code="g">nr 80(1961)</marc:subfield>
                     // </marc:datafield>
-                    $output['succeeding'] = isset($output['succeeding']) ? $output['succeeding'] : array();
 
-                    if (!isset($output['succeeding']['items'])) {
-                        $output['succeeding']['items'] = array();
+                    if (!isset($succeeding['items'])) {
+                        $succeeding['items'] = array();
                     }
-                    $output['succeeding']['items'][] = $this->parseRelationship($node);
+                    $succeeding['items'][] = $this->parseRelationship($node);
 
                     $ind2 = $node->attr('ind2');
                     $relationship_types = array(
@@ -360,7 +362,7 @@ class BibliographicRecord extends Record {
                     );
 
                     if (isset($relationship_types[$ind2])) {
-                        $output['succeeding']['relationship_type'] = $relationship_types[$ind2];
+                        $succeeding['relationship_type'] = $relationship_types[$ind2];
                     }
                     break;
 
@@ -371,7 +373,7 @@ class BibliographicRecord extends Record {
                         'id' => preg_replace('/\(NO-TrBIB\)/', '', $node->text('marc:subfield[@code="w"]')),
                         'volume' => $node->text('marc:subfield[@code="v"]')
                     );
-                    $output['series'][] = $serie;
+                    $series[] = $serie;
                     break;
 
                 case 856:
@@ -390,14 +392,14 @@ class BibliographicRecord extends Record {
                         // </marc:datafield>
                     $description = $node->text('marc:subfield[@code="3"]');
                     if (in_array($description, array('Cover image', 'Omslagsbilde'))) {
-                        $output['cover_image'] = $node->text('marc:subfield[@code="u"]');
+                        $this->cover_image = $node->text('marc:subfield[@code="u"]');
 
                         // Silly hack to get larger images from Bibsys:
-                        $output['cover_image'] = str_replace('mini','stor',$output['cover_image']);
-                        $output['cover_image'] = str_replace('LITE','STOR',$output['cover_image']);
+                        $this->cover_image = str_replace('mini','stor',$this->cover_image);
+                        $this->cover_image = str_replace('LITE','STOR',$this->cover_image);
                     }
                     if (in_array($description, array('Beskrivelse fra forlaget (kort)', 'Beskrivelse fra forlaget (lang)'))) {
-                        $output['description'] = $node->text('marc:subfield[@code="u"]');
+                        $this->description = $node->text('marc:subfield[@code="u"]');
                     }
                     break;
 
@@ -408,12 +410,12 @@ class BibliographicRecord extends Record {
 
                     // Multi-volume work (flerbindsverk), parts linked through 773 w
                     if ($node->text('marc:subfield[@code="a"]') == 'volumes') {
-                        $output['is_multivolume'] = true;
+                        $this->is_multivolume = true;
                     }
 
                     // Series (serier), parts linked through 830 w
                     if ($node->text('marc:subfield[@code="a"]') == 'parts') {
-                        $output['is_series'] = true;
+                        $this->is_series = true;
                     }
 
                     break;
@@ -421,7 +423,18 @@ class BibliographicRecord extends Record {
             }
         }
 
-        $this->data = $output;
+        $this->preceding = $preceding;
+        $this->succeeding = $succeeding;
+        $this->part_of = $part_of;
+        $this->other_form = $other_form;
+
+        $this->isbns = $isbns;
+        $this->series = $series;
+        $this->authors = $authors;
+        $this->subjects = $subjects;
+        $this->classifications = $classifications;
+        $this->notes = $notes;
+        // $this->fulltext = $fulltext;
     }
 
 }

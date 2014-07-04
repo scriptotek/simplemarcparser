@@ -1,8 +1,9 @@
 <?php namespace Scriptotek\SimpleMarcParser;
 
+use Illuminate\Support\Contracts\JsonableInterface;
 use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
 
-class HoldingsRecord extends Record {
+class HoldingsRecord extends Record implements JsonableInterface {
 
     // 859 $f: Use restrictions / Tilgjengelighet
     // Ref: http://www.bibsys.no/files/out/biblev/utlaanstatus-marc21.pdf

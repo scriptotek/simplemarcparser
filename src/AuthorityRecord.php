@@ -1,9 +1,10 @@
 <?php namespace Scriptotek\SimpleMarcParser;
 
+use Illuminate\Support\Contracts\JsonableInterface;
 use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
 use Carbon\Carbon;
 
-class AuthorityRecord extends Record {
+class AuthorityRecord extends Record implements JsonableInterface {
 
     // http://www.loc.gov/marc/authority/ad008.html
     public static $cat_rules = array(
@@ -27,64 +28,61 @@ class AuthorityRecord extends Record {
 
     public function __construct(QuiteSimpleXmlElement $data) {
 
-        $output = array();
-        $output['class'] = null;
-
         // 001: Control number
-        $output['id'] = $data->text('marc:controlfield[@tag="001"]');
+        $this->id = $data->text('marc:controlfield[@tag="001"]');
 
         // 003: MARC code for the agency whose system control number is 
         // contained in field 001 (Control Number)
         // See http://www.loc.gov/marc/authority/ecadorg.html
-        $output['agency'] = $data->text('marc:controlfield[@tag="003"]');
+        $this->agency = $data->text('marc:controlfield[@tag="003"]');
 
         // 005: Modified
         $x = $data->text('marc:controlfield[@tag="005"]');
-        if (strlen($x) == 8) $output['modified'] = Carbon::createFromFormat('Ymd', $x);
-        if (strlen($x) == 16) $output['modified'] = Carbon::createFromFormat('YmdHis', substr($x,0,14)); // skip decimal fraction
+        if (strlen($x) == 8) $this->modified = Carbon::createFromFormat('Ymd', $x);
+        if (strlen($x) == 16) $this->modified = Carbon::createFromFormat('YmdHis', substr($x,0,14)); // skip decimal fraction
 
         // 008: Extract *some* information
         $f008 = $data->text('marc:controlfield[@tag="008"]');
         $r = substr($f008, 10, 1);
-        $output['cataloging'] = isset(self::$cat_rules[$r]) ? self::$cat_rules[$r] : null;
+        $this->cataloging = isset(self::$cat_rules[$r]) ? self::$cat_rules[$r] : null;
         $r = substr($f008, 11, 1);
-        $output['vocabulary'] = isset(self::$vocabularies[$r]) ? self::$vocabularies[$r] : null;
+        $this->vocabulary = isset(self::$vocabularies[$r]) ? self::$vocabularies[$r] : null;
 
         // 040: 
         $source = $data->first('marc:datafield[@tag="040"]');
         if ($source) {
-            $output['catalogingAgency'] = $source->text('marc:subfield[@code="a"]') ?: null;
-            $output['language'] = $source->text('marc:subfield[@code="b"]') ?: null;
-            $output['transcribingAgency'] = $source->text('marc:subfield[@code="c"]') ?: null;
-            $output['modifyingAgency'] = $source->text('marc:subfield[@code="d"]') ?: null;
-            $output['vocabulary'] = $source->text('marc:subfield[@code="f"]') ?: $output['vocabulary'];            
+            $this->catalogingAgency = $source->text('marc:subfield[@code="a"]') ?: null;
+            $this->language = $source->text('marc:subfield[@code="b"]') ?: null;
+            $this->transcribingAgency = $source->text('marc:subfield[@code="c"]') ?: null;
+            $this->modifyingAgency = $source->text('marc:subfield[@code="d"]') ?: null;
+            $this->vocabulary = $source->text('marc:subfield[@code="f"]') ?: $this->vocabulary;            
         }
 
         // 100: Personal name (NR)
         foreach ($data->xpath('marc:datafield[@tag="100"]') as $field) {
-            $output['class'] = 'person';
-            $output['name'] = $field->text('marc:subfield[@code="a"]');
-            $spl = explode(', ', $output['name']);
+            $this->class = 'person';
+            $this->name = $field->text('marc:subfield[@code="a"]');
+            $spl = explode(', ', $this->name);
             if (count($spl) == 2) {
-                $output['label'] = $spl[1] . ' ' . $spl[0];
+                $this->label = $spl[1] . ' ' . $spl[0];
             } else {
-                $output['label'] = $output['name'];
+                $this->label = $this->name;
             }
             $bd = $field->text('marc:subfield[@code="d"]');
             $bd = explode('-', $bd);
-            $output['birth'] = $bd[0] ?: null;
-            $output['death'] = (count($bd) > 1 && $bd[1]) ? $bd[1] : null;
+            $this->birth = $bd[0] ?: null;
+            $this->death = (count($bd) > 1 && $bd[1]) ? $bd[1] : null;
         }
 
         // 110: Corporate Name (NR)
         foreach ($data->xpath('marc:datafield[@tag="110"]') as $field) {
-            $output['class'] = 'corporate';
+            $this->class = 'corporate';
             // TODO: ...
         }
 
         // 111: Meeting Name (NR)
         foreach ($data->xpath('marc:datafield[@tag="111"]') as $field) {
-            $output['class'] = 'meeting';
+            $this->class = 'meeting';
             // TODO: ...
         }
 
@@ -92,8 +90,8 @@ class AuthorityRecord extends Record {
 
         // 150: Topical Term (NR)
         foreach ($data->xpath('marc:datafield[@tag="150"]') as $field) {
-            $output['class'] = 'topicalTerm';
-            $output['term'] = $field->text('marc:subfield[@code="a"]');
+            $this->class = 'topicalTerm';
+            $this->term = $field->text('marc:subfield[@code="a"]');
             $label = $field->text('marc:subfield[@code="a"]');
             foreach ($field->xpath('marc:subfield[@code="x"]') as $s) { 
                 $label .= ' : ' . $s;
@@ -107,7 +105,7 @@ class AuthorityRecord extends Record {
             foreach ($field->xpath('marc:subfield[@code="z"]') as $s) {
                 $label .= ' : ' . $s;
             }
-            $output['label'] = $label;
+            $this->label = $label;
             // TODO: ...
         }
 
@@ -115,31 +113,33 @@ class AuthorityRecord extends Record {
         // 155: Genre/form Term (NR)
 
         // 375: Gender (R)
-        $output['genders'] = array();
+        $genders = array();
         foreach ($data->xpath('marc:datafield[@tag="375"]') as $field) {
             $gender = $field->text('marc:subfield[@code="a"]');
             $start = $field->text('marc:subfield[@code="s"]');
             $end = $field->text('marc:subfield[@code="e"]');
-            $output['genders'][] = array(
+            $genders[] = array(
                 'value' => $gender,
                 'from' => $start,
                 'until' => $end,
             );
         }
+        $this->genders = $genders;
+
         // Alias gender to the last value to make utilizing easier
-        $output['gender'] = (count($output['genders']) > 0)
-            ? $output['genders'][count($output['genders']) - 1]['value']  // assume sane ordering for now
+        $this->gender = (count($this->genders) > 0)
+            ? $this->genders[count($this->genders) - 1]['value']  // assume sane ordering for now
             : null;
 
         // 400: See From Tracing-Personal Name (R)
-        $output['nameVariants'] = array();
+        $nameVariants = array();
         foreach ($data->xpath('marc:datafield[@tag="400"]') as $field) {
-            $output['nameVariants'][] = $field->text('marc:subfield[@code="a"]');
+            $nameVariants[] = $field->text('marc:subfield[@code="a"]');
         }
+        $this->nameVariants = $nameVariants;
 
         // TODO: rest
 
-        $this->data = $output;
     }
 
 }

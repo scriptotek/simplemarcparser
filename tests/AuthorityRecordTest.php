@@ -138,7 +138,7 @@ class AuthorityRecordTest extends \PHPUnit_Framework_TestCase {
 
         $rec2 = $this->parseRecordData('');
 
-        $this->assertCount(0, $rec2->genders);
+        $this->assertNull($rec2->genders);
         $this->assertNull($rec2->gender);
     }
 
@@ -157,4 +157,28 @@ class AuthorityRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('Rishøi, Ingvild Hedemann', $rec1->nameVariants[0]);
         $this->assertEquals('Hedemann Rishøi, Ingvild', $rec1->nameVariants[1]);
     }
+
+    public function testJson()
+    {
+        $rec1 = $this->parseRecordData('
+          <marc:datafield tag="400" ind1="1" ind2=" ">
+            <marc:subfield code="a">Rishøi, Ingvild Hedemann</marc:subfield>
+          </marc:datafield>
+          <marc:datafield tag="400" ind1="1" ind2=" ">
+            <marc:subfield code="a">Hedemann Rishøi, Ingvild</marc:subfield>
+          </marc:datafield>
+        ');
+
+        $expected = json_encode(
+          array(
+            'nameVariants' => array(
+              'Rishøi, Ingvild Hedemann',
+              'Hedemann Rishøi, Ingvild',
+            )
+          )
+        );
+
+        $this->assertJsonStringEqualsJsonString($expected, $rec1->toJson());
+    }
+
 }

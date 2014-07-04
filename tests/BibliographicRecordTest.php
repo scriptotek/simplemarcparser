@@ -46,8 +46,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertCount(1, $out->isbn);
-        $this->assertEquals('978-8243005129', $out->isbn[0]);
+        $this->assertCount(1, $out->isbns);
+        $this->assertEquals('978-8243005129', $out->isbns[0]);
     }
 
     public function testCanceledIsbn() {
@@ -59,7 +59,7 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertNull($out->isbn);
+        $this->assertNull($out->isbns);
     }
 
     public function testIsbnWithX() {
@@ -70,7 +70,7 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertEquals('1-85723-457-X', $out->isbn[0]);
+        $this->assertEquals('1-85723-457-X', $out->isbns[0]);
     }
 
     public function testMarc082() {
@@ -440,6 +440,23 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse($out3->is_series);
         $this->assertTrue($out3->is_multivolume);
 
+    }
+
+    public function testJson()
+    {
+        $rec1 = $this->parseRecordData('
+            <marc:controlfield tag="001">12149361x</marc:controlfield>
+        ');
+
+        $expected = json_encode(
+          array(
+            'id' => '12149361x',
+            'is_series' => false,
+            'is_multivolume' => false,
+          )
+        );
+
+        $this->assertJsonStringEqualsJsonString($expected, $rec1->toJson());
     }
 
 }

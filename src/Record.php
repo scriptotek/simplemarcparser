@@ -1,5 +1,7 @@
 <?php namespace Scriptotek\SimpleMarcParser;
 
+use Illuminate\Support\Contracts\JsonableInterface;
+
 class Record {
 
     protected $data;
@@ -9,6 +11,33 @@ class Record {
             return $this->data[$name];
         }
         return null;
+    }
+
+    public function __set($name, $value) {
+        if ($value === false || !empty($value)) {
+            $this->data[$name] = $value;
+        }
+    }
+
+    /**
+     * Convert the object to its JSON representation.
+     *
+     * @param  int  $options
+     * @return string
+     */
+    public function toJson($options=0)
+    {
+        return json_encode($this->toArray(), $options);
+    }
+
+    /**
+     * Convert the model instance to an array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return $this->data;
     }
 
     protected function parseAuthority(&$node, &$out) {

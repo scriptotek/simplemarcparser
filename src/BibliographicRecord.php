@@ -110,8 +110,12 @@ class BibliographicRecord extends Record {
 
                 // 245 : Title Statement (NR)
                 case 245:
-                    $output['title'] = rtrim($node->text('marc:subfield[@code="a"]'), " \t\n\r\0\x0B:-");
-                    $output['subtitle'] = $node->text('marc:subfield[@code="b"]');
+                    $title = rtrim($node->text('marc:subfield[@code="a"]'), " \t\n\r\0\x0B:-");
+                    $subtitle = $node->text('marc:subfield[@code="b"]');
+                    $output['title'] = $title;
+                    if (!empty($subtitle)) {
+                        $output['title'] .= ' : ' . $subtitle;
+                    }
                     if (preg_match('/elektronisk ressurs/', $node->text('marc:subfield[@code="h"]'))) {
                         $output['electronic'] = true;
                     }

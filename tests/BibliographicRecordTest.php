@@ -158,8 +158,7 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertEquals('Evolusjon', $out->title);
-        $this->assertEquals('naturens kulturhistorie', $out->subtitle);
+        $this->assertEquals('Evolusjon : naturens kulturhistorie', $out->title);
         $this->assertEquals('[videoopptak]', $out->medium);
     }
 

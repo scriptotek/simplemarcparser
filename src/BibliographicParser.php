@@ -174,8 +174,17 @@ class BibliographicParser {
                     $y = preg_replace('/^.*?([0-9]{4}).*$/', '\1', current($node->xpath('marc:subfield[@code="c"]')));
                     $output['year'] = $y ? intval($y) : null;
                     break;
+
                 case 300:
-                    $output['pages'] = $node->text('marc:subfield[@code="a"]');
+                    $output['extent'] = $node->text('marc:subfield[@code="a"]');
+                    preg_match(
+                        '/([0-9]+) (s.|p.|pp.)/',
+                        $node->text('marc:subfield[@code="a"]'),
+                        $matches
+                    );
+                    if ($matches) {
+                        $output['pages'] = $matches[1];
+                    }
                     break;
 
                 /*

@@ -228,7 +228,7 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testMarc300() {
-        $out = $this->parseRecordData('
+        $out1 = $this->parseRecordData('
             <marc:datafield tag="300" ind1=" " ind2=" ">
                 <marc:subfield code="a">353 s.</marc:subfield>
                 <marc:subfield code="b">ill.</marc:subfield>
@@ -236,7 +236,18 @@ class BibliographicParserTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        // TODO
+        $out2 = $this->parseRecordData('
+            <marc:datafield tag="300" ind1=" " ind2=" ">
+                <marc:subfield code="a">1 videoplate (DVD-video) (1 t 36 min)</marc:subfield>
+                <marc:subfield code="b">lyd, kol.</marc:subfield>
+            </marc:datafield>
+        ');
+
+        $this->assertEquals('353 s.', $out1['extent']);
+        $this->assertEquals(353, $out1['pages']);
+
+        $this->assertEquals('1 videoplate (DVD-video) (1 t 36 min)', $out2['extent']);
+        $this->assertArrayNotHasKey('pages', $out2);
     }
 
     public function testMarc500() {

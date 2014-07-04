@@ -10,6 +10,45 @@ class BibliographicRecord extends Record implements JsonableInterface {
         $output = array();
 
         $leader = $data->text('marc:leader');
+        // Field 008/18-34 Configuration
+        // If Leader/06 = a and Leader/07 = a, c, d, or m: Books
+        // If Leader/06 = a and Leader/07 = b, i, or s: Continuing Resources
+        // If Leader/06 = t: Books
+        // If Leader/06 = c, d, i, or j: Music
+        // If Leader/06 = e, or f: Maps
+        // If Leader/06 = g, k, o, or r: Visual Materials
+        // If Leader/06 = m: Computer Files
+        // If Leader/06 = p: Mixed Materials
+
+        $l6 = substr($leader, 6, 1);
+        $l7 = substr($leader, 7, 1);
+        $material = '';
+        if ($l6 == 'a' && in_array($l7, array('a','c','d','m'))) {
+            $material = 'book';
+        }
+        if ($l6 == 't') {
+            $material = 'book';
+        }
+        if ($l6 == 'a' && in_array($l7, array('b','i','s'))) {
+            $material = 'series';
+        }
+        if (in_array($l6, array('c','d','i','j'))) {
+            $material = 'music';
+        }
+        if (in_array($l6, array('e','f'))) {
+            $material = 'map';
+        }
+        if (in_array($l6, array('g','k','o','r'))) {
+            $material = 'visual';
+        }
+        if ($l6 == 'm') {
+            $material = 'file';
+        }
+        if ($l6 == 'p') {
+            $material = 'mixed';
+        }
+        $this->material = $material;
+
 
         $this->id = $data->text('marc:controlfield[@tag="001"]');
         $authors = array();
@@ -160,7 +199,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
                         $matches
                     );
                     if ($matches) {
-                        $this->pages = $matches[1];
+                        $this->pages = intval($matches[1]);
                     }
                     break;
 

@@ -19,6 +19,22 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         return new BibliographicRecord($dom);
     }
 
+    public function testMaterial() {
+        $out1 = $this->parseRecordData('
+            <marc:leader>99999 as a22999997c 4500</marc:leader>
+        ');
+        $out2 = $this->parseRecordData('
+            <marc:leader>99999 em a2299999 c 4500</marc:leader>
+        ');
+        $out3 = $this->parseRecordData('
+            <marc:leader>99999 am a22999997c 4500</marc:leader>
+        ');
+
+        $this->assertEquals('series', $out1->material);
+        $this->assertEquals('map', $out2->material);
+        $this->assertEquals('book', $out3->material);
+    }
+
     public function testMarc001() {
         $out = $this->parseRecordData('
             <marc:controlfield tag="001">12149361x</marc:controlfield>

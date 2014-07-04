@@ -128,4 +128,21 @@ class HoldingsRecordTest extends \PHPUnit_Framework_TestCase {
 
     }
 
+    public function testJson()
+    {
+        $rec1 = $this->parseRecordData('
+            <marc:datafield tag="866" ind1="3" ind2="0">
+                <marc:subfield code="a">1(1969/70)-34(1997/99)</marc:subfield>
+            </marc:datafield>
+        ');
+
+        $expected = json_encode(
+          array(
+            'holdings' => '1(1969/70)-34(1997/99)'
+          )
+        );
+
+        $this->assertJsonStringEqualsJsonString($expected, $rec1->toJson());
+    }
+
 }

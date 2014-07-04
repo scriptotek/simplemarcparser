@@ -125,6 +125,10 @@ class BibliographicRecord extends Record implements JsonableInterface {
                         'name' => $node->text('marc:subfield[@code="a"]'),
                         'role' => 'main'
                     );
+                    $spl = explode(', ', $author['name']);
+                    if (count($spl) == 2) {
+                        $author['name'] = $spl[1] . ' ' . $spl[0];
+                    }
                     $this->parseAuthority($node, $author);
 
                     $authors[] = $author;
@@ -145,6 +149,10 @@ class BibliographicRecord extends Record implements JsonableInterface {
                         'name' => $node->text('marc:subfield[@code="a"]'),
                         'role' => 'uniform'
                     );
+                    $spl = explode(', ', $author['name']);
+                    if (count($spl) == 2) {
+                        $author['name'] = $spl[1] . ' ' . $spl[0];
+                    }
                     $this->parseAuthority($node, $author);
 
                     $authors[] = $author;
@@ -300,6 +308,10 @@ class BibliographicRecord extends Record implements JsonableInterface {
                     );
                     $author['role'] = $node->text('marc:subfield[@code="4"]') 
                         ?: ($node->text('marc:subfield[@code="e"]') ?: 'added');
+                    $spl = explode(', ', $author['name']);
+                    if (count($spl) == 2) {
+                        $author['name'] = $spl[1] . ' ' . $spl[0];
+                    }
 
                     $this->parseAuthority($node, $author);
 

@@ -133,7 +133,7 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertCount(1, $out->authors);
 
         $el = $out->authors[0];
-        $this->assertEquals('Bjerkestrand, Bernt', $el['name']);
+        $this->assertEquals('Bernt Bjerkestrand', $el['name']);
         $this->assertEquals('x12001130', $el['bibsys_identifier']);
     }
 
@@ -147,7 +147,7 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertCount(1, $out->authors);
 
         $el = $out->authors[0];
-        $this->assertEquals('Bjerkestrand, Bernt', $el['name']);
+        $this->assertEquals('Bernt Bjerkestrand', $el['name']);
         $this->assertArrayNotHasKey('authority', $el);
     }
 
@@ -312,7 +312,7 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         ');
 
         $this->assertCount(1, $out1->authors);
-        $this->assertEquals('Almås, Karl Andreas', $out1->authors[0]['name']);
+        $this->assertEquals('Karl Andreas Almås', $out1->authors[0]['name']);
         $this->assertEquals('red.', $out1->authors[0]['role']);
         $this->assertEquals('1952-', $out1->authors[0]['dates']);
         $this->assertEquals('x90235102', $out1->authors[0]['bibsys_identifier']);

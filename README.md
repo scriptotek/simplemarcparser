@@ -49,4 +49,4 @@ Some light normalization is done.
  - title (300 $a) and subtitle (300 $b) is combined into a single field `title` separated by ` : `.
  - year is converted to a integer by extracting the first four digit integer found (`c2013` → `2013`, `2009 [i.e. 2008]` → `2009` (not sure about this one..))
  - `pages` is a numeric value extracted from 300 $a. The raw value is stored in `extent`
- - …
+ - names are changed from '<Lastname>, <Firstname>' to '<Firstname> <Lastname>'

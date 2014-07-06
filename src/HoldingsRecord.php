@@ -49,6 +49,13 @@ class HoldingsRecord extends Record implements JsonableInterface {
         $nonpublic_notes = array();
         $public_notes = array();
 
+        // 008: Extract datestamp only
+        $f008 = $data->text('marc:controlfield[@tag="008"]');
+        $this->created = $this->parseDateTime(substr($f008, 0, 6));
+
+        // 009: Reserved for local use
+        $this->status = $data->text('marc:controlfield[@tag="009"]');
+
         foreach ($data->xpath('marc:datafield') as $node) {
             $marcfield = intval($node->attributes()->tag);
             switch ($marcfield) {

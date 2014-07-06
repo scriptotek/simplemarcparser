@@ -2,7 +2,7 @@
 
 require 'vendor/autoload.php';
 use Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement;
-use Scriptotek\SimpleMarcParser\BibliographicRecord;
+use Carbon\Carbon;
 
 class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
 
@@ -41,6 +41,34 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         ');
 
         $this->assertEquals('12149361x', $out->id);
+    }
+
+    public function testModified() {
+        $out1 = $this->parseRecordData('
+            <marc:controlfield tag="005">19970411</marc:controlfield>
+        ');
+        $out2 = $this->parseRecordData('
+            <marc:controlfield tag="005">19940223151047.0</marc:controlfield>
+        ');
+
+        $this->assertEquals(Carbon::createFromDate(1997, 4, 11), $out1->modified);
+        $this->assertEquals(Carbon::create(1994, 2, 23, 15, 10, 47), $out2->modified);
+    }
+
+    public function testCreated() {
+        $out1 = $this->parseRecordData('
+            <marc:controlfield tag="008">970411s1996 000 u|eng d</marc:controlfield>
+        ');
+        $out2 = $this->parseRecordData('
+            <marc:controlfield tag="008">700101s1996 000 u|eng d</marc:controlfield>
+        ');
+        $out3 = $this->parseRecordData('
+            <marc:controlfield tag="008">690101s1996 000 u|eng d</marc:controlfield>
+        ');
+
+        $this->assertEquals(Carbon::createFromDate(1997, 4, 11), $out1->created);
+        $this->assertEquals(Carbon::createFromDate(1970, 1, 1), $out2->created);
+        $this->assertEquals(Carbon::createFromDate(2069, 1, 1), $out3->created);
     }
 
     public function testMarc010() {

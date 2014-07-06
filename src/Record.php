@@ -1,6 +1,7 @@
 <?php namespace Scriptotek\SimpleMarcParser;
 
 use Illuminate\Support\Contracts\JsonableInterface;
+use Carbon\Carbon;
 
 class Record {
 
@@ -40,6 +41,29 @@ class Record {
         return $this->data;
     }
 
+    /**
+     * Parse a *Representation of Dates and Times* (ISO 8601).
+     * The date requires 8 numeric characters in the pattern yyyymmdd. 
+     * The time requires 8 numeric characters in the pattern hhmmss.f, 
+     * expressed in terms of the 24-hour (00-23) clock.
+     *
+     * @param  string $value
+     * @return Carbon\Carbon
+     */
+    protected function parseDateTime($value)
+    {
+        if (strlen($value) == 6) return Carbon::createFromFormat('ymd', $value);
+        if (strlen($value) == 8) return Carbon::createFromFormat('Ymd', $value);
+        if (strlen($value) == 16) return Carbon::createFromFormat('YmdHis', substr($value, 0, 14)); // skip decimal fraction
+    }
+
+    /**
+     * Parse a "name node", personal or corporate, main or added, that
+     * might have authority information encapsulated.
+     *
+     * @param  Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement &$node
+     * @param  array &$out
+     */
     protected function parseAuthority(&$node, &$out) {
         $authority = $node->text('marc:subfield[@code="0"]');
         if (!empty($authority)) {
@@ -51,6 +75,12 @@ class Record {
         }
     }
 
+    /**
+     * Parse a "relationship node", one that have links to other records encapsulated.
+     *
+     * @param  Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement $node
+     * @return array
+     */
     protected function parseRelationship($node)
     {
         $rel = array();

@@ -37,9 +37,7 @@ class AuthorityRecord extends Record implements JsonableInterface {
         $this->agency = $data->text('marc:controlfield[@tag="003"]');
 
         // 005: Modified
-        $x = $data->text('marc:controlfield[@tag="005"]');
-        if (strlen($x) == 8) $this->modified = Carbon::createFromFormat('Ymd', $x);
-        if (strlen($x) == 16) $this->modified = Carbon::createFromFormat('YmdHis', substr($x,0,14)); // skip decimal fraction
+        $this->modified = $this->parseDateTime($data->text('marc:controlfield[@tag="005"]'));
 
         // 008: Extract *some* information
         $f008 = $data->text('marc:controlfield[@tag="008"]');

@@ -47,8 +47,21 @@ class BibliographicRecord extends Record implements JsonableInterface {
         }
         $this->material = $material;
 
-
+        // Control fields
         $this->id = $data->text('marc:controlfield[@tag="001"]');
+
+        // 003: MARC code for the agency whose system control number is
+        // contained in field 001 (Control Number)
+        // See http://www.loc.gov/marc/authority/ecadorg.html
+        $this->agency = $data->text('marc:controlfield[@tag="003"]');
+
+        // 005: Modified
+        $this->modified = $this->parseDateTime($data->text('marc:controlfield[@tag="005"]'));
+
+        // 008: Extract *some* information
+        $f008 = $data->text('marc:controlfield[@tag="008"]');
+        $this->created = $this->parseDateTime(substr($f008, 0, 6));
+
         $authors = array();
         $subjects = array();
         $classifications = array();
@@ -68,11 +81,6 @@ class BibliographicRecord extends Record implements JsonableInterface {
         foreach ($data->xpath('marc:datafield') as $node) {
             $marcfield = intval($node->attributes()->tag);
             switch ($marcfield) {
-                /*
-                case 8:                                                             // ???
-                    $this->form = $node->text('marc:subfield[@code="a"]');
-                    break;
-                */
 
                 // 010 - Library of Congress Control Number (NR)
                 case 10:

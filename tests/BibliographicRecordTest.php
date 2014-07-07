@@ -19,22 +19,53 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         return new BibliographicRecord($dom);
     }
 
-    public function testMaterial() {
-        $out1 = $this->parseRecordData('
-            <marc:leader>99999 as a22999997c 4500</marc:leader>
-        ');
-        $out2 = $this->parseRecordData('
-            <marc:leader>99999 em a2299999 c 4500</marc:leader>
-        ');
-        $out3 = $this->parseRecordData('
-            <marc:leader>99999 am a22999997c 4500</marc:leader>
+    public function testMaterialIsPrintedBook() {
+        $out = $this->parseRecordData('
+            <marc:leader>99999 am a2299999 c 4500</marc:leader>
+            <marc:controlfield tag="001">131381679</marc:controlfield>
+            <marc:controlfield tag="007">ta</marc:controlfield>
+            <marc:controlfield tag="008">130916s2011                  000 u|eng d</marc:controlfield>
         ');
 
-        $this->assertEquals('series', $out1->material);
-        $this->assertEquals('map', $out2->material);
-        $this->assertEquals('book', $out3->material);
+        $this->assertEquals('Book', $out->material);
+        $this->assertFalse($out->electronic);
     }
 
+    public function testMaterialIsElectronicBook() {
+        $out = $this->parseRecordData('
+            <marc:leader>99999 am a22999997c 4500</marc:leader>
+            <marc:controlfield tag="001">133788229</marc:controlfield>
+            <marc:controlfield tag="007">cr |||||||||||</marc:controlfield>
+            <marc:controlfield tag="008">140313s2011            o     000 u|eng d</marc:controlfield>
+        ');
+
+        $this->assertEquals('Book', $out->material);
+        $this->assertTrue($out->electronic);
+    }
+
+    public function testMaterialIsPrintedPeriodical() {
+        $out = $this->parseRecordData('
+            <marc:leader>99999 as a2299999 c 4500</marc:leader>
+            <marc:controlfield tag="001">981315402</marc:controlfield>
+            <marc:controlfield tag="007">ta</marc:controlfield>
+            <marc:controlfield tag="008">130625uuuuuuuuu      p       |    0eng d</marc:controlfield>
+        ');
+
+        $this->assertEquals('Periodical', $out->material);
+        $this->assertFalse($out->electronic);
+    }
+
+    public function testMaterialIsElectronicPeriodical() {
+        $out = $this->parseRecordData('
+            <marc:leader>99999 as a22999997c 4500</marc:leader>
+            <marc:controlfield tag="001">080880762</marc:controlfield>
+            <marc:controlfield tag="007">cr |||||||||||</marc:controlfield>
+            <marc:controlfield tag="008">110404uuuuuuuuu      p o     |    0eng d</marc:controlfield>
+        ');
+
+        $this->assertEquals('Periodical', $out->material);
+        $this->assertTrue($out->electronic);
+    }
     public function testMarc001() {
         $out = $this->parseRecordData('
             <marc:controlfield tag="001">12149361x</marc:controlfield>
@@ -347,10 +378,14 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testMarc710() {
+        // Here, 'dgg' is  'Degree granting institution' used 
+        // http://www.loc.gov/marc/relators/relacode.html
         $out = $this->parseRecordData('
             <marc:datafield tag="710" ind1="2" ind2=" ">
-                <marc:subfield code="a">Det Norske videnskaps-akademi</marc:subfield>
-                <marc:subfield code="0">(NO-TrBIB)x90114096</marc:subfield>
+                <marc:subfield code="a">Universitetet i Oslo</marc:subfield>
+                <marc:subfield code="b">Det utdanningsvitenskapelige fakultet</marc:subfield>
+                <marc:subfield code="4">dgg</marc:subfield>
+                <marc:subfield code="0">(NO-TrBIB)x90921833</marc:subfield>
             </marc:datafield>
         ');
 

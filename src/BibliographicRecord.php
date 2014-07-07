@@ -5,10 +5,123 @@ use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
 
 class BibliographicRecord extends Record implements JsonableInterface {
 
-    public function __construct(QuiteSimpleXmlElement $data) {
 
-        $leader = $data->text('marc:leader');
+    protected function parseMaterial($data)
+    {
+        // See http://www.loc.gov/marc/ldr06guide.html
+
+        // The Leader/06 (Type of record) character position contains a one-character 
+        // alphabetic code that differentiates MARC records created for various types of
+        // content and materials.
+
+        // The 008 field contains character positions that provide coded information about
+        // the record as a whole and about special bibliographic aspects of the item cataloged.
+
+        // Field 006 (Fixed-length data elements - Additional material characteristics) 
+        // permits coding for additional aspects of an electronic resource (including any 
+        // computer file aspects) if the 007 and 008 fields do not adequately describe it.
+
+        // leader[6] : Type of record
+        // leader[7] : Bibliographic level
         // Field 008/18-34 Configuration
+
+        // LDR/06
+        $recordTypes = array(
+            'a' => 'Language material',
+            'c' => 'Notated music',
+            'd' => 'Manuscript notated music',
+            'e' => 'Cartographic material',
+            'f' => 'Manuscript cartographic material',
+            'g' => 'Projected medium',
+            'i' => 'Nonmusical sound recording',
+            'j' => 'Musical sound recording',
+            'k' => 'Two-dimensional nonprojectable graphic',
+            'm' => 'Computer file',
+            'o' => 'Kit',
+            'p' => 'Mixed materials',
+            'r' => 'Three-dimensional artifact or naturally occurring object',
+            't' => 'Manuscript language material',
+        );
+
+        // LDR/07
+        $bibliographicLevels = array(
+            'a' => 'Monographic component part',
+            'b' => 'Serial component part',
+            'c' => 'Collection',
+            'd' => 'Subunit',
+            'i' => 'Integrating resource',
+            'm' => 'Monograph/Item',
+            's' => 'Serial',
+        );
+
+        // 007/00 (Category of material)
+        $materialCategories = array(
+            'a' => 'Map',
+            'c' => 'Electronic resource',
+            'd' => 'Globe',
+            'f' => 'Tactile material',
+            'g' => 'Projected graphic',
+            'h' => 'Microform',
+            'k' => 'Nonprojected graphic',
+            'm' => 'Motion picture',
+            'o' => 'Kit',
+            'q' => 'Notated music',
+            'r' => 'Remote-sensing image',
+            's' => 'Sound recording',
+            't' => 'Text',                 // p Trykt materiale
+            'v' => 'Videorecording',
+            'z' => 'Unspecified',
+        );
+
+        $f007values = array(
+            'a' => array(
+                'd' => 'Atlas',
+                'g' => 'Diagram',
+                'j' => 'Map',
+                'k' => 'Profile',
+                'q' => 'Model',
+                'r' => 'Remote-sensing image',
+                '_' => 'Map',
+            ),
+            'c' => array(
+                'a' => 'Tape cartridge',
+                'b' => 'Chip cartridge',
+                'c' => 'Computer optical disc cartridge',
+                'd' => 'Computer disc, type unspecified',
+                'e' => 'Computer disc cartridge, type unspecified',
+                'f' => 'Tape cassette',
+                'h' => 'Tape reel',
+                'j' => 'Magnetic disk',
+                'k' => 'Computer card',
+                'm' => 'Magneto-optical disc',
+                'o' => 'Optical disc',       // CD-rom
+                'r' => 'Remote resource',    // n Nettdokumenter
+            ),
+            'f' => array(
+                'a' => 'Moon',         // in the Moon writing system
+                'b' => 'Braille',      // in the Braille writing system
+                'c' => 'Combination ', // in a combination of two or more of the other defined types
+                'd' => 'No writing system',
+            ),
+            's' => array(
+                'd' => 'Music CD',         // v CD-er
+                'e' => 'Cylinder',
+                'g' => 'Sound cartridge',
+                'i' => 'Sound-track film',
+                'q' => 'Roll',
+                's' => 'Sound cassette',
+                't' => 'Sound-tape reel',
+                'u' => 'Unspecified',
+                'w' => 'Wire recording',
+            ),
+            'v' => array(
+                'c' => 'Videocartridge',
+                'd' => 'Videodisc',           // w DVD-er
+                'f' => 'Videocassette',
+                'r' => 'Videoreel',
+            ),
+        );
+
         // If Leader/06 = a and Leader/07 = a, c, d, or m: Books
         // If Leader/06 = a and Leader/07 = b, i, or s: Continuing Resources
         // If Leader/06 = t: Books
@@ -18,34 +131,80 @@ class BibliographicRecord extends Record implements JsonableInterface {
         // If Leader/06 = m: Computer Files
         // If Leader/06 = p: Mixed Materials
 
-        $l6 = substr($leader, 6, 1);
-        $l7 = substr($leader, 7, 1);
-        $material = '';
-        if ($l6 == 'a' && in_array($l7, array('a','c','d','m'))) {
-            $material = 'book';
+        $ldr = str_split($data->text('marc:leader'));
+        $f007 = str_split($data->text('marc:controlfield[@tag="007"]'));
+        $f008 = str_split($data->text('marc:controlfield[@tag="008"]'));
+
+        $material = 'unknown';
+
+        if (count($ldr) < 8) return;
+        if (count($f007) < 2) return;
+
+        switch ($ldr[6]) {
+
+            case 'a':
+                if (in_array($ldr[7], array('a','c','d','m'))) {
+                    $material = 'Book';
+                }
+                if (in_array($ldr[7], array('b','i','s'))) {
+                    $material = 'Series';
+                }
+                break;
+
+            case 't':
+                $material = 'Book';
+                break;
+
+            case 'c':
+            case 'd':
+            case 'i':
+            case 'j':
+                $material = 'Music';
+                break;
+
+            case 'e':
+            case 'f':
+                $material = 'Map';
+                break;
+
+            case 'g':
+            case 'k':
+            case 'o':
+            case 'r':
+                $material = 'Visual';
+                break;
+
+            case 'm':
+                $material = 'File';
+                // used for computer software, numeric data, not for e-books or e-journals!
+                break;
+
+            case 'p':
+                $material = 'Mixed';
+                break;
+
         }
-        if ($l6 == 't') {
-            $material = 'book';
+
+        $online = ($f007[0] == 'c' && $f007[1] == 'r');
+
+        if ($material == 'Music') {
+            $material = $f007values[$f007[0]][$f007[1]];
+
+        } else if ($material == 'Series') {
+            switch ($f008[21]) {
+                case 'p':
+                    $material = 'Periodical';
+                    break;
+            }
         }
-        if ($l6 == 'a' && in_array($l7, array('b','i','s'))) {
-            $material = 'series';
-        }
-        if (in_array($l6, array('c','d','i','j'))) {
-            $material = 'music';
-        }
-        if (in_array($l6, array('e','f'))) {
-            $material = 'map';
-        }
-        if (in_array($l6, array('g','k','o','r'))) {
-            $material = 'visual';
-        }
-        if ($l6 == 'm') {
-            $material = 'file';
-        }
-        if ($l6 == 'p') {
-            $material = 'mixed';
-        }
+
         $this->material = $material;
+        $this->electronic = $online;
+    }
+
+    public function __construct(QuiteSimpleXmlElement $data) {
+
+        $this->parseMaterial($data);
 
         // Control fields
         $this->id = $data->text('marc:controlfield[@tag="001"]');
@@ -174,11 +333,13 @@ class BibliographicRecord extends Record implements JsonableInterface {
                     if (!empty($subtitle)) {
                         $this->title .= ' : ' . $subtitle;
                     }
+                    /*
                     if (preg_match('/elektronisk ressurs/', $node->text('marc:subfield[@code="h"]'))) {
                         $this->electronic = true;
                     } else {
                         $this->electronic = false;
                     }
+                    */
 
                     // $n : Number of part/section of a work (R)
                     $part_no = $node->text('marc:subfield[@code="n"]');
@@ -336,6 +497,9 @@ class BibliographicRecord extends Record implements JsonableInterface {
                         'name' => $node->text('marc:subfield[@code="a"]'),
                         'role' => 'added_corporate'
                     );
+                    $author['role'] = $node->text('marc:subfield[@code="4"]') 
+                        ?: ($node->text('marc:subfield[@code="e"]') ?: 'added_corporate');
+
                     $this->parseAuthority($node, $author);
 
                     $authors[] = $author;

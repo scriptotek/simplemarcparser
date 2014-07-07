@@ -50,3 +50,28 @@ Some light normalization is done.
  - year is converted to a integer by extracting the first four digit integer found (`c2013` → `2013`, `2009 [i.e. 2008]` → `2009` (not sure about this one..))
  - `pages` is a numeric value extracted from 300 $a. The raw value is stored in `extent`
  - names are changed from '<Lastname>, <Firstname>' to '<Firstname> <Lastname>'
+
+# Form and material
+
+Form and material is encoded in the leader and in control fields 006, 007 and 008.
+Encoding this information in a format that makes sense is a *work-in-progress*.
+
+Electronic and printed material is currently distinguished using the boolean valued `electronic` key.
+
+Printed book:
+
+```json
+{
+	"material": "book",
+	"electronic": false
+}
+```
+
+Electronic book:
+
+```json
+{
+	"material": "book",
+	"electronic": true
+}
+```

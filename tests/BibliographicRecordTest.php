@@ -66,6 +66,19 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('Periodical', $out->material);
         $this->assertTrue($out->electronic);
     }
+
+    public function testMaterialIsPrintedSeries() {
+        $out = $this->parseRecordData('
+            <marc:leader>99999 as a2299999 c 4500</marc:leader>
+            <marc:controlfield tag="001">801065968</marc:controlfield>
+            <marc:controlfield tag="007">ta</marc:controlfield>
+            <marc:controlfield tag="008">051128uuuuuuuuu      m       |    0mul d</marc:controlfield>
+        ');
+
+        $this->assertEquals('Series', $out->material);
+        $this->assertFalse($out->electronic);
+    }
+
     public function testMarc001() {
         $out = $this->parseRecordData('
             <marc:controlfield tag="001">12149361x</marc:controlfield>

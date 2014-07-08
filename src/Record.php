@@ -20,6 +20,10 @@ class Record {
         }
     }
 
+    public function __isset($name) {
+       return isset($this->data[$name]);
+    }
+
     /**
      * Convert the object to its JSON representation.
      *

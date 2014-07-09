@@ -438,42 +438,51 @@ class BibliographicRecord extends Record implements JsonableInterface {
                     $ind2 = $node->attr('ind2');
                     $emne = $node->text('marc:subfield[@code="a"]');
 
-                      // topical, geographic, chronological, or form aspects
-                      $tmp = array('subdivisions' => array());
+                    // topical, geographic, chronological, or form aspects
+                    $tmp = array('parts' => array());
 
-                      $term = trim($emne, '.');
-                      if ($term !== '') $tmp['term'] = $term;
+                    // $term = trim($emne, '.');
+                    $tmp['term'] = trim($emne, '.');
 
-                      $vocabularies = array(
-                          '0' => 'lcsh',
-                          '1' => 'lccsh', // LC subject headings for children's literature
-                          '2' => 'mesh', // Medical Subject Headings
-                          '3' => 'atg', // National Agricultural Library subject authority file (?)
-                          // 4 : unknown
-                          '5' => 'cash', // Canadian Subject Headings
-                          '6' => 'rvm', // Répertoire de vedettes-matière
-                      );
+                    $vocabularies = array(
+                        '0' => 'lcsh',
+                        '1' => 'lccsh', // LC subject headings for children's literature
+                        '2' => 'mesh', // Medical Subject Headings
+                        '3' => 'atg', // National Agricultural Library subject authority file (?)
+                        // 4 : unknown
+                        '5' => 'cash', // Canadian Subject Headings
+                        '6' => 'rvm', // Répertoire de vedettes-matière
+                    );
 
-                      $voc = $node->text('marc:subfield[@code="2"]');
-                      if (isset($vocabularies[$ind2])) {
-                          $tmp['vocabulary'] = $vocabularies[$ind2];
-                      } else if (!empty($voc)) {
-                          $tmp['vocabulary'] = $voc;
-                      }
+                    $voc = $node->text('marc:subfield[@code="2"]');
+                    if (isset($vocabularies[$ind2])) {
+                      $tmp['vocabulary'] = $vocabularies[$ind2];
+                    } else if (!empty($voc)) {
+                      $tmp['vocabulary'] = $voc;
+                    }
 
-                      $topical = $node->text('marc:subfield[@code="x"]');
-                      if ($topical !== '') $tmp['subdivisions']['topical'] = trim($topical, '.');
+                    foreach ($node->xpath('marc:subfield[@code="x"]/text()') as $subdiv) {
+                        $subdiv = trim($subdiv, '.');
+                        $tmp['parts'][] = array('value' => $subdiv, 'type' => 'topical');
+                        $tmp['term'] .= ' : ' . $subdiv;
+                    }
+                    foreach ($node->xpath('marc:subfield[@code="y"]/text()') as $subdiv) {
+                        $subdiv = trim($subdiv, '.');
+                        $tmp['parts'][] = array('value' => $subdiv, 'type' => 'chronological');
+                        $tmp['term'] .= ' : ' . $subdiv;
+                    }
+                    foreach ($node->xpath('marc:subfield[@code="z"]/text()') as $subdiv) {
+                        $subdiv = trim($subdiv, '.');
+                        $tmp['parts'][] = array('value' => $subdiv, 'type' => 'geographic');
+                        $tmp['term'] .= ' : ' . $subdiv;
+                    }
+                    foreach ($node->xpath('marc:subfield[@code="v"]/text()') as $subdiv) {
+                        $subdiv = trim($subdiv, '.');
+                        $tmp['parts'][] = array('value' => $subdiv, 'type' => 'form');
+                        $tmp['term'] .= ' : ' . $subdiv;
+                    }
 
-                      $chrono = $node->text('marc:subfield[@code="y"]');
-                      if ($chrono !== '') $tmp['subdivisions']['chronological'] = $chrono;
-
-                      $geo = $node->text('marc:subfield[@code="z"]');
-                      if ($geo !== '') $tmp['subdivisions']['geographic'] = $geo;
-
-                      $form = $node->text('marc:subfield[@code="v"]');
-                      if ($form !== '') $tmp['subdivisions']['form'] = $form;
-
-                      array_push($subjects, $tmp);
+                    array_push($subjects, $tmp);
                     break;
 
                 case 700:

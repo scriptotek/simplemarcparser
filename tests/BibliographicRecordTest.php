@@ -364,13 +364,15 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertCount(1, $out1->subjects);
         $this->assertEquals('tekord', $out1->subjects[0]['vocabulary']);
-        $this->assertEquals('sjømat', $out1->subjects[0]['term']);
-        $this->assertEquals('Norge', $out1->subjects[0]['subdivisions']['geographic']);
+        $this->assertEquals('sjømat : Norge', $out1->subjects[0]['term']);
+        $this->assertEquals('Norge', $out1->subjects[0]['parts'][0]['value']);
+        $this->assertEquals('geographic', $out1->subjects[0]['parts'][0]['type']);
 
         $this->assertCount(1, $out2->subjects);
         $this->assertEquals('lcsh', $out2->subjects[0]['vocabulary']);
-        $this->assertEquals('Optoelectronics industry', $out2->subjects[0]['term']);
-        $this->assertEquals('Directories', $out2->subjects[0]['subdivisions']['topical']);
+        $this->assertEquals('Optoelectronics industry : Directories', $out2->subjects[0]['term']);
+        $this->assertEquals('Directories', $out2->subjects[0]['parts'][0]['value']);
+        $this->assertEquals('topical', $out2->subjects[0]['parts'][0]['type']);
     }
 
     public function testMarc700() {

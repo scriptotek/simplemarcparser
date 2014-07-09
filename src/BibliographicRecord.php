@@ -464,22 +464,22 @@ class BibliographicRecord extends Record implements JsonableInterface {
                     foreach ($node->xpath('marc:subfield[@code="x"]/text()') as $subdiv) {
                         $subdiv = trim($subdiv, '.');
                         $tmp['parts'][] = array('value' => $subdiv, 'type' => 'topical');
-                        $tmp['term'] .= ' : ' . $subdiv;
+                        $tmp['term'] .= '--' . $subdiv;
                     }
                     foreach ($node->xpath('marc:subfield[@code="y"]/text()') as $subdiv) {
                         $subdiv = trim($subdiv, '.');
                         $tmp['parts'][] = array('value' => $subdiv, 'type' => 'chronological');
-                        $tmp['term'] .= ' : ' . $subdiv;
+                        $tmp['term'] .= '--' . $subdiv;
                     }
                     foreach ($node->xpath('marc:subfield[@code="z"]/text()') as $subdiv) {
                         $subdiv = trim($subdiv, '.');
                         $tmp['parts'][] = array('value' => $subdiv, 'type' => 'geographic');
-                        $tmp['term'] .= ' : ' . $subdiv;
+                        $tmp['term'] .= '--' . $subdiv;
                     }
                     foreach ($node->xpath('marc:subfield[@code="v"]/text()') as $subdiv) {
                         $subdiv = trim($subdiv, '.');
                         $tmp['parts'][] = array('value' => $subdiv, 'type' => 'form');
-                        $tmp['term'] .= ' : ' . $subdiv;
+                        $tmp['term'] .= '--' . $subdiv;
                     }
 
                     array_push($subjects, $tmp);

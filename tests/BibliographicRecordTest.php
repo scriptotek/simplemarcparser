@@ -350,7 +350,7 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
     public function testMarc650() {
         $out1 = $this->parseRecordData('
             <marc:datafield tag="650" ind1=" " ind2="7">
-                <marc:subfield code="a">sjømat</marc:subfield>
+                <marc:subfield code="a">Sjømat</marc:subfield>
                 <marc:subfield code="z">Norge</marc:subfield>
                 <marc:subfield code="2">tekord</marc:subfield>
             </marc:datafield>
@@ -364,13 +364,13 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertCount(1, $out1->subjects);
         $this->assertEquals('tekord', $out1->subjects[0]['vocabulary']);
-        $this->assertEquals('sjømat : Norge', $out1->subjects[0]['term']);
+        $this->assertEquals('Sjømat--Norge', $out1->subjects[0]['term']);
         $this->assertEquals('Norge', $out1->subjects[0]['parts'][0]['value']);
         $this->assertEquals('geographic', $out1->subjects[0]['parts'][0]['type']);
 
         $this->assertCount(1, $out2->subjects);
         $this->assertEquals('lcsh', $out2->subjects[0]['vocabulary']);
-        $this->assertEquals('Optoelectronics industry : Directories', $out2->subjects[0]['term']);
+        $this->assertEquals('Optoelectronics industry--Directories', $out2->subjects[0]['term']);
         $this->assertEquals('Directories', $out2->subjects[0]['parts'][0]['value']);
         $this->assertEquals('topical', $out2->subjects[0]['parts'][0]['type']);
     }

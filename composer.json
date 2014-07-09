@@ -11,7 +11,7 @@
         }
     ],
     "support": {
-        "issues": "http://github.com/scriptotek/simplemarcparser/issues",
+        "issues": "http://github.com/scriptotek/simplemarcparser/issues"
     },
     "require": {
         "php": ">=5.3",

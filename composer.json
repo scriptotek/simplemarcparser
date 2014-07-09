@@ -3,15 +3,19 @@
     "description": "A simple MARC21/XML parser",
     "keywords": ["marc"],
     "license": "MIT",
+    "type": "library",
     "authors": [
         {
             "name": "Dan Michael O. Heggø",
             "email": "danmichaelo@gmail.com"
         }
     ],
+    "support": {
+        "issues": "http://github.com/scriptotek/simplemarcparser/issues",
+    },
     "require": {
         "php": ">=5.3",
-        "danmichaelo/quitesimplexmlelement": "~0.2",
+        "danmichaelo/quitesimplexmlelement": "~0.2.3",
         "nesbot/Carbon": "1.*",
         "illuminate/support": "~4.1"
     },

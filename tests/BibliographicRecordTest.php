@@ -95,7 +95,7 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
             <marc:controlfield tag="005">19940223151047.0</marc:controlfield>
         ');
 
-        $this->assertEquals(Carbon::createFromDate(1997, 4, 11), $out1->modified);
+        $this->assertEquals(Carbon::create(1997, 4, 11, 0, 0, 0), $out1->modified);
         $this->assertEquals(Carbon::create(1994, 2, 23, 15, 10, 47), $out2->modified);
     }
 
@@ -110,9 +110,9 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
             <marc:controlfield tag="008">690101s1996 000 u|eng d</marc:controlfield>
         ');
 
-        $this->assertEquals(Carbon::createFromDate(1997, 4, 11), $out1->created);
-        $this->assertEquals(Carbon::createFromDate(1970, 1, 1), $out2->created);
-        $this->assertEquals(Carbon::createFromDate(2069, 1, 1), $out3->created);
+        $this->assertEquals(Carbon::create(1997, 4, 11, 0, 0, 0), $out1->created);
+        $this->assertEquals(Carbon::create(1970, 1, 1, 0, 0, 0), $out2->created);
+        $this->assertEquals(Carbon::create(2069, 1, 1, 0, 0, 0), $out3->created);
     }
 
     public function testMarc010() {

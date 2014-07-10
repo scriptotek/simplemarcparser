@@ -56,8 +56,8 @@ class Record {
      */
     protected function parseDateTime($value)
     {
-        if (strlen($value) == 6) return Carbon::createFromFormat('ymd', $value);
-        if (strlen($value) == 8) return Carbon::createFromFormat('Ymd', $value);
+        if (strlen($value) == 6) return Carbon::createFromFormat('ymdHis', $value. '000000');
+        if (strlen($value) == 8) return Carbon::createFromFormat('YmdHis', $value . '000000');
         if (strlen($value) == 16) return Carbon::createFromFormat('YmdHis', substr($value, 0, 14)); // skip decimal fraction
     }
 

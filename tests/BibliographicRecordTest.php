@@ -361,6 +361,15 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
                 <marc:subfield code="x">Directories.</marc:subfield>
             </marc:datafield>
         ');
+        $out3 = $this->parseRecordData('
+            <marc:datafield tag="650" ind1=" " ind2="7">
+                <marc:subfield code="a">Musikk</marc:subfield>
+                <marc:subfield code="v">Historie</marc:subfield>
+                <marc:subfield code="y">1900-    .</marc:subfield>
+                <marc:subfield code="z">Tyskland</marc:subfield>
+                <marc:subfield code="2">tekord</marc:subfield>
+            </marc:datafield>
+        ');
 
         $this->assertCount(1, $out1->subjects);
         $this->assertEquals('tekord', $out1->subjects[0]['vocabulary']);
@@ -368,11 +377,19 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('Norge', $out1->subjects[0]['parts'][0]['value']);
         $this->assertEquals('geographic', $out1->subjects[0]['parts'][0]['type']);
 
-        $this->assertCount(1, $out2->subjects);
         $this->assertEquals('lcsh', $out2->subjects[0]['vocabulary']);
         $this->assertEquals('Optoelectronics industry--Directories', $out2->subjects[0]['term']);
         $this->assertEquals('Directories', $out2->subjects[0]['parts'][0]['value']);
-        $this->assertEquals('topical', $out2->subjects[0]['parts'][0]['type']);
+        $this->assertEquals('general', $out2->subjects[0]['parts'][0]['type']);
+
+        $this->assertEquals('tekord', $out3->subjects[0]['vocabulary']);
+        $this->assertEquals('Musikk--Historie--1900-    --Tyskland', $out3->subjects[0]['term']);
+        $this->assertEquals('Historie', $out3->subjects[0]['parts'][0]['value']);
+        $this->assertEquals('form', $out3->subjects[0]['parts'][0]['type']);
+        $this->assertEquals('1900-    ', $out3->subjects[0]['parts'][1]['value']);
+        $this->assertEquals('chronological', $out3->subjects[0]['parts'][1]['type']);
+        $this->assertEquals('Tyskland', $out3->subjects[0]['parts'][2]['value']);
+        $this->assertEquals('geographic', $out3->subjects[0]['parts'][2]['type']);
     }
 
     public function testMarc700() {

@@ -461,25 +461,19 @@ class BibliographicRecord extends Record implements JsonableInterface {
                       $tmp['vocabulary'] = $voc;
                     }
 
-                    foreach ($node->xpath('marc:subfield[@code="x"]/text()') as $subdiv) {
-                        $subdiv = trim($subdiv, '.');
-                        $tmp['parts'][] = array('value' => $subdiv, 'type' => 'topical');
-                        $tmp['term'] .= '--' . $subdiv;
-                    }
-                    foreach ($node->xpath('marc:subfield[@code="y"]/text()') as $subdiv) {
-                        $subdiv = trim($subdiv, '.');
-                        $tmp['parts'][] = array('value' => $subdiv, 'type' => 'chronological');
-                        $tmp['term'] .= '--' . $subdiv;
-                    }
-                    foreach ($node->xpath('marc:subfield[@code="z"]/text()') as $subdiv) {
-                        $subdiv = trim($subdiv, '.');
-                        $tmp['parts'][] = array('value' => $subdiv, 'type' => 'geographic');
-                        $tmp['term'] .= '--' . $subdiv;
-                    }
-                    foreach ($node->xpath('marc:subfield[@code="v"]/text()') as $subdiv) {
-                        $subdiv = trim($subdiv, '.');
-                        $tmp['parts'][] = array('value' => $subdiv, 'type' => 'form');
-                        $tmp['term'] .= '--' . $subdiv;
+                    $subdivtypes = array(
+                        'v' => 'form',
+                        'x' => 'general',
+                        'y' => 'chronological',
+                        'z' => 'geographic',
+                    );
+                    foreach ($node->xpath('marc:subfield') as $subdiv) {
+                        $code = $subdiv->attr('code');
+                        if (in_array($code, array_keys($subdivtypes))) {
+                            $subdiv = trim($subdiv, '.');
+                            $tmp['parts'][] = array('value' => $subdiv, 'type' => $subdivtypes[$code]);
+                            $tmp['term'] .= '--' . $subdiv;
+                        }
                     }
 
                     array_push($subjects, $tmp);

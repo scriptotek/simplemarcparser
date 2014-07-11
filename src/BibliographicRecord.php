@@ -94,7 +94,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
                 'j' => 'Magnetic disk',
                 'k' => 'Computer card',
                 'm' => 'Magneto-optical disc',
-                'o' => 'Optical disc',       // CD-rom
+                'o' => 'CD-ROM',                // Optical disc
                 'r' => 'Remote resource',    // n Nettdokumenter
             ),
             'f' => array(
@@ -104,7 +104,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
                 'd' => 'No writing system',
             ),
             's' => array(
-                'd' => 'Music CD',         // v CD-er
+                'd' => 'Music CD',             // v CD-er
                 'e' => 'Cylinder',
                 'g' => 'Sound cartridge',
                 'i' => 'Sound-track film',
@@ -120,6 +120,27 @@ class BibliographicRecord extends Record implements JsonableInterface {
                 'f' => 'Videocassette',
                 'r' => 'Videoreel',
             ),
+        );
+
+        $videoFormats = array(
+            'a' => 'Beta (1/2 in., videocassette)',
+            'b' => 'VHS (1/2 in., videocassette)',
+            'c' => 'U-matic (3/4 in., videocasstte)',
+            'd' => 'EIAJ (1/2 in., reel)',
+            'e' => 'Type C (1 in., reel)',
+            'f' => 'Quadruplex (1 in. or 2 in., reel)',
+            'g' => 'Laserdisc',
+            'h' => 'CED (Capacitance Electronic Disc) videodisc',
+            'i' => 'Betacam (1/2 in., videocassette)',
+            'j' => 'Betacam SP (1/2 in., videocassette)',
+            'k' => 'Super-VHS (1/2 in., videocassette)',
+            'm' => 'M-II (1/2 in., videocassette)',
+            'o' => 'D-2 (3/4 in., videocassette)',
+            'p' => '8 mm.',
+            'q' => 'Hi-8 mm.',
+            's' => 'Blu-ray',
+            'u' => 'Unknown',
+            'v' => 'DVD',
         );
 
         // If Leader/06 = a and Leader/07 = a, c, d, or m: Books
@@ -187,8 +208,23 @@ class BibliographicRecord extends Record implements JsonableInterface {
 
         $online = ($f007[0] == 'c' && $f007[1] == 'r');
 
-        if ($material == 'Music') {
+        if ($material == 'File') {
             $material = $f007values[$f007[0]][$f007[1]];
+
+
+        } else if ($material == 'Visual') {
+            $material = $f007values[$f007[0]][$f007[1]];
+
+            if (isset($videoFormats[$f007[4]])) {
+                $material = $videoFormats[$f007[4]]; // DVD, Blu-ray            
+            }
+
+        } else if ($material == 'Music') {
+            if ($f007[0] == 't') {
+                $material = 'Sheet music';
+            } else {
+                $material = $f007values[$f007[0]][$f007[1]];
+            }
 
         } else if ($material == 'Series') {
             switch ($f008[21]) {

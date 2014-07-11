@@ -71,8 +71,8 @@ class HoldingsRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('HIT/BØ', $out->sublocation);
         $this->assertEquals('BØ', $out->shelvinglocation);
         $this->assertEquals('633 A', $out->callcode);
-        $this->assertNull($out->public_notes);
-        $this->assertNull($out->nonpublic_notes);
+        $this->assertCount(0, $out->public_notes);
+        $this->assertCount(0, $out->nonpublic_notes);
     }
 
     public function testMarc856() {
@@ -146,7 +146,10 @@ class HoldingsRecordTest extends \PHPUnit_Framework_TestCase {
 
         $expected = json_encode(
           array(
-            'holdings' => '1(1969/70)-34(1997/99)'
+            'holdings' => '1(1969/70)-34(1997/99)',
+            'fulltext' => array(),
+            'nonpublic_notes' => array(),
+            'public_notes' => array(),
           )
         );
 

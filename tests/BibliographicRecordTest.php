@@ -151,15 +151,18 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
 
     public function testIsbn() {
         // Should strip off comments, but leave hyphens
-        $out = $this->parseRecordData('
+        $out1 = $this->parseRecordData('
             <marc:datafield tag="020" ind1=" " ind2=" ">
                 <marc:subfield code="a">978-8243005129 (ib.)</marc:subfield>
                 <marc:subfield code="c">Nkr 339.00</marc:subfield>
             </marc:datafield>
         ');
+        $out2 = $this->parseRecordData('');
 
-        $this->assertCount(1, $out->isbns);
-        $this->assertEquals('978-8243005129', $out->isbns[0]);
+        $this->assertCount(1, $out1->isbns);
+        $this->assertEquals('978-8243005129', $out1->isbns[0]);
+
+        $this->assertCount(0, $out2->isbns);
     }
 
     public function testCanceledIsbn() {
@@ -171,7 +174,7 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertNull($out->isbns);
+        $this->assertCount(0, $out->isbns);
     }
 
     public function testIsbnWithX() {
@@ -186,18 +189,22 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testMarc082() {
-        $out = $this->parseRecordData('
+        $out1 = $this->parseRecordData('
             <marc:datafield tag="082" ind1="0" ind2="4">
                 <marc:subfield code="a">333.914/02[U]</marc:subfield>
                 <marc:subfield code="2">23</marc:subfield>
             </marc:datafield>
         ');
+        $out2 = $this->parseRecordData('');
 
-        $klass = $out->classifications[0];
+        $this->assertCount(1, $out1->classifications);
+        $klass = $out1->classifications[0];
         $this->assertEquals('dewey', $klass['system']);
         $this->assertEquals('333.91402', $klass['number']);
         $this->assertEquals('23', $klass['edition']);
         $this->assertArrayNotHasKey('assigning_agency', $klass);
+
+        $this->assertCount(0, $out2->classifications);
     }
 
     public function testMarc082b() {
@@ -394,6 +401,7 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
                 <marc:subfield code="2">tekord</marc:subfield>
             </marc:datafield>
         ');
+        $out4 = $this->parseRecordData('');
 
         $this->assertCount(1, $out1->subjects);
         $this->assertEquals('tekord', $out1->subjects[0]['vocabulary']);
@@ -414,6 +422,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('chronological', $out3->subjects[0]['parts'][1]['type']);
         $this->assertEquals('Tyskland', $out3->subjects[0]['parts'][2]['value']);
         $this->assertEquals('geographic', $out3->subjects[0]['parts'][2]['type']);
+
+        $this->assertCount(0, $out4->subjects);
     }
 
     public function testMarc700() {
@@ -588,6 +598,12 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
             'id' => '12149361x',
             'is_series' => false,
             'is_multivolume' => false,
+            'isbns' => array(),
+            'series' => array(),
+            'authors' => array(),
+            'subjects' => array(),
+            'classifications' => array(),
+            'notes' => array(),
           )
         );
 

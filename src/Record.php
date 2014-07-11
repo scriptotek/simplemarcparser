@@ -15,9 +15,14 @@ class Record {
     }
 
     public function __set($name, $value) {
-        if ($value === false || !empty($value)) {
+        if (is_null($value)) {
+            unset($this->data[$name]);
+        } else if (is_string($value) && empty($value)) {
+            unset($this->data[$name]);
+        } else {
             $this->data[$name] = $value;
         }
+        // }
     }
 
     public function __isset($name) {

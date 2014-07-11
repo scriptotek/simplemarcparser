@@ -693,10 +693,18 @@ class BibliographicRecord extends Record implements JsonableInterface {
             }
         }
 
-        $this->preceding = $preceding;
-        $this->succeeding = $succeeding;
-        $this->part_of = $part_of;
-        $this->other_form = $other_form;
+        if (!empty($preceding)) {
+            $this->preceding = $preceding;
+        }
+        if (!empty($succeeding)) {
+            $this->succeeding = $succeeding;
+        }
+        if (!empty($other_form)) {
+        $this->part_of = $other_form;
+        }
+        if (!empty($other_form)) {
+            $this->other_form = $other_form;
+        }
 
         $this->isbns = $isbns;
         $this->series = $series;

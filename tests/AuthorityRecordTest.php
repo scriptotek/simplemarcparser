@@ -138,7 +138,7 @@ class AuthorityRecordTest extends \PHPUnit_Framework_TestCase {
 
         $rec2 = $this->parseRecordData('');
 
-        $this->assertNull($rec2->genders);
+        $this->assertCount(0, $rec2->genders);
         $this->assertNull($rec2->gender);
     }
 
@@ -171,6 +171,7 @@ class AuthorityRecordTest extends \PHPUnit_Framework_TestCase {
 
         $expected = json_encode(
           array(
+            'genders' => array(),
             'nameVariants' => array(
               'Rishøi, Ingvild Hedemann',
               'Hedemann Rishøi, Ingvild',

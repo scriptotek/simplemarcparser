@@ -103,6 +103,10 @@ class BibliographicRecord extends Record implements JsonableInterface {
                 'c' => 'Combination ', // in a combination of two or more of the other defined types
                 'd' => 'No writing system',
             ),
+            'o' => array(
+                'u' => 'Kit',
+                '|' => 'Kit',
+            ),
             's' => array(
                 'd' => 'Music CD',             // v CD-er
                 'e' => 'Cylinder',
@@ -213,9 +217,11 @@ class BibliographicRecord extends Record implements JsonableInterface {
 
 
         } else if ($material == 'Visual') {
-            $material = $f007values[$f007[0]][$f007[1]];
+            if (isset($f007values[$f007[0]]) && isset($f007values[$f007[0]][$f007[1]])) {
+                $material = $f007values[$f007[0]][$f007[1]];
+            }
 
-            if (isset($videoFormats[$f007[4]])) {
+            if (isset($f007[4]) && isset($videoFormats[$f007[4]])) {
                 $material = $videoFormats[$f007[4]]; // DVD, Blu-ray            
             }
 

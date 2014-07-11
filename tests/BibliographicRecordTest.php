@@ -91,6 +91,18 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse($out->electronic);
     }
 
+    public function testMaterialIsKit() {
+        $out = $this->parseRecordData('
+            <marc:leader>99999 oa a2299999 c 4500</marc:leader>
+            <marc:controlfield tag="001">020299729</marc:controlfield>
+            <marc:controlfield tag="007">o|</marc:controlfield>
+            <marc:controlfield tag="008">020205s1986    ||||||| |    |||||b|eng|d</marc:controlfield>
+        ');
+
+        $this->assertEquals('Kit', $out->material);
+        $this->assertFalse($out->electronic);
+    }
+
     public function testMarc001() {
         $out = $this->parseRecordData('
             <marc:controlfield tag="001">12149361x</marc:controlfield>

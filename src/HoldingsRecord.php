@@ -7,6 +7,7 @@ class HoldingsRecord extends Record implements JsonableInterface {
 
     // 859 $f: Use restrictions / Tilgjengelighet
     // Ref: http://www.bibsys.no/files/out/biblev/utlaanstatus-marc21.pdf
+    //      http://norzig.no/profiles/holdings2.html#tab1
     static $m859_f = array(
         '1' => 'Not for loan',
         '2' => 'In-library use only',
@@ -18,11 +19,14 @@ class HoldingsRecord extends Record implements JsonableInterface {
         '8' => 'Long loan period',
         '9' => 'Term loan',
         '10' => 'Semester loan',
-        '11' => 'Available for supply without return'
+        '11' => 'Available for supply without return',
+        '12' => 'Not for ILL',
+        '13' => 'Not for User ILL',
     );
 
     // 859 $h: Circulation status  / Utlånsstatus
     // Ref: http://www.bibsys.no/files/out/biblev/utlaanstatus-marc21.pdf
+    //      http://norzig.no/profiles/holdings2.html#tab2
     static $m859_h = array(
         '0' => 'Available',
         '1' => 'Circulation status undefined',
@@ -38,7 +42,17 @@ class HoldingsRecord extends Record implements JsonableInterface {
         '11' => 'Claimed returned or never borrowed',
         '12' => 'Lost',
         '13' => 'Missing, being traced',
-        '14' => 'Supplied (i.e. return not required'
+        '14' => 'Supplied (i.e. return not required',
+        '15' => 'In binding',
+        '16' => 'In repair',
+        '17' => 'Pending transfer',
+        '18' => 'Missing, overdue',
+        '19' => 'Withdrawn',
+        '20' => 'Weeded',
+        '21' => 'Unreserved',
+        '22' => 'Damaged',
+        '23' => 'Non circulating',
+        '24' => 'Other',
     );
 
     public function __construct(QuiteSimpleXmlElement $data) {

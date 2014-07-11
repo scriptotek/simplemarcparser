@@ -24,6 +24,11 @@ class Record {
        return isset($this->data[$name]);
     }
 
+    public function __unset($name)
+    {
+        unset($this->data[$name]);
+    }
+
     /**
      * Convert the object to its JSON representation.
      *

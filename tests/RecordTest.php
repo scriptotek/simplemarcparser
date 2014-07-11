@@ -22,4 +22,17 @@ class RecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertJsonStringEqualsJsonString(json_encode(array('key' => 'value')), $rec->toJson());
 
     }
+
+    public function testMagicMethods()
+    {
+        $rec = new Record;
+        $rec->lalala = "humdidum";
+
+        $this->assertTrue(isset($rec->lalala));
+        $this->assertFalse(isset($rec->humdidum));
+
+        unset($rec->lalala);
+        $this->assertFalse(isset($rec->lalala));
+    }
+
 }

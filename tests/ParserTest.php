@@ -49,9 +49,9 @@ class ParserTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException Scriptotek\SimpleMarcParser\ParserException
      */
-    public function testInvalidRecord() {
+    public function testInvalidRecordType() {
         $out = $this->parseRecordData('
             <marc:leader>99999 qi a22999997c 4500</marc:leader>
         ');

@@ -42,7 +42,7 @@ class Parser {
             case 'y': // Serial item holdings 
                 return new HoldingsRecord($record);
             default:
-                throw new \Exception('Unknown record type.');
+                throw new ParserException("Unknown record type.\n\n------------------------\n" . $record->asXML() . "\n------------------------");
         }
 
     }

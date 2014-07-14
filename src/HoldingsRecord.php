@@ -126,6 +126,15 @@ class HoldingsRecord extends Record implements JsonableInterface {
                     $this->holdings = $node->text('marc:subfield[@code="a"]');
 
                     break;
+
+                case 876:
+                    // 866: Item Information - Basic Bibliographic Unit
+                    // $d - Date acquired (R)
+                    $this->acquired = $this->parseDateTime($node->text('marc:subfield[@code="d"]'));
+                    $this->barcode = $node->text('marc:subfield[@code="p"]');
+                    //$this->status = $node->text('marc:subfield[@code="j"]');
+                    break;
+
             }
         }
 

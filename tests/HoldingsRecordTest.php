@@ -3,6 +3,7 @@
 require 'vendor/autoload.php';
 use Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement;
 use Scriptotek\SimpleMarcParser\HoldingsRecord;
+use Carbon\Carbon;
 
 class HoldingsRecordTest extends \PHPUnit_Framework_TestCase {
 
@@ -134,6 +135,19 @@ class HoldingsRecordTest extends \PHPUnit_Framework_TestCase {
         ');
         $this->assertEquals('1(1969/70)-34(1997/99)', $out->holdings);
 
+    }
+
+    public function testMarc876() {
+
+        $out = $this->parseRecordData('
+            <marc:datafield tag="876" ind1=" " ind2=" ">
+                <marc:subfield code="d">20130620</marc:subfield>
+                <marc:subfield code="j">kat</marc:subfield>
+                <marc:subfield code="p">050233na0</marc:subfield>
+            </marc:datafield>
+        ');
+        $this->assertEquals(Carbon::create(2013, 6, 20, 0, 0, 0), $out->acquired);
+        $this->assertEquals('050233na0', $out->barcode);
     }
 
     public function testJson()

@@ -302,8 +302,8 @@ class BibliographicRecord extends Record implements JsonableInterface {
                     break;
 
                 // 082 - Dewey Decimal Classification Number (R)
-                case 82:                                                            // Test?
-                    $cl = array('system' => 'dewey');
+                case 82:
+                    $cl = array('system' => 'DDC');
 
                     $map = array(
                         'a' => array('number', '^.*?([0-9.]+)\/?([0-9.]*).*$', '\1\2'),

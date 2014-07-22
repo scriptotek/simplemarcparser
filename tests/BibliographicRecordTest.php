@@ -199,7 +199,7 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertCount(1, $out1->classifications);
         $klass = $out1->classifications[0];
-        $this->assertEquals('dewey', $klass['system']);
+        $this->assertEquals('DDC', $klass['system']);
         $this->assertEquals('333.91402', $klass['number']);
         $this->assertEquals('23', $klass['edition']);
         $this->assertArrayNotHasKey('assigning_agency', $klass);
@@ -217,7 +217,7 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         ');
 
         $klass = $out->classifications[0];
-        $this->assertEquals('dewey', $klass['system']);
+        $this->assertEquals('DDC', $klass['system']);
         $this->assertEquals('639.3', $klass['number']);
         $this->assertEquals('5/nor', $klass['edition']);
         $this->assertEquals('NO-OsNB', $klass['assigning_agency']);

@@ -188,6 +188,20 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('1-85723-457-X', $out->isbns[0]);
     }
 
+    public function testMarc080() {
+        $out1 = $this->parseRecordData('
+            <marc:datafield tag="080" ind1=" " ind2=" ">
+                <marc:subfield code="a">551.2:51(02)</marc:subfield>
+            </marc:datafield>
+        ');
+        $out2 = $this->parseRecordData('');
+
+        $this->assertCount(1, $out1->classifications);
+        $klass = $out1->classifications[0];
+        $this->assertEquals('UDC', $klass['system']);
+        $this->assertEquals('551.2:51(02)', $klass['number']);
+    }
+
     public function testMarc082() {
         $out1 = $this->parseRecordData('
             <marc:datafield tag="082" ind1="0" ind2="4">

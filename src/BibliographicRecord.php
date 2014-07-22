@@ -301,6 +301,24 @@ class BibliographicRecord extends Record implements JsonableInterface {
                     array_push($isbns, $isbn);
                     break;
 
+                // 080 - Universal Decimal Classification Number (R)
+                case 80:
+                    $cl = array('system' => 'UDC');
+
+                    $map = array(
+                        'a' => array('number', '^.*?([0-9.\/:()]+).*$', '\1'),
+                        '2' => 'edition',
+                    );
+                    foreach ($map as $key => $val) {
+                        $t = $node->text('marc:subfield[@code="' . $key . '"]');
+                        if (!is_array($val)) $val = array($val);
+                        if (count($val) > 2) $t = preg_replace('/' . $val[1] . '/', $val[2], $t);
+                        if (!empty($t)) $cl[$val[0]] = $t;
+                    }
+
+                    $classifications[] = $cl;
+                    break;
+
                 // 082 - Dewey Decimal Classification Number (R)
                 case 82:
                     $cl = array('system' => 'DDC');

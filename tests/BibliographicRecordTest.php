@@ -221,6 +221,40 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertCount(0, $out2->classifications);
     }
 
+    public function testMarc084() {
+        $out1 = $this->parseRecordData('
+            <marc:datafield tag="084" ind1=" " ind2=" ">
+                <marc:subfield code="a">62.70</marc:subfield>
+                <marc:subfield code="2">msc</marc:subfield>
+            </marc:datafield>
+            <marc:datafield tag="084" ind1=" " ind2=" ">
+                <marc:subfield code="a">62G15</marc:subfield>
+                <marc:subfield code="2">msc</marc:subfield>
+            </marc:datafield>
+            <marc:datafield tag="084" ind1=" " ind2=" ">
+                <marc:subfield code="a">62G05</marc:subfield>
+                <marc:subfield code="2">msc</marc:subfield>
+            </marc:datafield>
+            <marc:datafield tag="084" ind1=" " ind2=" ">
+                <marc:subfield code="a">62G10</marc:subfield>
+                <marc:subfield code="2">msc</marc:subfield>
+            </marc:datafield>
+            <marc:datafield tag="084" ind1=" " ind2=" ">
+                <marc:subfield code="a">62.70</marc:subfield>
+            </marc:datafield>
+        ');
+
+        $this->assertCount(4, $out1->classifications); // Not 5! Entries without $2 are ignored!
+
+        $this->assertEquals('msc', $out1->classifications[0]['system']);
+        $this->assertEquals('62.70', $out1->classifications[0]['number']);
+        $this->assertArrayNotHasKey('assigning_agency', $out1->classifications[0]);
+
+        $this->assertEquals('msc', $out1->classifications[1]['system']);
+        $this->assertEquals('62G15', $out1->classifications[1]['number']);
+
+    }
+
     public function testMarc082b() {
         $out = $this->parseRecordData('
             <marc:datafield tag="082" ind1="7" ind2="4">

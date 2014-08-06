@@ -338,6 +338,29 @@ class BibliographicRecord extends Record implements JsonableInterface {
                     $classifications[] = $cl;
                     break;
 
+                // 084 - Other Classification Number (R)
+                case 84:
+                    $cl = array();
+
+                    $map = array(
+                        'a' => 'number',
+                        '2' => 'system',
+                        'q' => 'assigning_agency'
+                    );
+                    foreach ($map as $key => $val) {
+                        $t = $node->text('marc:subfield[@code="' . $key . '"]');
+                        if (!is_array($val)) $val = array($val);
+                        if (count($val) > 2) $t = preg_replace('/' . $val[1] . '/', $val[2], $t);
+                        if (!empty($t)) $cl[$val[0]] = $t;
+                    }
+
+                    // Only add classifications with a system assigned. 
+                    // "Local classification" is deprecated!
+                    if (isset($cl['system'])) {
+                        $classifications[] = $cl;
+                    }
+                    break;
+
                 /*
                 case 89:
                     if (!isset($this->klass)) $this->klass = array();

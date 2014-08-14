@@ -270,6 +270,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
 
         $authors = array();
         $subjects = array();
+        $forms = array();
         $classifications = array();
         $series = array();
         $notes = array();
@@ -579,6 +580,52 @@ class BibliographicRecord extends Record implements JsonableInterface {
                     array_push($subjects, $tmp);
                     break;
 
+
+                case 655:
+                    $ind2 = $node->attr('ind2');
+                    $emne = $node->text('marc:subfield[@code="a"]');
+
+                    // topical, geographic, chronological, or form aspects
+                    $tmp = array('parts' => array());
+
+                    // $term = trim($emne, '.');
+                    $tmp['term'] = trim($emne, '.');
+
+                    $vocabularies = array(
+                        '0' => 'lcsh',
+                        '1' => 'lccsh', // LC subject headings for children's literature
+                        '2' => 'mesh', // Medical Subject Headings
+                        '3' => 'atg', // National Agricultural Library subject authority file (?)
+                        // 4 : unknown
+                        '5' => 'cash', // Canadian Subject Headings
+                        '6' => 'rvm', // Répertoire de vedettes-matière
+                    );
+
+                    $voc = $node->text('marc:subfield[@code="2"]');
+                    if (isset($vocabularies[$ind2])) {
+                      $tmp['vocabulary'] = $vocabularies[$ind2];
+                    } else if (!empty($voc)) {
+                      $tmp['vocabulary'] = $voc;
+                    }
+
+                    $subdivtypes = array(
+                        'v' => 'form',
+                        'x' => 'general',
+                        'y' => 'chronological',
+                        'z' => 'geographic',
+                    );
+                    foreach ($node->xpath('marc:subfield') as $subdiv) {
+                        $code = $subdiv->attr('code');
+                        if (in_array($code, array_keys($subdivtypes))) {
+                            $subdiv = trim($subdiv, '.');
+                            $tmp['parts'][] = array('value' => $subdiv, 'type' => $subdivtypes[$code]);
+                            $tmp['term'] .= '--' . $subdiv;
+                        }
+                    }
+
+                    array_push($forms, $tmp);
+                    break;
+
                 case 700:
                     $author = array(
                         'name' => $node->text('marc:subfield[@code="a"]'),
@@ -768,6 +815,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
         $this->series = $series;
         $this->authors = $authors;
         $this->subjects = $subjects;
+        $this->forms = $forms;
         $this->classifications = $classifications;
         $this->notes = $notes;
     }

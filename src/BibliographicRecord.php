@@ -320,7 +320,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
 
                 // 080 - Universal Decimal Classification Number (R)
                 case 80:
-                    $cl = array('system' => 'UDC');
+                    $cl = array('system' => 'udc');
 
                     $map = array(
                         'a' => array('number', '^.*?([0-9.\/:()]+).*$', '\1'),
@@ -338,7 +338,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
 
                 // 082 - Dewey Decimal Classification Number (R)
                 case 82:
-                    $cl = array('system' => 'DDC');
+                    $cl = array('system' => 'ddc');
 
                     $map = array(
                         'a' => array('number', '^.*?([0-9.]+)\/?([0-9.]*).*$', '\1\2'),

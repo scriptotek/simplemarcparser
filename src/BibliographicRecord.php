@@ -301,6 +301,23 @@ class BibliographicRecord extends Record implements JsonableInterface {
                     array_push($isbns, $isbn);
                     break;
 
+                // 060 - National Library of Medicine Call Number (R)
+                case 60:
+                    $cl = array('system' => 'nlm');
+
+                    $map = array(
+                        'a' => 'number'
+                    );
+                    foreach ($map as $key => $val) {
+                        $t = $node->text('marc:subfield[@code="' . $key . '"]');
+                        if (!is_array($val)) $val = array($val);
+                        if (count($val) > 2) $t = preg_replace('/' . $val[1] . '/', $val[2], $t);
+                        if (!empty($t)) $cl[$val[0]] = $t;
+                    }
+
+                    $classifications[] = $cl;
+                    break;
+
                 // 080 - Universal Decimal Classification Number (R)
                 case 80:
                     $cl = array('system' => 'UDC');

@@ -26,7 +26,18 @@ class AuthorityRecord extends Record implements JsonableInterface {
         'v' => 'rvm', // Répertoire de vedettes-matière
     );
 
+    public function normalize_name($value)
+    {
+        $spl = explode(', ', $value);
+        if (count($spl) == 2) {
+            return $spl[1] . ' ' . $spl[0];
+        }
+        return $value;
+    }
+
     public function __construct(QuiteSimpleXmlElement $data) {
+
+        $altLabels = array();
 
         // 001: Control number
         $this->id = $data->text('marc:controlfield[@tag="001"]');
@@ -60,12 +71,7 @@ class AuthorityRecord extends Record implements JsonableInterface {
         foreach ($data->xpath('marc:datafield[@tag="100"]') as $field) {
             $this->class = 'person';
             $this->name = $field->text('marc:subfield[@code="a"]');
-            $spl = explode(', ', $this->name);
-            if (count($spl) == 2) {
-                $this->label = $spl[1] . ' ' . $spl[0];
-            } else {
-                $this->label = $this->name;
-            }
+            $this->label = $this->normalize_name($this->name);
             $bd = $field->text('marc:subfield[@code="d"]');
             $bd = explode('-', $bd);
             $this->birth = $bd[0] ?: null;
@@ -74,14 +80,20 @@ class AuthorityRecord extends Record implements JsonableInterface {
 
         // 110: Corporate Name (NR)
         foreach ($data->xpath('marc:datafield[@tag="110"]') as $field) {
-            $this->class = 'corporate';
-            // TODO: ...
+            $this->class = 'corporation';
+            $this->name = $field->text('marc:subfield[@code="a"]');
+            $this->label = ($field->attr('ind1') == '0')  // Inverted name
+                ? $this->normalize_name($this->name)
+                : $this->name;
         }
 
         // 111: Meeting Name (NR)
         foreach ($data->xpath('marc:datafield[@tag="111"]') as $field) {
             $this->class = 'meeting';
-            // TODO: ...
+            $this->name = $field->text('marc:subfield[@code="a"]');
+            $this->label = ($field->attr('ind1') == '0')  // Inverted name
+                ? $this->normalize_name($this->name)
+                : $this->name;
         }
 
         // 130: Uniform title: Not interested for now
@@ -130,14 +142,28 @@ class AuthorityRecord extends Record implements JsonableInterface {
             : null;
 
         // 400: See From Tracing-Personal Name (R)
-        $nameVariants = array();
         foreach ($data->xpath('marc:datafield[@tag="400"]') as $field) {
-            $nameVariants[] = $field->text('marc:subfield[@code="a"]');
+            $altLabels[] = $field->text('marc:subfield[@code="a"]');
         }
-        $this->nameVariants = $nameVariants;
+
+        // 410: See From Tracing-Corporate Name (R)
+        foreach ($data->xpath('marc:datafield[@tag="410"]') as $field) {
+            $s = $field->text('marc:subfield[@code="a"]');
+            if ($field->has('marc:subfield[@code="b"]')) {
+                $s .= ' : ' . $field->text('marc:subfield[@code="b"]');
+            }
+            $altLabels[] = $s;
+        }
+
+        // 411: See From Tracing-Meeting Name (R)
+        foreach ($data->xpath('marc:datafield[@tag="411"]') as $field) {
+            $altLabels[] = $field->text('marc:subfield[@code="a"]');
+        }
+
 
         // TODO: rest
 
+        $this->altLabels = $altLabels;
     }
 
 }

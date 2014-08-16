@@ -77,13 +77,20 @@ class AuthorityRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('noraf', $rec1->vocabulary);
     }
 
-    // 100 - Heading-Personal Name (NR)
-    public function testMarc100() {
+    // 100, 400 - Person
+    public function testPerson() {
+
         $rec1 = $this->parseRecordData('
            <marc:datafield tag="100" ind1="1" ind2=" ">
               <marc:subfield code="a">Bakke, Dagfinn</marc:subfield>
               <marc:subfield code="d">1933-</marc:subfield>
            </marc:datafield>
+          <marc:datafield tag="400" ind1="1" ind2=" ">
+              <marc:subfield code="a">Rishøi, Ingvild Hedemann</marc:subfield>
+          </marc:datafield>
+          <marc:datafield tag="400" ind1="1" ind2=" ">
+              <marc:subfield code="a">Hedemann Rishøi, Ingvild</marc:subfield>
+          </marc:datafield>
         ');
         $rec2 = $this->parseRecordData('
            <marc:datafield tag="100" ind1="1" ind2=" ">
@@ -96,9 +103,68 @@ class AuthorityRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(1933, $rec1->birth);
         $this->assertNull($rec1->death);
         $this->assertEquals('Dagfinn Bakke', $rec1->label);
+        $this->assertCount(2, $rec1->altLabels);
+        $this->assertEquals('Rishøi, Ingvild Hedemann', $rec1->altLabels[0]);
+        $this->assertEquals('Hedemann Rishøi, Ingvild', $rec1->altLabels[1]);
 
         $this->assertEquals(1828, $rec2->birth);
         $this->assertEquals(1906, $rec2->death);
+    }
+
+    // 110, 410 - Corporation
+    public function testCorporation() {
+        $rec1 = $this->parseRecordData('
+          <marc:datafield tag="110" ind1="2" ind2=" ">
+            <marc:subfield code="a">Universitetsbiblioteket i Oslo</marc:subfield>
+          </marc:datafield>
+          <marc:datafield tag="410" ind1=" " ind2=" ">
+            <marc:subfield code="a">UBO</marc:subfield>
+          </marc:datafield>
+          <marc:datafield tag="410" ind1=" " ind2=" ">
+            <marc:subfield code="a">Royal University Library (Oslo)</marc:subfield>
+            <marc:subfield code="q">Oslo</marc:subfield>
+          </marc:datafield>
+          <marc:datafield tag="410" ind1=" " ind2=" ">
+            <marc:subfield code="a">University of Oslo</marc:subfield>
+            <marc:subfield code="b">Library</marc:subfield>
+          </marc:datafield>
+        ');
+
+        $this->assertEquals('corporation', $rec1->class);
+        $this->assertEquals('Universitetsbiblioteket i Oslo', $rec1->label);
+        $this->assertCount(3, $rec1->altLabels);
+        $this->assertContains('UBO', $rec1->altLabels);
+        $this->assertContains('Royal University Library (Oslo)', $rec1->altLabels);
+        $this->assertContains('University of Oslo : Library', $rec1->altLabels);
+    }
+
+    // 111, 411 - Meeting
+    public function testMeeting() {
+        $rec1 = $this->parseRecordData('
+          <marc:datafield tag="111" ind1="2" ind2=" ">
+            <marc:subfield code="a">VM på ski</marc:subfield>
+          </marc:datafield>
+          <marc:datafield tag="411" ind1=" " ind2=" ">
+            <marc:subfield code="a">Ski-VM</marc:subfield>
+          </marc:datafield>
+          <marc:datafield tag="411" ind1=" " ind2=" ">
+            <marc:subfield code="a">Verdensmesterskapet på ski</marc:subfield>
+          </marc:datafield>
+          <marc:datafield tag="411" ind1=" " ind2=" ">
+            <marc:subfield code="a">Osl2011</marc:subfield>
+          </marc:datafield>
+          <marc:datafield tag="411" ind1=" " ind2=" ">
+            <marc:subfield code="a">Oslo2o11</marc:subfield>
+          </marc:datafield>
+          <marc:datafield tag="411" ind1=" " ind2=" ">
+            <marc:subfield code="a">FIS Nordic World Ski Champions</marc:subfield>
+          </marc:datafield>
+        ');
+
+        $this->assertEquals('meeting', $rec1->class);
+        $this->assertEquals('VM på ski', $rec1->label);
+        $this->assertCount(5, $rec1->altLabels);
+        $this->assertContains('Ski-VM', $rec1->altLabels);
     }
 
     // 150 - Topical Term (NR)
@@ -142,22 +208,6 @@ class AuthorityRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertNull($rec2->gender);
     }
 
-    // 400 - See From Tracing-Personal Name (R)
-    public function testMarc400() {
-        $rec1 = $this->parseRecordData('
-          <marc:datafield tag="400" ind1="1" ind2=" ">
-            <marc:subfield code="a">Rishøi, Ingvild Hedemann</marc:subfield>
-          </marc:datafield>
-          <marc:datafield tag="400" ind1="1" ind2=" ">
-            <marc:subfield code="a">Hedemann Rishøi, Ingvild</marc:subfield>
-          </marc:datafield>
-        ');
-
-        $this->assertCount(2, $rec1->nameVariants);
-        $this->assertEquals('Rishøi, Ingvild Hedemann', $rec1->nameVariants[0]);
-        $this->assertEquals('Hedemann Rishøi, Ingvild', $rec1->nameVariants[1]);
-    }
-
     public function testJson()
     {
         $rec1 = $this->parseRecordData('
@@ -172,7 +222,7 @@ class AuthorityRecordTest extends \PHPUnit_Framework_TestCase {
         $expected = json_encode(
           array(
             'genders' => array(),
-            'nameVariants' => array(
+            'altLabels' => array(
               'Rishøi, Ingvild Hedemann',
               'Hedemann Rishøi, Ingvild',
             )

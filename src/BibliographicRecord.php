@@ -667,7 +667,8 @@ class BibliographicRecord extends Record implements JsonableInterface {
                     $part_of['relationship'] = $node->text('marc:subfield[@code="i"]');
                     $part_of['title'] = $node->text('marc:subfield[@code="t"]');
                     $part_of['issn'] = $node->text('marc:subfield[@code="x"]');
-                    $part_of['id'] = preg_replace('/\(NO-TrBIB\)/', '', $node->text('marc:subfield[@code="w"]'));
+                    $part_of['isbn'] = $node->text('marc:subfield[@code="z"]');
+                    $part_of['bibsys_id'] = preg_replace('/\(NO-TrBIB\)/', '', $node->text('marc:subfield[@code="w"]'));
                     $part_of['volume'] = $node->text('marc:subfield[@code="v"]');
                     break;
 
@@ -804,8 +805,8 @@ class BibliographicRecord extends Record implements JsonableInterface {
         if (!empty($succeeding)) {
             $this->succeeding = $succeeding;
         }
-        if (!empty($other_form)) {
-        $this->part_of = $other_form;
+        if (count($part_of)) {
+            $this->part_of = $part_of;
         }
         if (!empty($other_form)) {
             $this->other_form = $other_form;

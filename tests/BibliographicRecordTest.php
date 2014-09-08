@@ -533,6 +533,32 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         // TODO
     }
 
+    public function testPartOf() {
+        $out = $this->parseRecordData('
+            <marc:datafield tag="245" ind1="0" ind2="0">
+                <marc:subfield code="a">Scattering</marc:subfield>
+                <marc:subfield code="b">scattering and inverse scattering in pure and applied science</marc:subfield>
+                <marc:subfield code="n">Vol. 1</marc:subfield>
+            </marc:datafield>
+            <marc:datafield tag="773" ind1="0" ind2="8">
+                <marc:subfield code="i">Inkludert i</marc:subfield>
+                <marc:subfield code="t">Scattering</marc:subfield>
+                <marc:subfield code="d">San Diego, Calif. : Academic Press, c2002</marc:subfield>
+                <marc:subfield code="z">0126137609</marc:subfield>
+                <marc:subfield code="w">(NO-TrBIB)042457270</marc:subfield>
+            </marc:datafield>
+        ');
+        $out2 = $this->parseRecordData('');
+
+        $this->assertEquals('Vol. 1', $out->part_no);
+        $this->assertEquals('042457270', $out->part_of['bibsys_id']);
+        $this->assertEquals('0126137609', $out->part_of['isbn']);
+        $this->assertEquals('Scattering', $out->part_of['title']);
+        $this->assertEquals('Inkludert i', $out->part_of['relationship']);
+
+        $this->assertNull($out2->part_of);
+    }
+
     public function testMarc776() {
         $out = $this->parseRecordData('
             <marc:datafield tag="776" ind1="0" ind2=" ">

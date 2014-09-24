@@ -302,6 +302,13 @@ class BibliographicRecord extends Record implements JsonableInterface {
                     array_push($isbns, $isbn);
                     break;
 
+                // 040 - Cataloging Source (NR)
+                case 40:                                                            // Test added
+                    $x = $node->text('marc:subfield[@code="e"]');
+                    if ($x) $this->catalogingRules = $x;
+                    // Value from http://www.loc.gov/standards/sourcelist/descriptive-conventions.html
+                    break;
+
                 // 060 - National Library of Medicine Call Number (R)
                 case 60:
                     $cl = array('system' => 'nlm');

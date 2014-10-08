@@ -27,6 +27,6 @@
         "psr-4": {
             "Scriptotek\\SimpleMarcParser\\": "src/"
         }
-    }
-
+    },
+    "minimum-stability": "dev"
 }

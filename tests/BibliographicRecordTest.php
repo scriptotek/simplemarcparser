@@ -437,11 +437,35 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
+        $out3 = $this->parseRecordData('
+            <marc:datafield tag="300" ind1=" " ind2=" ">
+                <marc:subfield code="a">xxi, s. 958-1831</marc:subfield>
+            </marc:datafield>
+        ');
+
+        $out4 = $this->parseRecordData('
+            <marc:datafield tag="300" ind1=" " ind2=" ">
+                <marc:subfield code="a">xxi, 48 [i.e. 96] s.</marc:subfield>
+            </marc:datafield>
+        ');
+
+        $out5 = $this->parseRecordData('
+            <marc:datafield tag="300" ind1=" " ind2=" ">
+                <marc:subfield code="a">[104] s.</marc:subfield>
+            </marc:datafield>
+        ');
+
         $this->assertEquals('353 s.', $out1->extent);
         $this->assertEquals(353, $out1->pages);
 
         $this->assertEquals('1 videoplate (DVD-video) (1 t 36 min)', $out2->extent);
         $this->assertNull($out2->pages);
+
+        $this->assertEquals(1831 - 958 + 1, $out3->pages);
+
+        $this->assertEquals(96, $out4->pages);
+
+        $this->assertEquals(104, $out5->pages);
     }
 
     public function testMarc500() {

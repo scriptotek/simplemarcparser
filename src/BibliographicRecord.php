@@ -480,15 +480,22 @@ class BibliographicRecord extends Record implements JsonableInterface {
 
                 case 300:
                     $this->extent = $node->text('marc:subfield[@code="a"]');
+                    
+                    # 2.5B2 "327 s.", 2.5B4 "48 [i.e. 96] s.", 2.5B7 "[93] s."
                     preg_match(
-                        '/([0-9]+) (s.|p.|pp.)/',
+                        '/\[?([0-9]+)\]? (s.|p.|pp.)/',
                         $node->text('marc:subfield[@code="a"]'),
                         $matches
                     );
-                    if ($matches) {
-                        $this->pages = intval($matches[1]);
-                    }
-                    break;
+                    if ($matches) $this->pages = intval($matches[1]);
+
+                    # 2.5B6 Eks: "s. 327-698" (flerbindsverk)
+                    preg_match(
+                        '/(s.|p.|pp.) ([0-9]+)-([0-9]+)/',
+                        $node->text('marc:subfield[@code="a"]'),
+                        $matches
+                    );
+                    if ($matches) $this->pages = intval($matches[3]) - intval($matches[2]) + 1;
 
                 /*
                 case 490:

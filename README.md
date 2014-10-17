@@ -16,7 +16,7 @@ with support for the MARC21 Bibliographic, Authority and Holdings formats.
 require_once('vendor/autoload.php');
 
 use Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement,
-    Scriptotek\SimpleMarcParser\Parser;
+    Scriptotek\SimpleMarcParser\BibliographicRecord;
 
 $data = file_get_contents('http://sru.bibsys.no/search/biblio?' . http_build_query(array(
 	'version' => '1.2',
@@ -32,8 +32,7 @@ $doc->registerXPathNamespaces(array(
         'd' => 'http://www.loc.gov/zing/srw/diagnostic/'
     ));
 
-$parser = new Parser;
-$record = $parser->parse($doc->first('/srw:searchRetrieveResponse/srw:records/srw:record/srw:recordData/marc:record'));
+$record = new BibliographicRecord($doc->first('/srw:searchRetrieveResponse/srw:records/srw:record/srw:recordData/marc:record'));
 
 print $record->title;
 
@@ -42,14 +41,21 @@ foreach ($record->subjects as $subject) {
 }
 ```
 
-# Normalization
+# Transformation/normalization
 
-Some light normalization is done.
+This parser is aimed at producing machine actionable output, and does some non-reversible 
+transformations to achieve this. Transformation rules expect AACR2-like records, and are
+tested mainly against the Norwegian version of AACR2 (*Norske katalogregler*), but might
+work well with other editions as well.
 
- - title (300 $a) and subtitle (300 $b) is combined into a single field `title` separated by ` : `.
- - year is converted to a integer by extracting the first four digit integer found (`c2013` → `2013`, `2009 [i.e. 2008]` → `2009` (not sure about this one..))
- - `pages` is a numeric value extracted from 300 $a. The raw value is stored in `extent`
- - names are changed from '<Lastname>, <Firstname>' to '<Firstname> <Lastname>'
+Examples:
+
+ - `title` is a combination of 300 $a and $b, separated by ` : `.
+ - `year` is an integer extracted from 260 $c by extracting the first four digit integer found
+   (`c2013` → `2013`, `2009 [i.e. 2008]` → `2009` (this might be a bit rough…))
+ - `pages` is an integer extracted from 300 $a. The raw value, useful for e.g. non-verbal content,
+   is stored in `extent`
+ - `creators[].name` are transformed from '<Lastname>, <Firstname>' to '<Firstname> <Lastname>'
 
 # Form and material
 

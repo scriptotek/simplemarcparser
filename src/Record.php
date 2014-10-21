@@ -90,6 +90,26 @@ class Record {
     }
 
     /**
+     * Parse a "name node", personal or corporate, main or added, that
+     * might have relators encapsulated.
+     *
+     * @param  Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement &$node
+     * @param  array &$out
+     * @param  string $default
+     */
+    protected function parseRelator(&$node, &$out, $default=null) {
+        $relterm = $node->text('marc:subfield[@code="e"]');
+        $relcode = $node->text('marc:subfield[@code="4"]');
+        if (!empty($relcode)) {
+            $out['role'] = $relcode;
+        } elseif (!empty($relterm)) {
+            $out['role'] = $relterm;
+        } elseif (!is_null($default)) {
+            $out['role'] = $default;            
+        }
+    }
+
+    /**
      * Parse a "relationship node", one that have links to other records encapsulated.
      *
      * @param  Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement $node
@@ -116,4 +136,5 @@ class Record {
 
         return $rel;
     }
+
 }

@@ -301,7 +301,7 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
     }
 
 
-    public function testMarc100() {
+    public function testPersonalNameHeadingWithAuthority() {
         $out = $this->parseRecordData('
             <marc:datafield tag="100" ind1="1" ind2=" ">
                 <marc:subfield code="a">Bjerkestrand, Bernt</marc:subfield>
@@ -310,25 +310,31 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertCount(1, $out->authors);
-
-        $el = $out->authors[0];
-        $this->assertEquals('Bernt Bjerkestrand', $el['name']);
-        $this->assertEquals('x12001130', $el['bibsys_identifier']);
-    }
-
-    public function testMarc100b() {
-        $out = $this->parseRecordData('
+        $out2 = $this->parseRecordData('
             <marc:datafield tag="100" ind1="1" ind2=" ">
                 <marc:subfield code="a">Bjerkestrand, Bernt</marc:subfield>
             </marc:datafield>
         ');
 
         $this->assertCount(1, $out->authors);
+        $this->assertEquals('Bernt Bjerkestrand', $out->authors[0]['name']);
+        $this->assertEquals('x12001130', $out->authors[0]['bibsys_identifier']);
 
-        $el = $out->authors[0];
-        $this->assertEquals('Bernt Bjerkestrand', $el['name']);
-        $this->assertArrayNotHasKey('authority', $el);
+        $this->assertEquals('Bernt Bjerkestrand', $out2->authors[0]['name']);
+        $this->assertArrayNotHasKey('authority', $out2->authors[0]);
+    }
+
+    public function testPersonalNameHeadingWithRelatorCode()
+    {
+        $out = $this->parseRecordData('
+            <marc:datafield tag="100" ind1="1" ind2=" ">
+                <marc:subfield code="a">Cangelosi, Angelo</marc:subfield>
+                <marc:subfield code="4">aut</marc:subfield>
+            </marc:datafield>
+        ');
+
+        $this->assertEquals('Angelo Cangelosi', $out->authors[0]['name']);
+        $this->assertEquals('aut', $out->authors[0]['role']);
     }
 
     public function testMarc110() {

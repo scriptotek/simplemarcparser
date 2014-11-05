@@ -6,6 +6,67 @@ use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
 class BibliographicRecord extends Record implements JsonableInterface {
 
 
+    public function getMaterialSubtypeFrom007($x1, $x2, $default = 'Unknown')
+    {
+         $f007values = array(
+            'a' => array(
+                'd' => 'Atlas',
+                'g' => 'Diagram',
+                'j' => 'Map',
+                'k' => 'Profile',
+                'q' => 'Model',
+                'r' => 'Remote-sensing image',
+                '_' => 'Map',
+            ),
+            'c' => array(
+                'a' => 'Tape cartridge',
+                'b' => 'Chip cartridge',
+                'c' => 'Computer optical disc cartridge',
+                'd' => 'Computer disc, type unspecified',
+                'e' => 'Computer disc cartridge, type unspecified',
+                'f' => 'Tape cassette',
+                'h' => 'Tape reel',
+                'j' => 'Magnetic disk',
+                'k' => 'Computer card',
+                'm' => 'Magneto-optical disc',
+                'o' => 'CD-ROM',                // Optical disc
+                'r' => 'Remote resource',    // n Nettdokumenter
+            ),
+            'f' => array(
+                'a' => 'Moon',         // in the Moon writing system
+                'b' => 'Braille',      // in the Braille writing system
+                'c' => 'Combination ', // in a combination of two or more of the other defined types
+                'd' => 'No writing system',
+            ),
+            'o' => array(
+                'u' => 'Kit',
+                '|' => 'Kit',
+            ),
+            's' => array(
+                'd' => 'Music CD',             // v CD-er
+                'e' => 'Cylinder',
+                'g' => 'Sound cartridge',
+                'i' => 'Sound-track film',
+                'q' => 'Roll',
+                's' => 'Sound cassette',
+                't' => 'Sound-tape reel',
+                'u' => 'Unspecified',
+                'w' => 'Wire recording',
+            ),
+            'v' => array(
+                'c' => 'Videocartridge',
+                'd' => 'Videodisc',           // w DVD-er
+                'f' => 'Videocassette',
+                'r' => 'Videoreel',
+            ),
+        );
+        if (isset($f007values[$x1]) && isset($f007values[$x1][$x2])) {
+            return $f007values[$x1][$x2];
+        }
+        // TODO: LOG IT!
+        return $default;
+    }
+
     protected function parseMaterial($data)
     {
         // See http://www.loc.gov/marc/ldr06guide.html
@@ -73,59 +134,6 @@ class BibliographicRecord extends Record implements JsonableInterface {
             'z' => 'Unspecified',
         );
 
-        $f007values = array(
-            'a' => array(
-                'd' => 'Atlas',
-                'g' => 'Diagram',
-                'j' => 'Map',
-                'k' => 'Profile',
-                'q' => 'Model',
-                'r' => 'Remote-sensing image',
-                '_' => 'Map',
-            ),
-            'c' => array(
-                'a' => 'Tape cartridge',
-                'b' => 'Chip cartridge',
-                'c' => 'Computer optical disc cartridge',
-                'd' => 'Computer disc, type unspecified',
-                'e' => 'Computer disc cartridge, type unspecified',
-                'f' => 'Tape cassette',
-                'h' => 'Tape reel',
-                'j' => 'Magnetic disk',
-                'k' => 'Computer card',
-                'm' => 'Magneto-optical disc',
-                'o' => 'CD-ROM',                // Optical disc
-                'r' => 'Remote resource',    // n Nettdokumenter
-            ),
-            'f' => array(
-                'a' => 'Moon',         // in the Moon writing system
-                'b' => 'Braille',      // in the Braille writing system
-                'c' => 'Combination ', // in a combination of two or more of the other defined types
-                'd' => 'No writing system',
-            ),
-            'o' => array(
-                'u' => 'Kit',
-                '|' => 'Kit',
-            ),
-            's' => array(
-                'd' => 'Music CD',             // v CD-er
-                'e' => 'Cylinder',
-                'g' => 'Sound cartridge',
-                'i' => 'Sound-track film',
-                'q' => 'Roll',
-                's' => 'Sound cassette',
-                't' => 'Sound-tape reel',
-                'u' => 'Unspecified',
-                'w' => 'Wire recording',
-            ),
-            'v' => array(
-                'c' => 'Videocartridge',
-                'd' => 'Videodisc',           // w DVD-er
-                'f' => 'Videocassette',
-                'r' => 'Videoreel',
-            ),
-        );
-
         $videoFormats = array(
             'a' => 'Beta (1/2 in., videocassette)',
             'b' => 'VHS (1/2 in., videocassette)',
@@ -160,7 +168,9 @@ class BibliographicRecord extends Record implements JsonableInterface {
         $f007 = str_split($data->text('marc:controlfield[@tag="007"]'));
         $f008 = str_split($data->text('marc:controlfield[@tag="008"]'));
 
-        $material = 'unknown';
+        $material = 'Unknown';
+        $this->material = $material;
+        $this->electronic = false;
 
         if (count($ldr) < 8) return;
         if (count($f007) < 2) return;
@@ -213,13 +223,12 @@ class BibliographicRecord extends Record implements JsonableInterface {
         $online = ($f007[0] == 'c' && $f007[1] == 'r');
 
         if ($material == 'File') {
-            $material = $f007values[$f007[0]][$f007[1]];
+            $material = $this->getMaterialSubtypeFrom007($f007[0], $f007[1], $material);
 
 
         } else if ($material == 'Visual') {
-            if (isset($f007values[$f007[0]]) && isset($f007values[$f007[0]][$f007[1]])) {
-                $material = $f007values[$f007[0]][$f007[1]];
-            }
+            $material = $this->getMaterialSubtypeFrom007($f007[0], $f007[1], $material);
+
 
             if (isset($f007[4]) && isset($videoFormats[$f007[4]])) {
                 $material = $videoFormats[$f007[4]]; // DVD, Blu-ray            
@@ -229,7 +238,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
             if ($f007[0] == 't') {
                 $material = 'Sheet music';
             } else {
-                $material = $f007values[$f007[0]][$f007[1]];
+                $material = $this->getMaterialSubtypeFrom007($f007[0], $f007[1], $material);
             }
 
         } else if ($material == 'Series') {

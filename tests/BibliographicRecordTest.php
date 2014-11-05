@@ -43,6 +43,18 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($out->electronic);
     }
 
+    public function testMaterialIsMusicCD() {
+        $out = $this->parseRecordData('
+            <marc:leader>99999cja a2299999 c 4500</marc:leader>
+            <marc:controlfield tag="001">040262626</marc:controlfield>
+            <marc:controlfield tag="007">sd f||||||||||</marc:controlfield>
+            <marc:controlfield tag="008">040209s20uu    xx#|||| |    |||||||und|d</marc:controlfield>
+        ');
+
+        $this->assertEquals('Music CD', $out->material);
+        $this->assertFalse($out->electronic);
+    }
+
     public function testMaterialIsPrintedPeriodical() {
         $out = $this->parseRecordData('
             <marc:leader>99999 as a2299999 c 4500</marc:leader>
@@ -100,6 +112,17 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         ');
 
         $this->assertEquals('Kit', $out->material);
+        $this->assertFalse($out->electronic);
+    }
+
+    public function testMaterialUnknown() {
+        $out = $this->parseRecordData('
+            <marc:leader>99999c   a2299999 c 4500</marc:leader>
+            <marc:controlfield tag="001">834084449</marc:controlfield>
+            <marc:controlfield tag="008">141105s1978    ||||||||||||||||0|||||||d</marc:controlfield>
+        ');
+
+        $this->assertEquals('Unknown', $out->material);
         $this->assertFalse($out->electronic);
     }
 
@@ -752,6 +775,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
             'forms' => array(),
             'classifications' => array(),
             'notes' => array(),
+            'material' => 'Unknown',
+            'electronic' => false,
           )
         );
 

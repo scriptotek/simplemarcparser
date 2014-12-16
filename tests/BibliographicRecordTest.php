@@ -335,15 +335,17 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
 
         $out2 = $this->parseRecordData('
             <marc:datafield tag="100" ind1="1" ind2=" ">
-                <marc:subfield code="a">Bjerkestrand, Bernt</marc:subfield>
+                <marc:subfield code="a">Halldór Kiljan Laxness</marc:subfield>
             </marc:datafield>
         ');
 
         $this->assertCount(1, $out->authors);
         $this->assertEquals('Bernt Bjerkestrand', $out->authors[0]['name']);
+        $this->assertEquals('Bjerkestrand, Bernt', $out->authors[0]['normalizedName']);
         $this->assertEquals('x12001130', $out->authors[0]['bibsys_identifier']);
 
-        $this->assertEquals('Bernt Bjerkestrand', $out2->authors[0]['name']);
+        $this->assertEquals('Halldór Kiljan Laxness', $out2->authors[0]['name']);
+        $this->assertEquals('Halldór Kiljan Laxness', $out2->authors[0]['normalizedName']);
         $this->assertArrayNotHasKey('authority', $out2->authors[0]);
     }
 

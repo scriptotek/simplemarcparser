@@ -48,6 +48,10 @@ class AuthorityRecord extends Record implements JsonableInterface {
         'v' => 'rvm', // Répertoire de vedettes-matière
     );
 
+    /**
+     * @param string $value
+     * @return string
+     */
     public function normalize_name($value)
     {
         $spl = explode(', ', $value);
@@ -57,6 +61,9 @@ class AuthorityRecord extends Record implements JsonableInterface {
         return $value;
     }
 
+    /**
+     * @param \Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement $data
+     */
     public function __construct(QuiteSimpleXmlElement $data) {
 
         $altLabels = array();

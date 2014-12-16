@@ -73,6 +73,9 @@ class HoldingsRecord extends Record implements JsonableInterface {
         '24' => 'Other',
     );
 
+    /**
+     * @param \Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement $data
+     */
     public function __construct(QuiteSimpleXmlElement $data) {
 
         $this->id = $data->text('marc:controlfield[@tag="001"]');  // Dokid

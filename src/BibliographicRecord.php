@@ -17,7 +17,6 @@ use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
  * @property string    $part_no
  * @property string    $part_name
  * @property string    $part_of
- * @property string    $other_form
  * @property string    $medium
  * @property string    $edition
  * @property string    $publisher
@@ -30,7 +29,8 @@ use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
  * @property string    $succeeding
  * @property string[]  $isbns
  * @property string[]  $notes
- * @property string    $series
+ * @property array     $series
+ * @property array     $other_form
  * @property array     $authors
  * @property array     $subjects
  * @property array     $genres
@@ -43,6 +43,12 @@ use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
 class BibliographicRecord extends Record implements JsonableInterface {
 
 
+    /**
+     * @param string $x1
+     * @param string $x2
+     * @param string $default
+     * @return string
+     */
     public function getMaterialSubtypeFrom007($x1, $x2, $default = 'Unknown')
     {
          $f007values = array(
@@ -104,7 +110,10 @@ class BibliographicRecord extends Record implements JsonableInterface {
         return $default;
     }
 
-    protected function parseMaterial($data)
+    /**
+     * @param \Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement $data
+     */
+    protected function parseMaterial(QuiteSimpleXmlElement $data)
     {
         // See http://www.loc.gov/marc/ldr06guide.html
 
@@ -295,6 +304,9 @@ class BibliographicRecord extends Record implements JsonableInterface {
         $this->electronic = $online;
     }
 
+    /**
+     * @param \Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement $data
+     */
     public function __construct(QuiteSimpleXmlElement $data) {
 
         $this->parseMaterial($data);

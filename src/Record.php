@@ -1,7 +1,7 @@
 <?php namespace Scriptotek\SimpleMarcParser;
 
-use Illuminate\Support\Contracts\JsonableInterface;
 use Carbon\Carbon;
+use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
 
 class Record {
 
@@ -62,7 +62,7 @@ class Record {
      * expressed in terms of the 24-hour (00-23) clock.
      *
      * @param  string $value
-     * @return Carbon\Carbon
+     * @return Carbon|null
      */
     protected function parseDateTime($value)
     {
@@ -75,7 +75,7 @@ class Record {
      * Parse a "name node", personal or corporate, main or added, that
      * might have authority information encapsulated.
      *
-     * @param  Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement &$node
+     * @param  QuiteSimpleXmlElement &$node
      * @param  array &$out
      */
     protected function parseAuthority(&$node, &$out) {
@@ -93,7 +93,7 @@ class Record {
      * Parse a "name node", personal or corporate, main or added, that
      * might have relators encapsulated.
      *
-     * @param  Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement &$node
+     * @param  QuiteSimpleXmlElement &$node
      * @param  array &$out
      * @param  string $default
      */
@@ -112,7 +112,7 @@ class Record {
     /**
      * Parse a "relationship node", one that have links to other records encapsulated.
      *
-     * @param  Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement $node
+     * @param  QuiteSimpleXmlElement $node
      * @return array
      */
     protected function parseRelationship($node)

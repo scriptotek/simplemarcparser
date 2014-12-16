@@ -1,11 +1,11 @@
 SimpleMarcParser
 ===============
 
-[![Build Status](https://travis-ci.org/scriptotek/simplemarcparser.png?branch=master)](https://travis-ci.org/scriptotek/simplemarcparser)
-[![Coverage Status](https://coveralls.io/repos/scriptotek/simplemarcparser/badge.png?branch=master)](https://coveralls.io/r/scriptotek/simplemarcparser?branch=master)
-[![Latest Stable Version](https://poser.pugx.org/scriptotek/simplemarcparser/version.png)](https://packagist.org/packages/scriptotek/simplemarcparser)
-[![Total Downloads](https://poser.pugx.org/scriptotek/simplemarcparser/downloads.png)](https://packagist.org/packages/scriptotek/simplemarcparser)
-
+[![Build Status](http://img.shields.io/travis/scriptotek/simplemarcparser.svg?style=flat-square)](https://travis-ci.org/scriptotek/simplemarcparser)
+[![Coverage Status](http://img.shields.io/coveralls/scriptotek/simplemarcparser.svg?style=flat-square)](https://coveralls.io/r/scriptotek/simplemarcparser?branch=master)
+[![Code Quality](http://img.shields.io/scrutinizer/g/scriptotek/simplemarcparser/master.svg?style=flat-square)](https://scrutinizer-ci.com/g/scriptotek/simplemarcparser/?branch=master)
+[![Latest Stable Version](http://img.shields.io/packagist/v/scriptotek/simplemarcparser.svg?style=flat-square)](https://packagist.org/packages/scriptotek/simplemarcparser)
+[![Total Downloads](http://img.shields.io/packagist/dt/scriptotek/simplemarcparser.svg?style=flat-square)](https://packagist.org/packages/scriptotek/simplemarcparser)
 
 `SimpleMarcParser` is currently a minimal MARC21/XML parser for use with `QuiteSimpleXMLElement`,
 with support for the MARC21 Bibliographic, Authority and Holdings formats.

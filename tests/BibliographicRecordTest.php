@@ -567,9 +567,9 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertCount(1, $out1->forms);
-        $this->assertEquals('no-ubo-mn', $out1->forms[0]['vocabulary']);
-        $this->assertEquals('Populærvitenskap', $out1->forms[0]['term']);
+        $this->assertCount(1, $out1->genres);
+        $this->assertEquals('no-ubo-mn', $out1->genres[0]['vocabulary']);
+        $this->assertEquals('Populærvitenskap', $out1->genres[0]['term']);
     }
 
     public function testMarc700() {
@@ -774,7 +774,7 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
             'series' => array(),
             'authors' => array(),
             'subjects' => array(),
-            'forms' => array(),
+            'genres' => array(),
             'classifications' => array(),
             'notes' => array(),
             'material' => 'Unknown',

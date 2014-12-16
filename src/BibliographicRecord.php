@@ -279,7 +279,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
 
         $authors = array();
         $subjects = array();
-        $forms = array();
+        $genres = array();
         $classifications = array();
         $series = array();
         $notes = array();
@@ -648,7 +648,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
                         }
                     }
 
-                    array_push($forms, $tmp);
+                    array_push($genres, $tmp);
                     break;
 
                 case 700:
@@ -838,7 +838,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
         $this->series = $series;
         $this->authors = $authors;
         $this->subjects = $subjects;
-        $this->forms = $forms;
+        $this->genres = $genres;
         $this->classifications = $classifications;
         $this->notes = $notes;
     }

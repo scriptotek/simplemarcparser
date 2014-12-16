@@ -506,6 +506,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
                         $matches
                     );
                     if ($matches) $this->pages = intval($matches[3]) - intval($matches[2]) + 1;
+                    break;
 
                 /*
                 case 490:

@@ -3,6 +3,43 @@
 use Illuminate\Support\Contracts\JsonableInterface;
 use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
 
+/**
+ * @property int       $id                 Local record identifier
+ * @property string    $material
+ * @property boolean   $electronic
+ * @property boolean   $is_series
+ * @property boolean   $is_multivolume
+ * @property boolean
+ * @property string    $agency
+ * @property string    $lccn
+ * @property string    $catalogingRules
+ * @property string    $title
+ * @property string    $part_no
+ * @property string    $part_name
+ * @property string    $part_of
+ * @property string    $other_form
+ * @property string    $medium
+ * @property string    $edition
+ * @property string    $publisher
+ * @property string    $extent
+ * @property string    $contents
+ * @property string    $summary
+ * @property string    $cover_image
+ * @property string    $description
+ * @property string    $preceding
+ * @property string    $succeeding
+ * @property string[]  $isbns
+ * @property string[]  $notes
+ * @property string    $series
+ * @property array     $authors
+ * @property array     $subjects
+ * @property array     $genres
+ * @property array     $classifications
+ * @property int       $pages
+ * @property int       $year
+ * @property Carbon\Carbon    $modified
+ * @property Carbon\Carbon    $created
+ */
 class BibliographicRecord extends Record implements JsonableInterface {
 
 
@@ -294,7 +331,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
         $this->is_series = false;
         $this->is_multivolume = false;
 
-        foreach ($data->xpath('marc:datafield') as $node) {
+        foreach ($data->all('marc:datafield') as $node) {
             $marcfield = intval($node->attributes()->tag);
             switch ($marcfield) {
 
@@ -484,7 +521,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
 
                 case 260:
                     $this->publisher = $node->text('marc:subfield[@code="b"]');
-                    $y = preg_replace('/^.*?([0-9]{4}).*$/', '\1', current($node->xpath('marc:subfield[@code="c"]')));
+                    $y = preg_replace('/^.*?([0-9]{4}).*$/', '\1', $node->first('marc:subfield[@code="c"]'));
                     $this->year = $y ? intval($y) : null;
                     break;
 
@@ -593,7 +630,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
                         'y' => 'chronological',
                         'z' => 'geographic',
                     );
-                    foreach ($node->xpath('marc:subfield') as $subdiv) {
+                    foreach ($node->all('marc:subfield') as $subdiv) {
                         $code = $subdiv->attr('code');
                         if (in_array($code, array_keys($subdivtypes))) {
                             $subdiv = trim($subdiv, '.');
@@ -639,7 +676,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
                         'y' => 'chronological',
                         'z' => 'geographic',
                     );
-                    foreach ($node->xpath('marc:subfield') as $subdiv) {
+                    foreach ($node->all('marc:subfield') as $subdiv) {
                         $code = $subdiv->attr('code');
                         if (in_array($code, array_keys($subdivtypes))) {
                             $subdiv = trim($subdiv, '.');

@@ -15,7 +15,7 @@
     },
     "require": {
         "php": ">=5.3",
-        "danmichaelo/quitesimplexmlelement": "~0.2.3",
+        "danmichaelo/quitesimplexmlelement": "~0.2.4",
         "nesbot/Carbon": "1.*",
         "illuminate/support": "~4.1"
     },

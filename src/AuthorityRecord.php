@@ -4,6 +4,28 @@ use Illuminate\Support\Contracts\JsonableInterface;
 use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
 use Carbon\Carbon;
 
+/**
+ * @property int      $id                 Local record identifier
+ * @property string   $class              One of 'person'|'corporation'|'meeting'|'topicalTerm'
+ * @property Carbon\Carbon   $modified
+ * @property string   $cataloging
+ * @property string   $catalogingAgency
+ * @property string   $language
+ * @property string   $transcribingAgency
+ * @property string   $modifyingAgency
+ *
+ * @property string   $agency
+ * @property string[] $genders
+ * @property string   $gender
+ * @property string   $name
+ * @property string   $label
+ * @property string   $birth
+ * @property string   $death
+ *
+ * @property string   $term
+ * @property string   $vocabulary
+ * @property string   $altLabels
+ */
 class AuthorityRecord extends Record implements JsonableInterface {
 
     // http://www.loc.gov/marc/authority/ad008.html
@@ -68,7 +90,7 @@ class AuthorityRecord extends Record implements JsonableInterface {
         }
 
         // 100: Personal name (NR)
-        foreach ($data->xpath('marc:datafield[@tag="100"]') as $field) {
+        foreach ($data->all('marc:datafield[@tag="100"]') as $field) {
             $this->class = 'person';
             $this->name = $field->text('marc:subfield[@code="a"]');
             $this->label = $this->normalize_name($this->name);
@@ -79,7 +101,7 @@ class AuthorityRecord extends Record implements JsonableInterface {
         }
 
         // 110: Corporate Name (NR)
-        foreach ($data->xpath('marc:datafield[@tag="110"]') as $field) {
+        foreach ($data->all('marc:datafield[@tag="110"]') as $field) {
             $this->class = 'corporation';
             $this->name = $field->text('marc:subfield[@code="a"]');
             $this->label = ($field->attr('ind1') == '0')  // Inverted name
@@ -88,7 +110,7 @@ class AuthorityRecord extends Record implements JsonableInterface {
         }
 
         // 111: Meeting Name (NR)
-        foreach ($data->xpath('marc:datafield[@tag="111"]') as $field) {
+        foreach ($data->all('marc:datafield[@tag="111"]') as $field) {
             $this->class = 'meeting';
             $this->name = $field->text('marc:subfield[@code="a"]');
             $this->label = ($field->attr('ind1') == '0')  // Inverted name
@@ -99,20 +121,20 @@ class AuthorityRecord extends Record implements JsonableInterface {
         // 130: Uniform title: Not interested for now
 
         // 150: Topical Term (NR)
-        foreach ($data->xpath('marc:datafield[@tag="150"]') as $field) {
+        foreach ($data->all('marc:datafield[@tag="150"]') as $field) {
             $this->class = 'topicalTerm';
             $this->term = $field->text('marc:subfield[@code="a"]');
             $label = $field->text('marc:subfield[@code="a"]');
-            foreach ($field->xpath('marc:subfield[@code="x"]') as $s) { 
+            foreach ($field->all('marc:subfield[@code="x"]') as $s) { 
                 $label .= ' : ' . $s;
             }
-            foreach ($field->xpath('marc:subfield[@code="v"]') as $s) {
+            foreach ($field->all('marc:subfield[@code="v"]') as $s) {
                 $label .= ' : ' . $s;
             }
-            foreach ($field->xpath('marc:subfield[@code="y"]') as $s) {
+            foreach ($field->all('marc:subfield[@code="y"]') as $s) {
                 $label .= ' : ' . $s;
             }
-            foreach ($field->xpath('marc:subfield[@code="z"]') as $s) {
+            foreach ($field->all('marc:subfield[@code="z"]') as $s) {
                 $label .= ' : ' . $s;
             }
             $this->label = $label;
@@ -124,7 +146,7 @@ class AuthorityRecord extends Record implements JsonableInterface {
 
         // 375: Gender (R)
         $genders = array();
-        foreach ($data->xpath('marc:datafield[@tag="375"]') as $field) {
+        foreach ($data->all('marc:datafield[@tag="375"]') as $field) {
             $gender = $field->text('marc:subfield[@code="a"]');
             $start = $field->text('marc:subfield[@code="s"]');
             $end = $field->text('marc:subfield[@code="e"]');
@@ -142,12 +164,12 @@ class AuthorityRecord extends Record implements JsonableInterface {
             : null;
 
         // 400: See From Tracing-Personal Name (R)
-        foreach ($data->xpath('marc:datafield[@tag="400"]') as $field) {
+        foreach ($data->all('marc:datafield[@tag="400"]') as $field) {
             $altLabels[] = $field->text('marc:subfield[@code="a"]');
         }
 
         // 410: See From Tracing-Corporate Name (R)
-        foreach ($data->xpath('marc:datafield[@tag="410"]') as $field) {
+        foreach ($data->all('marc:datafield[@tag="410"]') as $field) {
             $s = $field->text('marc:subfield[@code="a"]');
             if ($field->has('marc:subfield[@code="b"]')) {
                 $s .= ' : ' . $field->text('marc:subfield[@code="b"]');
@@ -156,7 +178,7 @@ class AuthorityRecord extends Record implements JsonableInterface {
         }
 
         // 411: See From Tracing-Meeting Name (R)
-        foreach ($data->xpath('marc:datafield[@tag="411"]') as $field) {
+        foreach ($data->all('marc:datafield[@tag="411"]') as $field) {
             $altLabels[] = $field->text('marc:subfield[@code="a"]');
         }
 

@@ -3,6 +3,24 @@
 use Illuminate\Support\Contracts\JsonableInterface;
 use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
 
+/**
+ * @property int       $id                 Local record identifier
+ * @property string    $barcode
+ * @property string    $status
+ * @property string    $location
+ * @property string    $sublocation
+ * @property string    $shelvinglocation
+ * @property string    $callcode
+ * @property string    $use_restrictions
+ * @property string    $circulation_status
+ * @property string    $fulltext
+ * @property string[]  $nonpublic_notes
+ * @property string[]  $public_notes
+ * @property array     $holdings
+ * @property Carbon\Carbon    $acquired
+ * @property Carbon\Carbon    $modified
+ * @property Carbon\Carbon    $created
+ */
 class HoldingsRecord extends Record implements JsonableInterface {
 
     // 859 $f: Use restrictions / Tilgjengelighet
@@ -70,7 +88,7 @@ class HoldingsRecord extends Record implements JsonableInterface {
         // 009: Reserved for local use
         $this->status = $data->text('marc:controlfield[@tag="009"]');
 
-        foreach ($data->xpath('marc:datafield') as $node) {
+        foreach ($data->all('marc:datafield') as $node) {
             $marcfield = intval($node->attributes()->tag);
             switch ($marcfield) {
 

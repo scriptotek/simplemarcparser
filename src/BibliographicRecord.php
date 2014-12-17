@@ -477,6 +477,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
                     $author = array(
                         'name' => $node->text('marc:subfield[@code="a"]'),
                     );
+                    $author['normalizedName'] = $author['name'];
                     $this->parseRelator($node, $author, 'corporate');
                     $this->parseAuthority($node, $author);
 
@@ -487,6 +488,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
                     $author = array(
                         'name' => $node->text('marc:subfield[@code="a"]'),
                     );
+                    $author['normalizedName'] = $author['name'];
                     $spl = explode(', ', $author['name']);
                     if (count($spl) == 2) {
                         $author['name'] = $spl[1] . ' ' . $spl[0];
@@ -704,6 +706,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
                     $author = array(
                         'name' => $node->text('marc:subfield[@code="a"]'),
                     );
+                    $author['normalizedName'] = $author['name'];
                     $spl = explode(', ', $author['name']);
                     if (count($spl) == 2) {
                         $author['name'] = $spl[1] . ' ' . $spl[0];
@@ -724,6 +727,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
                     $author = array(
                         'name' => $node->text('marc:subfield[@code="a"]'),
                     );
+                    $author['normalizedName'] = $author['name'];
 
                     $this->parseRelator($node, $author, 'added_corporate');
                     $this->parseAuthority($node, $author);

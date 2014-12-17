@@ -16,7 +16,7 @@ with support for the MARC21 Bibliographic, Authority and Holdings formats.
 require_once('vendor/autoload.php');
 
 use Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement,
-    Scriptotek\SimpleMarcParser\BibliographicRecord;
+    Scriptotek\SimpleMarcParser\Parser;
 
 $data = file_get_contents('http://sru.bibsys.no/search/biblio?' . http_build_query(array(
 	'version' => '1.2',
@@ -32,7 +32,9 @@ $doc->registerXPathNamespaces(array(
         'd' => 'http://www.loc.gov/zing/srw/diagnostic/'
     ));
 
-$record = new BibliographicRecord($doc->first('/srw:searchRetrieveResponse/srw:records/srw:record/srw:recordData/marc:record'));
+$parser = new Parser();
+
+$record = $parser->parse($doc->first('/srw:searchRetrieveResponse/srw:records/srw:record/srw:recordData/marc:record'));
 
 print $record->title;
 

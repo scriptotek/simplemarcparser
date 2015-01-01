@@ -126,7 +126,7 @@ class Record {
         if (!empty($x)) $rel['title'] = $x;
 
         $x = $node->text('marc:subfield[@code="g"]');
-        if (!empty($x)) $rel['related_parts'] = $x;
+        if (!empty($x)) $rel['parts'] = $x;
 
         $x = $node->text('marc:subfield[@code="x"]');
         if (!empty($x)) $rel['issn'] = $x;

@@ -115,17 +115,6 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse($out->electronic);
     }
 
-    public function testMaterialUnknown() {
-        $out = $this->parseRecordData('
-            <marc:leader>99999c   a2299999 c 4500</marc:leader>
-            <marc:controlfield tag="001">834084449</marc:controlfield>
-            <marc:controlfield tag="008">141105s1978    ||||||||||||||||0|||||||d</marc:controlfield>
-        ');
-
-        $this->assertEquals('Unknown', $out->material);
-        $this->assertFalse($out->electronic);
-    }
-
     public function testMarc001() {
         $out = $this->parseRecordData('
             <marc:controlfield tag="001">12149361x</marc:controlfield>
@@ -695,10 +684,13 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('Continues', $out->preceding['relationship_type']);
         $this->assertCount(1, $out->preceding['items']);
         $this->assertEquals('920713874', $out->preceding['items'][0]['id']);
-        $this->assertEquals('nr 80(1961)', $out->preceding['items'][0]['related_parts']);
+        $this->assertEquals('nr 80(1961)', $out->preceding['items'][0]['parts']);
     }
 
-    public function testComplexSucceeding() {
+    /*
+     * Expect simplification of 'Merged with'
+     */
+    public function testSucceedingMergedWith() {
         $out = $this->parseRecordData('
             <marc:datafield tag="580" ind1=" " ind2=" ">
                 <marc:subfield code="a">
@@ -727,16 +719,14 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertEquals('Merged with', $out->succeeding['relationship_type']);
+        $this->assertEquals('Continued by', $out->succeeding['relationship_type']);
         $this->assertEquals(
             'Slått sammen med: Comments on astrophysics : a journal of critical discussion of the current literature, 18(1995/96) og: Comments on condensed matter physics : a journal of critical discussion of the current literature, 18(1998) og: Comments on nuclear and particle physics : a journal of critical discussion of the current literature, 22(1998) og: Comments on plasma physics and controlled fusion : a journal of critical discussion of the current literature, 18(1999) til: Comments on modern physics (trykt utg.), 1(1999)',
             $out->succeeding['note']
         );
-        $this->assertCount(5, $out->succeeding['items']);
-        $this->assertEquals('841195196', $out->succeeding['items'][0]['id']);
-        $this->assertEquals('18(1995/96)', $out->succeeding['items'][0]['related_parts']);
-        $this->assertEquals('990840832', $out->succeeding['items'][4]['id']);
-        $this->assertEquals('1(1999)', $out->succeeding['items'][4]['related_parts']);
+        $this->assertCount(1, $out->succeeding['items']);
+        $this->assertEquals('990840832', $out->succeeding['items'][0]['id']);
+        $this->assertEquals('1(1999)', $out->succeeding['items'][0]['parts']);
     }
 
     public function testMarc830() {

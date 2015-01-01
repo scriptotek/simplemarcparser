@@ -826,9 +826,15 @@ class BibliographicRecord extends Record implements JsonableInterface {
                         '4' => 'Absorbed by',
                         '5' => 'Absorbed in part by',
                         '6' => 'Split into',  // ... and ...',
-                        '7' => 'Merged with',  // ... to form ...',
+                        '7' => 'Continued by', // more precisely 'Merged with ... to form ...', but we simplify slightly
                         '8' => 'Changed back to',
                     );
+
+                    if ($ind2 == '7') {
+                        // The first elements are the documents that go into the merge,
+                        // we are not interested in those due to our slight simplification.
+                        $succeeding['items'] = array(array_pop($succeeding['items']));
+                    }
 
                     if (isset($relationship_types[$ind2])) {
                         $succeeding['relationship_type'] = $relationship_types[$ind2];

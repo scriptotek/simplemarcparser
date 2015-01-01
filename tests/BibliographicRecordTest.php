@@ -342,7 +342,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertCount(1, $out->authors);
         $this->assertEquals('Bernt Bjerkestrand', $out->authors[0]['name']);
         $this->assertEquals('Bjerkestrand, Bernt', $out->authors[0]['normalizedName']);
-        $this->assertEquals('x12001130', $out->authors[0]['bibsys_identifier']);
+        $this->assertEquals('x12001130', $out->authors[0]['id']);
+        $this->assertEquals('NO-TrBIB', $out->authors[0]['vocabulary']);
 
         $this->assertEquals('Halldór Kiljan Laxness', $out2->authors[0]['name']);
         $this->assertEquals('Halldór Kiljan Laxness', $out2->authors[0]['normalizedName']);
@@ -627,7 +628,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('Karl Andreas Almås', $out1->authors[0]['name']);
         $this->assertEquals('red.', $out1->authors[0]['role']);
         $this->assertEquals('1952-', $out1->authors[0]['dates']);
-        $this->assertEquals('x90235102', $out1->authors[0]['bibsys_identifier']);
+        $this->assertEquals('x90235102', $out1->authors[0]['id']);
+        $this->assertEquals('NO-TrBIB', $out1->authors[0]['vocabulary']);
     }
 
     public function testMarc710() {
@@ -663,7 +665,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $out2 = $this->parseRecordData('');
 
         $this->assertEquals('Vol. 1', $out->part_no);
-        $this->assertEquals('042457270', $out->part_of['bibsys_id']);
+        $this->assertEquals('042457270', $out->part_of['id']);
+        $this->assertEquals('NO-TrBIB', $out->part_of['vocabulary']);
         $this->assertEquals('0126137609', $out->part_of['isbn']);
         $this->assertEquals('Scattering', $out->part_of['title']);
         $this->assertEquals('Inkludert i', $out->part_of['relationship']);

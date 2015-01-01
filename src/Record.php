@@ -75,16 +75,16 @@ class Record {
      * Parse a "name node", personal or corporate, main or added, that
      * might have authority information encapsulated.
      *
-     * @param  QuiteSimpleXmlElement &$node
+     * @param  string $authority
      * @param  array &$out
      */
-    protected function parseAuthority(&$node, &$out) {
-        $authority = $node->text('marc:subfield[@code="0"]');
+    protected function parseAuthority($authority, &$out) {
         if (!empty($authority)) {
-            $out['authority'] = $authority;
-            $asplit = explode(')', $authority);
-            if (substr($authority, 1, 8) === 'NO-TrBIB') {
-                $out['bibsys_identifier'] = substr($authority, strpos($authority, ')') + 1);
+            $out['id'] = $authority;
+            if (preg_match('/\((.*?)\)(.*)/', $authority, $matches)) {
+                // As used by at least OCLC and Bibsys
+                $out['vocabulary'] = $matches[1];
+                $out['id'] = $matches[2];
             }
         }
     }

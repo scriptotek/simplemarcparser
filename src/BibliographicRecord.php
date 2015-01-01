@@ -310,7 +310,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
      *
      * @param \Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement $node
      */
-    function parseSubjectAddedEntry(QuiteSimpleXmlElement $node) {
+    function parseSubjectAddedEntry(QuiteSimpleXmlElement &$node) {
         $out = array('term' => '');
         $vocabularies = array(
             '0' => 'lcsh',
@@ -324,15 +324,9 @@ class BibliographicRecord extends Record implements JsonableInterface {
         );
         $ind2 = $node->attr('ind2');
 
-        $vocab = '';
-        $ident = $node->text('marc:subfield[@code="0"]');
-        if (preg_match('/\((.*?)\)(.*)/', $ident, $matches)) {
-            $vocab = $matches[1];
-            $ident = $matches[2];
-        }
-
-        if (!empty($ident)) {
-            $out['id'] = $ident;
+        $id = $node->text('marc:subfield[@code="0"]');
+        if (!empty($id)) {
+            $out['id'] = $id;
         }
 
         if (isset($vocabularies[$ind2])) {
@@ -343,9 +337,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
                 $out['vocabulary'] = $vocab;
             }
         } elseif ($ind2 == '4') {
-            if (!empty($vocab)) {
-                $out['vocabulary'] = $vocab;
-            }
+            $this->parseAuthority($node->text('marc:subfield[@code="0"]'), $out);
         }
 
         $out['parts'] = array();
@@ -530,7 +522,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
                         $author['name'] = $spl[1] . ' ' . $spl[0];
                     }
                     $this->parseRelator($node, $author, 'main');
-                    $this->parseAuthority($node, $author);
+                    $this->parseAuthority($node->text('marc:subfield[@code="0"]'), $author);
 
                     $authors[] = $author;
                     break;
@@ -541,7 +533,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
                     );
                     $author['normalizedName'] = $author['name'];
                     $this->parseRelator($node, $author, 'corporate');
-                    $this->parseAuthority($node, $author);
+                    $this->parseAuthority($node->text('marc:subfield[@code="0"]'), $author);
 
                     $authors[] = $author;
                     break;
@@ -556,7 +548,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
                         $author['name'] = $spl[1] . ' ' . $spl[0];
                     }
                     $this->parseRelator($node, $author, 'uniform_title');
-                    $this->parseAuthority($node, $author);
+                    $this->parseAuthority($node->text('marc:subfield[@code="0"]'), $author);
 
                     $authors[] = $author;
                     break;
@@ -738,7 +730,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
                     }
 
                     $this->parseRelator($node, $author, 'added');
-                    $this->parseAuthority($node, $author);
+                    $this->parseAuthority($node->text('marc:subfield[@code="0"]'), $author);
 
                     $dates = $node->text('marc:subfield[@code="d"]');
                     if (!empty($dates)) {
@@ -755,7 +747,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
                     $author['normalizedName'] = $author['name'];
 
                     $this->parseRelator($node, $author, 'added_corporate');
-                    $this->parseAuthority($node, $author);
+                    $this->parseAuthority($node->text('marc:subfield[@code="0"]'), $author);
 
                     $authors[] = $author;
                     break;
@@ -768,8 +760,9 @@ class BibliographicRecord extends Record implements JsonableInterface {
                     $part_of['title'] = $node->text('marc:subfield[@code="t"]');
                     $part_of['issn'] = $node->text('marc:subfield[@code="x"]');
                     $part_of['isbn'] = $node->text('marc:subfield[@code="z"]');
-                    $part_of['bibsys_id'] = preg_replace('/\(NO-TrBIB\)/', '', $node->text('marc:subfield[@code="w"]'));
                     $part_of['volume'] = $node->text('marc:subfield[@code="v"]');
+                    $this->parseAuthority($node->text('marc:subfield[@code="w"]'), $part_of);
+
                     break;
 
                 // 776 : Additional Physical Form Entry (R)

@@ -32,6 +32,7 @@ use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
  * @property array     $series
  * @property array     $other_form
  * @property array     $authors
+ * @property array     $meetings
  * @property array     $subjects
  * @property array     $genres
  * @property array     $classifications
@@ -380,6 +381,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
         $this->created = $this->parseDateTime(substr($f008, 0, 6));
 
         $authors = array();
+        $meetings = array();
         $subjects = array();
         $genres = array();
         $classifications = array();
@@ -531,10 +533,24 @@ class BibliographicRecord extends Record implements JsonableInterface {
                         'name' => $node->text('marc:subfield[@code="a"]'),
                     );
                     $author['normalizedName'] = $author['name'];
+                    foreach ($node->all('marc:subfield[@code="b"]') as $subunit) {
+                        $author['name'] .= self::$subfieldSeparator . trim($subunit, ',');
+                    }
                     $this->parseRelator($node, $author, 'corporate');
                     $this->parseAuthority($node->text('marc:subfield[@code="0"]'), $author);
 
                     $authors[] = $author;
+                    break;
+
+                case 111:
+                    $meeting = array(
+                        'name' => $node->text('marc:subfield[@code="a"]'),
+                    );
+                    $meeting['normalizedName'] = $meeting['name'];
+                    $this->parseRelator($node, $meeting, 'meeting');
+                    $this->parseAuthority($node->text('marc:subfield[@code="0"]'), $meeting);
+
+                    $meetings[] = $meeting;
                     break;
 
                 case 130:
@@ -957,6 +973,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
         $this->isbns = $isbns;
         $this->series = $series;
         $this->authors = $authors;
+        $this->meetings = $meetings;
         $this->subjects = $subjects;
         $this->genres = $genres;
         $this->classifications = $classifications;

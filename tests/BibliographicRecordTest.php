@@ -361,7 +361,22 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        // TODO
+        $this->assertEquals('Norge' . Record::$subfieldSeparator . 'Miljøverndepartementet', $out->authors[0]['name']);
+        $this->assertEquals('x90051067', $out->authors[0]['id']);
+    }
+
+    public function testMarc111() {
+
+        // Example from 863012868
+        $out = $this->parseRecordData('
+            <marc:datafield tag="111" ind1="2" ind2=" ">
+                <marc:subfield code="a">Ecology of coastal vegetation (Haamstede : 1983)</marc:subfield>
+                <marc:subfield code="0">(NO-TrBIB)x90051629</marc:subfield>
+            </marc:datafield>
+        ');
+
+        $this->assertEquals('Ecology of coastal vegetation (Haamstede : 1983)', $out->meetings[0]['name']);
+        $this->assertEquals('x90051629', $out->meetings[0]['id']);
     }
 
     public function testMarc245() {
@@ -863,6 +878,7 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
             'isbns' => array(),
             'series' => array(),
             'authors' => array(),
+            'meetings' => array(),
             'subjects' => array(),
             'genres' => array(),
             'classifications' => array(),

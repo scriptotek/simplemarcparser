@@ -31,7 +31,7 @@ use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
  * @property string[]  $notes
  * @property array     $series
  * @property array     $other_form
- * @property array     $authors
+ * @property array     $creators
  * @property array     $meetings
  * @property array     $subjects
  * @property array     $genres
@@ -414,7 +414,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
         $f008 = $data->text('marc:controlfield[@tag="008"]');
         $this->created = $this->parseDateTime(substr($f008, 0, 6));
 
-        $authors = array();
+        $creators = array();
         $meetings = array();
         $subjects = array();
         $genres = array();
@@ -559,7 +559,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
                     $this->parseRelator($node, $author, 'main');
                     $this->parseAuthority($node->text('marc:subfield[@code="0"]'), $author);
 
-                    $authors[] = $author;
+                    $creators[] = $author;
                     break;
 
                 case 110:
@@ -573,7 +573,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
                     $this->parseRelator($node, $author, 'corporate');
                     $this->parseAuthority($node->text('marc:subfield[@code="0"]'), $author);
 
-                    $authors[] = $author;
+                    $creators[] = $author;
                     break;
 
                 case 111:
@@ -599,7 +599,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
                     $this->parseRelator($node, $author, 'uniform_title');
                     $this->parseAuthority($node->text('marc:subfield[@code="0"]'), $author);
 
-                    $authors[] = $author;
+                    $creators[] = $author;
                     break;
 
                 // 245 : Title Statement (NR)
@@ -837,7 +837,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
                         $author['dates'] = $dates;
                     }
 
-                    $authors[] = $author;
+                    $creators[] = $author;
                     break;
 
                 case 710:
@@ -849,7 +849,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
                     $this->parseRelator($node, $author, 'added_corporate');
                     $this->parseAuthority($node->text('marc:subfield[@code="0"]'), $author);
 
-                    $authors[] = $author;
+                    $creators[] = $author;
                     break;
 
                 // 773 : Host Item Entry (R)
@@ -1013,7 +1013,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
 
         $this->isbns = $isbns;
         $this->series = $series;
-        $this->authors = $authors;
+        $this->creators = $creators;
         $this->meetings = $meetings;
         $this->subjects = $subjects;
         $this->genres = $genres;

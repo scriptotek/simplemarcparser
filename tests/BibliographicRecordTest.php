@@ -340,15 +340,15 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertCount(1, $out->authors);
-        $this->assertEquals('Bernt Bjerkestrand', $out->authors[0]['name']);
-        $this->assertEquals('Bjerkestrand, Bernt', $out->authors[0]['normalizedName']);
-        $this->assertEquals('x12001130', $out->authors[0]['id']);
-        $this->assertEquals('NO-TrBIB', $out->authors[0]['vocabulary']);
+        $this->assertCount(1, $out->creators);
+        $this->assertEquals('Bernt Bjerkestrand', $out->creators[0]['name']);
+        $this->assertEquals('Bjerkestrand, Bernt', $out->creators[0]['normalizedName']);
+        $this->assertEquals('x12001130', $out->creators[0]['id']);
+        $this->assertEquals('NO-TrBIB', $out->creators[0]['vocabulary']);
 
-        $this->assertEquals('Halldór Kiljan Laxness', $out2->authors[0]['name']);
-        $this->assertEquals('Halldór Kiljan Laxness', $out2->authors[0]['normalizedName']);
-        $this->assertArrayNotHasKey('authority', $out2->authors[0]);
+        $this->assertEquals('Halldór Kiljan Laxness', $out2->creators[0]['name']);
+        $this->assertEquals('Halldór Kiljan Laxness', $out2->creators[0]['normalizedName']);
+        $this->assertArrayNotHasKey('authority', $out2->creators[0]);
     }
 
     public function testPersonalNameHeadingWithRelatorCode()
@@ -360,8 +360,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertEquals('Angelo Cangelosi', $out->authors[0]['name']);
-        $this->assertEquals('aut', $out->authors[0]['role']);
+        $this->assertEquals('Angelo Cangelosi', $out->creators[0]['name']);
+        $this->assertEquals('aut', $out->creators[0]['role']);
     }
 
     public function testMarc110() {
@@ -373,8 +373,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertEquals('Norge' . Record::$subfieldSeparator . 'Miljøverndepartementet', $out->authors[0]['name']);
-        $this->assertEquals('x90051067', $out->authors[0]['id']);
+        $this->assertEquals('Norge' . Record::$subfieldSeparator . 'Miljøverndepartementet', $out->creators[0]['name']);
+        $this->assertEquals('x90051067', $out->creators[0]['id']);
     }
 
     public function testMarc111() {
@@ -709,12 +709,12 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertCount(1, $out1->authors);
-        $this->assertEquals('Karl Andreas Almås', $out1->authors[0]['name']);
-        $this->assertEquals('red.', $out1->authors[0]['role']);
-        $this->assertEquals('1952-', $out1->authors[0]['dates']);
-        $this->assertEquals('x90235102', $out1->authors[0]['id']);
-        $this->assertEquals('NO-TrBIB', $out1->authors[0]['vocabulary']);
+        $this->assertCount(1, $out1->creators);
+        $this->assertEquals('Karl Andreas Almås', $out1->creators[0]['name']);
+        $this->assertEquals('red.', $out1->creators[0]['role']);
+        $this->assertEquals('1952-', $out1->creators[0]['dates']);
+        $this->assertEquals('x90235102', $out1->creators[0]['id']);
+        $this->assertEquals('NO-TrBIB', $out1->creators[0]['vocabulary']);
     }
 
     public function testMarc710() {
@@ -902,7 +902,7 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
             'is_multivolume' => false,
             'isbns' => array(),
             'series' => array(),
-            'authors' => array(),
+            'creators' => array(),
             'meetings' => array(),
             'subjects' => array(),
             'genres' => array(),

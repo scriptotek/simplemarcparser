@@ -305,8 +305,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
     }
 
     /**
-     * Parses common elements in subject added entry fields such as
-     * 600, 650 and 655.
+     * Parses common elements in subject added entry fields 600-655
      *
      * @param \Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement $node
      */
@@ -693,19 +692,63 @@ class BibliographicRecord extends Record implements JsonableInterface {
                         $name = "$name (" . implode(',', $qualifiers) . ")";
                     }
                     $tmp['term'] = $name . $tmp['term'];
-
-                    // Spesifikasjonen tillater forsåvidt underinndelinger,
-                    // men er det noen som bygger strenger bestående av
-                    // egennavn blandet med andre typer emneord??
+                    $tmp['type'] = 'person';
 
                     array_push($subjects, $tmp);
                     break;
 
+                case 610:
+                    $tmp = $this->parseSubjectAddedEntry($node);
+
+                    $name = trim($node->text('marc:subfield[@code="a"]'), ',');
+                    foreach ($node->all('marc:subfield[@code="b"]') as $subunit) {
+                        $name .= '--' . trim($subunit, ',');
+                    }
+                    $tmp['type'] = 'corporation';
+                    $tmp['term'] = $name . $tmp['term'];
+                    array_push($subjects, $tmp);
+                    break;
+
+                case 611:
+                    $tmp = $this->parseSubjectAddedEntry($node);
+                    $dates = $node->text('marc:subfield[@code="d"]');
+                    if (!empty($dates)) {
+                        $tmp['time'] = trim($dates, ' :,.()');
+                    }
+                    $location = $node->text('marc:subfield[@code="c"]');
+                    if (!empty($location)) {
+                        $tmp['place'] = trim($location, ' :,.()');
+                    }
+                    $misc = $node->text('marc:subfield[@code="g"]');
+                    if (!empty($misc)) {
+                        $tmp['misc'] = trim($misc, ' :,.()');
+                    }
+                    $number = $node->text('marc:subfield[@code="n"]');
+                    if (!empty($number)) {
+                        $tmp['number'] = trim($number, ' :,.()');
+                    }
+
+                    $name = trim($node->text('marc:subfield[@code="a"]'), ',');
+                    $tmp['type'] = 'meeting';
+                    $tmp['term'] = $name . $tmp['term'];
+                    array_push($subjects, $tmp);
+                    break;
+
+                case 648:
+                    $tmp = $this->parseSubjectAddedEntry($node);
+
+                    $emne = $node->text('marc:subfield[@code="a"]');
+                    $tmp['type'] = 'chronological';
+                    $tmp['term'] = trim($emne, '.') . $tmp['term'];
+
+                    array_push($subjects, $tmp);
+                    break;
                 case 650:
                     $tmp = $this->parseSubjectAddedEntry($node);
 
                     $emne = $node->text('marc:subfield[@code="a"]');
                     $tmp['term'] = trim($emne, '.') . $tmp['term'];
+                    $tmp['type'] = 'topical';
 
                     array_push($subjects, $tmp);
                     break;

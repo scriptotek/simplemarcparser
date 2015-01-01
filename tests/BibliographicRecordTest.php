@@ -528,6 +528,7 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         ');
 
         $this->assertCount(1, $out1->subjects);
+        $this->assertEquals('person', $out1->subjects[0]['type']);
         $this->assertEquals('Støre, Jonas Gahr (1960-)', $out1->subjects[0]['term']);
         $this->assertEquals('NO-TrBIB', $out1->subjects[0]['vocabulary']);
         $this->assertEquals('x02121602', $out1->subjects[0]['id']);
@@ -535,6 +536,60 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('Zacchaeus (Biblical character)', $out2->subjects[0]['term']);
 
         $this->assertEquals('Pushkin, Aleksandr Sergeevich (1799-1837)--Museums--Russia (Federation)--Moscow--Maps', $out3->subjects[0]['term']);
+    }
+
+    public function testMarc610() {
+        $out1 = $this->parseRecordData('
+            <marc:datafield tag="610" ind1="1" ind2="0">
+                <marc:subfield code="a">United States.</marc:subfield>
+                <marc:subfield code="b">Army.</marc:subfield>
+                <marc:subfield code="b">Cavalry, 7th.</marc:subfield>
+                <marc:subfield code="b">Company E,</marc:subfield>
+                <marc:subfield code="e">depicted.</marc:subfield>
+            </marc:datafield>
+        ');
+
+        $out2 = $this->parseRecordData('
+            <marc:datafield tag="610" ind1="2" ind2="4">
+                <marc:subfield code="a">Tidens tegn (avis)</marc:subfield>
+                <marc:subfield code="0">(NO-TrBIB)x90071929</marc:subfield>
+            </marc:datafield>
+            <marc:datafield tag="610" ind1="2" ind2="4">
+                <marc:subfield code="a">Aftenposten</marc:subfield>
+                <marc:subfield code="0">(NO-TrBIB)x90052061</marc:subfield>
+            </marc:datafield>
+        ');
+
+        $this->assertCount(1, $out1->subjects);
+        // Problem: How to normalize punctuation? We loose the dot in '7th.' if we strip off dots..
+        $this->assertEquals('corporation', $out1->subjects[0]['type']);
+        $this->assertEquals('United States.--Army.--Cavalry, 7th.--Company E', $out1->subjects[0]['term']);
+
+        $this->assertCount(2, $out2->subjects);
+        $this->assertEquals('Tidens tegn (avis)', $out2->subjects[0]['term']);
+        $this->assertEquals('x90071929', $out2->subjects[0]['id']);
+        $this->assertEquals('NO-TrBIB', $out2->subjects[0]['vocabulary']);
+    }
+
+    public function testMarc611() {
+        $out1 = $this->parseRecordData('
+            <marc:datafield tag="611" ind1="2" ind2="0">
+                <marc:subfield code="a">International Congress of Writers for the Defense of Culture
+</marc:subfield>
+                <marc:subfield code="n">(1st :</marc:subfield>
+                <marc:subfield code="d">1935 :</marc:subfield>
+                <marc:subfield code="c">Paris, France)</marc:subfield>
+                <marc:subfield code="v">Fiction.</marc:subfield>
+            </marc:datafield>
+        ');
+
+        $this->assertCount(1, $out1->subjects);
+        // Problem: How to normalize punctuation? We loose the dot in '7th.' if we strip off dots..
+        $this->assertEquals('meeting', $out1->subjects[0]['type']);
+        $this->assertEquals('International Congress of Writers for the Defense of Culture--Fiction', $out1->subjects[0]['term']);
+        $this->assertEquals('1st', $out1->subjects[0]['number']);
+        $this->assertEquals('1935', $out1->subjects[0]['time']);
+        $this->assertEquals('Paris, France', $out1->subjects[0]['place']);
     }
 
     public function testMarc650() {
@@ -564,6 +619,7 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $out4 = $this->parseRecordData('');
 
         $this->assertCount(1, $out1->subjects);
+        $this->assertEquals('topical', $out1->subjects[0]['type']);
         $this->assertEquals('tekord', $out1->subjects[0]['vocabulary']);
         $this->assertEquals('NTUB12641', $out1->subjects[0]['id']);
         $this->assertEquals('Sjømat--Norge', $out1->subjects[0]['term']);

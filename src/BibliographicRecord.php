@@ -325,9 +325,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
         $ind2 = $node->attr('ind2');
 
         $id = $node->text('marc:subfield[@code="0"]');
-        if (!empty($id)) {
-            $out['id'] = $id;
-        }
+        $out['id'] = empty($id) ? null : $id;
 
         if (isset($vocabularies[$ind2])) {
             $out['vocabulary'] = $vocabularies[$ind2];

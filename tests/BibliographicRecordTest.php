@@ -549,8 +549,10 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('x02121602', $out1->subjects[0]['id']);
 
         $this->assertEquals('Zacchaeus (Biblical character)', $out2->subjects[0]['term']);
+        $this->assertNull($out2->subjects[0]['id']);
 
         $this->assertEquals('Pushkin, Aleksandr Sergeevich (1799-1837)' . Record::$subfieldSeparator . 'Museums' . Record::$subfieldSeparator . 'Russia (Federation)' . Record::$subfieldSeparator . 'Moscow' . Record::$subfieldSeparator . 'Maps', $out3->subjects[0]['term']);
+        $this->assertNull($out3->subjects[0]['id']);
     }
 
     public function testMarc610() {

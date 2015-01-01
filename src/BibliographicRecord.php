@@ -305,6 +305,68 @@ class BibliographicRecord extends Record implements JsonableInterface {
     }
 
     /**
+     * Parses common elements in subject added entry fields such as
+     * 600, 650 and 655.
+     *
+     * @param \Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement $node
+     */
+    function parseSubjectAddedEntry(QuiteSimpleXmlElement $node) {
+        $out = array('term' => '');
+        $vocabularies = array(
+            '0' => 'lcsh',
+            '1' => 'lccsh', // LC subject headings for children's literature
+            '2' => 'mesh', // Medical Subject Headings
+            '3' => 'atg', // National Agricultural Library subject authority file (?)
+            // 4 : unknown
+            '5' => 'cash', // Canadian Subject Headings
+            '6' => 'rvm', // Répertoire de vedettes-matière
+            // 7: Source specified in subfield $2
+        );
+        $ind2 = $node->attr('ind2');
+
+        $vocab = '';
+        $ident = $node->text('marc:subfield[@code="0"]');
+        if (preg_match('/\((.*?)\)(.*)/', $ident, $matches)) {
+            $vocab = $matches[1];
+            $ident = $matches[2];
+        }
+
+        if (!empty($ident)) {
+            $out['id'] = $ident;
+        }
+
+        if (isset($vocabularies[$ind2])) {
+            $out['vocabulary'] = $vocabularies[$ind2];
+        } elseif ($ind2 == '7') {
+            $vocab = $node->text('marc:subfield[@code="2"]');
+            if (!empty($vocab)) {
+                $out['vocabulary'] = $vocab;
+            }
+        } elseif ($ind2 == '4') {
+            if (!empty($vocab)) {
+                $out['vocabulary'] = $vocab;
+            }
+        }
+
+        $out['parts'] = array();
+        $subdivtypes = array(
+            'v' => 'form',
+            'x' => 'general',
+            'y' => 'chronological',
+            'z' => 'geographic',
+        );
+        foreach ($node->all('marc:subfield') as $subdiv) {
+            $code = $subdiv->attr('code');
+            if (in_array($code, array_keys($subdivtypes))) {
+                $subdiv = trim($subdiv, '.');
+                $out['parts'][] = array('value' => $subdiv, 'type' => $subdivtypes[$code]);
+                $out['term'] .= '--' . $subdiv;
+            }
+        }
+        return $out;
+    }
+
+    /**
      * @param \Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement $data
      */
     public function __construct(QuiteSimpleXmlElement $data) {
@@ -611,93 +673,56 @@ class BibliographicRecord extends Record implements JsonableInterface {
                     }
                     break;
 
+                case 600:
+                    $tmp = $this->parseSubjectAddedEntry($node);
+
+                    $name = $node->text('marc:subfield[@code="a"]');
+                    $qualifiers = array();
+                    $titles = $node->text('marc:subfield[@code="c"]');
+                    if (!empty($titles)) {
+                        $qualifiers[] = trim($titles, '(),.');
+                    }
+                    $dates = $node->text('marc:subfield[@code="d"]');
+                    if (!empty($dates)) {
+                        $qualifiers[] = trim($dates, '(),.');
+                    }
+
+                    // - To concat or not concat… not sure, but in principle
+                    // the $a $c $d $q values should be the same on all
+                    // records, so for filtering purposes it doesn't seem
+                    // necessary to have them separated. For display
+                    // purposes, it can be useful of course. But then again,
+                    // the parts should be available from the authority
+                    // register..
+                    // - Another question is whether we should do some
+                    // normalizing to try aligning records with different
+                    // punctuation standards (US vs UK)
+                    if (count($qualifiers) != 0) {
+                        $name = "$name (" . implode(',', $qualifiers) . ")";
+                    }
+                    $tmp['term'] = $name . $tmp['term'];
+
+                    // Spesifikasjonen tillater forsåvidt underinndelinger,
+                    // men er det noen som bygger strenger bestående av
+                    // egennavn blandet med andre typer emneord??
+
+                    array_push($subjects, $tmp);
+                    break;
+
                 case 650:
-                    $ind2 = $node->attr('ind2');
+                    $tmp = $this->parseSubjectAddedEntry($node);
+
                     $emne = $node->text('marc:subfield[@code="a"]');
-
-                    // topical, geographic, chronological, or form aspects
-                    $tmp = array('parts' => array());
-
-                    // $term = trim($emne, '.');
-                    $tmp['term'] = trim($emne, '.');
-
-                    $vocabularies = array(
-                        '0' => 'lcsh',
-                        '1' => 'lccsh', // LC subject headings for children's literature
-                        '2' => 'mesh', // Medical Subject Headings
-                        '3' => 'atg', // National Agricultural Library subject authority file (?)
-                        // 4 : unknown
-                        '5' => 'cash', // Canadian Subject Headings
-                        '6' => 'rvm', // Répertoire de vedettes-matière
-                    );
-
-                    $voc = $node->text('marc:subfield[@code="2"]');
-                    if (isset($vocabularies[$ind2])) {
-                      $tmp['vocabulary'] = $vocabularies[$ind2];
-                    } else if (!empty($voc)) {
-                      $tmp['vocabulary'] = $voc;
-                    }
-
-                    $subdivtypes = array(
-                        'v' => 'form',
-                        'x' => 'general',
-                        'y' => 'chronological',
-                        'z' => 'geographic',
-                    );
-                    foreach ($node->all('marc:subfield') as $subdiv) {
-                        $code = $subdiv->attr('code');
-                        if (in_array($code, array_keys($subdivtypes))) {
-                            $subdiv = trim($subdiv, '.');
-                            $tmp['parts'][] = array('value' => $subdiv, 'type' => $subdivtypes[$code]);
-                            $tmp['term'] .= '--' . $subdiv;
-                        }
-                    }
+                    $tmp['term'] = trim($emne, '.') . $tmp['term'];
 
                     array_push($subjects, $tmp);
                     break;
 
 
                 case 655:
-                    $ind2 = $node->attr('ind2');
-                    $emne = $node->text('marc:subfield[@code="a"]');
 
-                    // topical, geographic, chronological, or form aspects
-                    $tmp = array('parts' => array());
-
-                    // $term = trim($emne, '.');
-                    $tmp['term'] = trim($emne, '.');
-
-                    $vocabularies = array(
-                        '0' => 'lcsh',
-                        '1' => 'lccsh', // LC subject headings for children's literature
-                        '2' => 'mesh', // Medical Subject Headings
-                        '3' => 'atg', // National Agricultural Library subject authority file (?)
-                        // 4 : unknown
-                        '5' => 'cash', // Canadian Subject Headings
-                        '6' => 'rvm', // Répertoire de vedettes-matière
-                    );
-
-                    $voc = $node->text('marc:subfield[@code="2"]');
-                    if (isset($vocabularies[$ind2])) {
-                      $tmp['vocabulary'] = $vocabularies[$ind2];
-                    } else if (!empty($voc)) {
-                      $tmp['vocabulary'] = $voc;
-                    }
-
-                    $subdivtypes = array(
-                        'v' => 'form',
-                        'x' => 'general',
-                        'y' => 'chronological',
-                        'z' => 'geographic',
-                    );
-                    foreach ($node->all('marc:subfield') as $subdiv) {
-                        $code = $subdiv->attr('code');
-                        if (in_array($code, array_keys($subdivtypes))) {
-                            $subdiv = trim($subdiv, '.');
-                            $tmp['parts'][] = array('value' => $subdiv, 'type' => $subdivtypes[$code]);
-                            $tmp['term'] .= '--' . $subdiv;
-                        }
-                    }
+                    $tmp = $this->parseSubjectAddedEntry($node);
+                    $tmp['term'] = trim($node->text('marc:subfield[@code="a"]'), '.') . $tmp['term'];
 
                     array_push($genres, $tmp);
                     break;

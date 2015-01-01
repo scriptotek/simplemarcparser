@@ -510,12 +510,50 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('Forts.som: Acoustical imaging. 8(1980)', $out->notes[0]);
     }
 
+    public function testMarc600() {
+        $out1 = $this->parseRecordData('
+            <marc:datafield tag="600" ind1="1" ind2="4">
+                <marc:subfield code="a">Støre, Jonas Gahr</marc:subfield>
+                <marc:subfield code="d">1960-</marc:subfield>
+                <marc:subfield code="0">(NO-TrBIB)x02121602</marc:subfield>
+            </marc:datafield>
+        ');
+
+        $out2 = $this->parseRecordData('
+            <marc:datafield tag="600" ind1="0" ind2="0">
+                <marc:subfield code="a">Zacchaeus</marc:subfield>
+                <marc:subfield code="c">(Biblical character)</marc:subfield>
+            </marc:datafield>
+        ');
+
+        $out3 = $this->parseRecordData('
+            <marc:datafield tag="600" ind1="1" ind2="0">
+                <marc:subfield code="a">Pushkin, Aleksandr Sergeevich</marc:subfield>
+                <marc:subfield code="d">1799-1837</marc:subfield>
+                <marc:subfield code="x">Museums</marc:subfield>
+                <marc:subfield code="z">Russia (Federation)</marc:subfield>
+                <marc:subfield code="z">Moscow</marc:subfield>
+                <marc:subfield code="v">Maps.</marc:subfield>
+            </marc:datafield>
+        ');
+
+        $this->assertCount(1, $out1->subjects);
+        $this->assertEquals('Støre, Jonas Gahr (1960-)', $out1->subjects[0]['term']);
+        $this->assertEquals('NO-TrBIB', $out1->subjects[0]['vocabulary']);
+        $this->assertEquals('x02121602', $out1->subjects[0]['id']);
+
+        $this->assertEquals('Zacchaeus (Biblical character)', $out2->subjects[0]['term']);
+
+        $this->assertEquals('Pushkin, Aleksandr Sergeevich (1799-1837)--Museums--Russia (Federation)--Moscow--Maps', $out3->subjects[0]['term']);
+    }
+
     public function testMarc650() {
         $out1 = $this->parseRecordData('
             <marc:datafield tag="650" ind1=" " ind2="7">
                 <marc:subfield code="a">Sjømat</marc:subfield>
                 <marc:subfield code="z">Norge</marc:subfield>
                 <marc:subfield code="2">tekord</marc:subfield>
+                <marc:subfield code="0">NTUB12641</marc:subfield>
             </marc:datafield>
         ');
         $out2 = $this->parseRecordData('
@@ -537,6 +575,7 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertCount(1, $out1->subjects);
         $this->assertEquals('tekord', $out1->subjects[0]['vocabulary']);
+        $this->assertEquals('NTUB12641', $out1->subjects[0]['id']);
         $this->assertEquals('Sjømat--Norge', $out1->subjects[0]['term']);
         $this->assertEquals('Norge', $out1->subjects[0]['parts'][0]['value']);
         $this->assertEquals('geographic', $out1->subjects[0]['parts'][0]['type']);
@@ -564,11 +603,13 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
             <marc:datafield tag="655" ind1=" " ind2="7">
                 <marc:subfield code="a">Populærvitenskap</marc:subfield>
                 <marc:subfield code="2">no-ubo-mn</marc:subfield>
+                <marc:subfield code="0">REAL14834</marc:subfield>
             </marc:datafield>
         ');
 
         $this->assertCount(1, $out1->genres);
         $this->assertEquals('no-ubo-mn', $out1->genres[0]['vocabulary']);
+        $this->assertEquals('REAL14834', $out1->genres[0]['id']);
         $this->assertEquals('Populærvitenskap', $out1->genres[0]['term']);
     }
 

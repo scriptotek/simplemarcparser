@@ -43,6 +43,18 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($out->electronic);
     }
 
+    public function testMaterialIsThesis() {
+        $out = $this->parseRecordData('
+            <marc:leader>99999cam a22999997c 4500</marc:leader>
+            <marc:controlfield tag="001">980016495</marc:controlfield>
+            <marc:controlfield tag="007">ta</marc:controlfield>
+            <marc:controlfield tag="008">980326s1984    xx#||||||m   |000|u|eng|d</marc:controlfield>
+        ');
+
+        $this->assertEquals('Thesis', $out->material);
+        $this->assertFalse($out->electronic);
+    }
+
     public function testMaterialIsMusicCD() {
         $out = $this->parseRecordData('
             <marc:leader>99999cja a2299999 c 4500</marc:leader>

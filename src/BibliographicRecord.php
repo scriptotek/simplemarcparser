@@ -181,6 +181,37 @@ class BibliographicRecord extends Record implements JsonableInterface {
             'z' => 'Unspecified',
         );
 
+        // 008/24-27 - Nature of contents (006/07-10)
+        $natureOfContents = array(
+            'a' => 'Abstract',
+            'b' => 'Bibliography',
+            'c' => 'Catalog',
+            'd' => 'Dictionary',
+            'e' => 'Encyclopedia',
+            'f' => 'Handbook',
+            'g' => 'Legal article',
+            'i' => 'Index',
+            'j' => 'Patent document',
+            'k' => 'Discography',
+            'l' => 'Legislation',
+            'm' => 'Thesis',
+            'n' => 'Surveys of literature in a subject area',
+            'o' => 'Review',
+            'p' => 'Programmed text',
+            'q' => 'Filmography',
+            'r' => 'Directory',
+            's' => 'Statistics',
+            't' => 'Technical report',
+            'u' => 'Standards/specification',
+            'v' => 'Legal cases and case notes',
+            'w' => 'Law reports and digests',
+            'y' => 'Yearbook',
+            'z' => 'Treaty',
+            '2' => 'Offprint',
+            '5' => 'Calendar',
+            '6' => 'Comics/graphic novel',
+        );
+
         $videoFormats = array(
             'a' => 'Beta (1/2 in., videocassette)',
             'b' => 'VHS (1/2 in., videocassette)',
@@ -298,6 +329,11 @@ class BibliographicRecord extends Record implements JsonableInterface {
                     $material = 'Series';  // Monographic series (merk: skiller ikke mellom 'flerbindsverk' og 'serieinnførsel')
                     break;
 
+            }
+        } else if ($material == 'Book') {
+            if (isset($natureOfContents[$f008[24]])) {
+                // Slight simplification
+                $material = $natureOfContents[$f008[24]];
             }
         }
 

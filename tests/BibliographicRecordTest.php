@@ -515,6 +515,17 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('Forts.som: Acoustical imaging. 8(1980)', $out->notes[0]);
     }
 
+    public function testMarc502() {
+        $out = $this->parseRecordData('
+            <marc:datafield tag="502" ind1=" " ind2=" ">
+                <marc:subfield code="a">Avhandling (Doktorgrad) - Aachen Technische Hochschule.</marc:subfield>
+            </marc:datafield>
+        ');
+
+        $this->assertCount(1, $out->notes);
+        $this->assertEquals('Avhandling (Doktorgrad) - Aachen Technische Hochschule.', $out->notes[0]);
+    }
+
     public function testMarc600() {
         $out1 = $this->parseRecordData('
             <marc:datafield tag="600" ind1="1" ind2="4">

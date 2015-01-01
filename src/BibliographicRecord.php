@@ -643,6 +643,13 @@ class BibliographicRecord extends Record implements JsonableInterface {
                     $notes[] = $node->text('marc:subfield[@code="a"]');
                     break;
 
+                // 502 : Dissertation Note (R)
+                case 502:
+
+                    // $a - Dissertation note (NR)
+                    $notes[] = $node->text('marc:subfield[@code="a"]');
+                    break;
+
                 case 505:
 
                     // <datafield tag="520" ind1=" " ind2=" ">

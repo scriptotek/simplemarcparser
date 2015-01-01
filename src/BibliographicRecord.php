@@ -351,7 +351,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
             if (in_array($code, array_keys($subdivtypes))) {
                 $subdiv = trim($subdiv, '.');
                 $out['parts'][] = array('value' => $subdiv, 'type' => $subdivtypes[$code]);
-                $out['term'] .= '--' . $subdiv;
+                $out['term'] .= self::$subfieldSeparator . $subdiv;
             }
         }
         return $out;
@@ -702,7 +702,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
 
                     $name = trim($node->text('marc:subfield[@code="a"]'), ',');
                     foreach ($node->all('marc:subfield[@code="b"]') as $subunit) {
-                        $name .= '--' . trim($subunit, ',');
+                        $name .= self::$subfieldSeparator . trim($subunit, ',');
                     }
                     $tmp['type'] = 'corporation';
                     $tmp['term'] = $name . $tmp['term'];

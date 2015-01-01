@@ -535,7 +535,7 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertEquals('Zacchaeus (Biblical character)', $out2->subjects[0]['term']);
 
-        $this->assertEquals('Pushkin, Aleksandr Sergeevich (1799-1837)--Museums--Russia (Federation)--Moscow--Maps', $out3->subjects[0]['term']);
+        $this->assertEquals('Pushkin, Aleksandr Sergeevich (1799-1837)' . Record::$subfieldSeparator . 'Museums' . Record::$subfieldSeparator . 'Russia (Federation)' . Record::$subfieldSeparator . 'Moscow' . Record::$subfieldSeparator . 'Maps', $out3->subjects[0]['term']);
     }
 
     public function testMarc610() {
@@ -563,7 +563,7 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertCount(1, $out1->subjects);
         // Problem: How to normalize punctuation? We loose the dot in '7th.' if we strip off dots..
         $this->assertEquals('corporation', $out1->subjects[0]['type']);
-        $this->assertEquals('United States.--Army.--Cavalry, 7th.--Company E', $out1->subjects[0]['term']);
+        $this->assertEquals('United States.' . Record::$subfieldSeparator . 'Army.' . Record::$subfieldSeparator . 'Cavalry, 7th.' . Record::$subfieldSeparator . 'Company E', $out1->subjects[0]['term']);
 
         $this->assertCount(2, $out2->subjects);
         $this->assertEquals('Tidens tegn (avis)', $out2->subjects[0]['term']);
@@ -586,7 +586,7 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertCount(1, $out1->subjects);
         // Problem: How to normalize punctuation? We loose the dot in '7th.' if we strip off dots..
         $this->assertEquals('meeting', $out1->subjects[0]['type']);
-        $this->assertEquals('International Congress of Writers for the Defense of Culture--Fiction', $out1->subjects[0]['term']);
+        $this->assertEquals('International Congress of Writers for the Defense of Culture' . Record::$subfieldSeparator . 'Fiction', $out1->subjects[0]['term']);
         $this->assertEquals('1st', $out1->subjects[0]['number']);
         $this->assertEquals('1935', $out1->subjects[0]['time']);
         $this->assertEquals('Paris, France', $out1->subjects[0]['place']);
@@ -622,17 +622,17 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('topical', $out1->subjects[0]['type']);
         $this->assertEquals('tekord', $out1->subjects[0]['vocabulary']);
         $this->assertEquals('NTUB12641', $out1->subjects[0]['id']);
-        $this->assertEquals('Sjømat--Norge', $out1->subjects[0]['term']);
+        $this->assertEquals('Sjømat' . Record::$subfieldSeparator . 'Norge', $out1->subjects[0]['term']);
         $this->assertEquals('Norge', $out1->subjects[0]['parts'][0]['value']);
         $this->assertEquals('geographic', $out1->subjects[0]['parts'][0]['type']);
 
         $this->assertEquals('lcsh', $out2->subjects[0]['vocabulary']);
-        $this->assertEquals('Optoelectronics industry--Directories', $out2->subjects[0]['term']);
+        $this->assertEquals('Optoelectronics industry' . Record::$subfieldSeparator . 'Directories', $out2->subjects[0]['term']);
         $this->assertEquals('Directories', $out2->subjects[0]['parts'][0]['value']);
         $this->assertEquals('general', $out2->subjects[0]['parts'][0]['type']);
 
         $this->assertEquals('tekord', $out3->subjects[0]['vocabulary']);
-        $this->assertEquals('Musikk--Historie--1900-    --Tyskland', $out3->subjects[0]['term']);
+        $this->assertEquals('Musikk' . Record::$subfieldSeparator . 'Historie' . Record::$subfieldSeparator . '1900-    ' . Record::$subfieldSeparator . 'Tyskland', $out3->subjects[0]['term']);
         $this->assertEquals('Historie', $out3->subjects[0]['parts'][0]['value']);
         $this->assertEquals('form', $out3->subjects[0]['parts'][0]['type']);
         $this->assertEquals('1900-    ', $out3->subjects[0]['parts'][1]['value']);

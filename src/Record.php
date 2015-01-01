@@ -7,6 +7,8 @@ class Record {
 
     protected $data;
 
+    public static $subfieldSeparator = '--';
+
     public function __get($name) {
         if (isset($this->data[$name])) {
             return $this->data[$name];

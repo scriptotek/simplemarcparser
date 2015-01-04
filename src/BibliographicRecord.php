@@ -458,7 +458,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
 
                 // 060 - National Library of Medicine Call Number (R)
                 case 60:
-                    $cl = array('system' => 'nlm');
+                    $cl = array('system' => 'nlm', 'edition' => null, 'assigner' => null);
 
                     $map = array(
                         'a' => 'number'
@@ -470,12 +470,14 @@ class BibliographicRecord extends Record implements JsonableInterface {
                         if (!empty($t)) $cl[$val[0]] = $t;
                     }
 
+                    $ind2 = $node->attr('ind2');
+                    $cl['assigner'] = ($ind2 == '0') ? 'DNLM' : null;
                     $classifications[] = $cl;
                     break;
 
                 // 080 - Universal Decimal Classification Number (R)
                 case 80:
-                    $cl = array('system' => 'udc');
+                    $cl = array('system' => 'udc', 'edition' => null, 'assigner' => null);
 
                     $map = array(
                         'a' => array('number', '^.*?([0-9.\/:()]+).*$', '\1'),
@@ -493,12 +495,12 @@ class BibliographicRecord extends Record implements JsonableInterface {
 
                 // 082 - Dewey Decimal Classification Number (R)
                 case 82:
-                    $cl = array('system' => 'ddc');
+                    $cl = array('system' => 'ddc', 'edition' => null, 'assigner' => null);
 
                     $map = array(
                         'a' => array('number', '^.*?([0-9.]+)\/?([0-9.]*).*$', '\1\2'),
                         '2' => 'edition',
-                        'q' => 'assigning_agency'
+                        'q' => 'assigner'
                     );
                     foreach ($map as $key => $val) {
                         $t = $node->text('marc:subfield[@code="' . $key . '"]');
@@ -512,12 +514,12 @@ class BibliographicRecord extends Record implements JsonableInterface {
 
                 // 084 - Other Classification Number (R)
                 case 84:
-                    $cl = array();
+                    $cl = array('edition' => null, 'assigner' => null);
 
                     $map = array(
                         'a' => 'number',
                         '2' => 'system',
-                        'q' => 'assigning_agency'
+                        'q' => 'assigner'
                     );
                     foreach ($map as $key => $val) {
                         $t = $node->text('marc:subfield[@code="' . $key . '"]');

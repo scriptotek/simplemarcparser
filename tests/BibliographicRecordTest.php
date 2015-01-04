@@ -228,7 +228,7 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('rda', $out2->catalogingRules);
     }
 
-    public function testMarc060() {
+    public function testNLMClassification() {
         $out1 = $this->parseRecordData('
             <marc:datafield tag="060" ind1="1" ind2="4">
                 <marc:subfield code="a">QH 305.M26</marc:subfield>
@@ -239,9 +239,11 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $klass = $out1->classifications[0];
         $this->assertEquals('nlm', $klass['system']);
         $this->assertEquals('QH 305.M26', $klass['number']);
+        $this->assertNull($klass['edition']);
+        $this->assertNull($klass['assigner']);
     }
 
-    public function testMarc080() {
+    public function testUDCClassification() {
         $out1 = $this->parseRecordData('
             <marc:datafield tag="080" ind1=" " ind2=" ">
                 <marc:subfield code="a">551.2:51(02)</marc:subfield>
@@ -253,9 +255,11 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $klass = $out1->classifications[0];
         $this->assertEquals('udc', $klass['system']);
         $this->assertEquals('551.2:51(02)', $klass['number']);
+        $this->assertNull($klass['edition']);
+        $this->assertNull($klass['assigner']);
     }
 
-    public function testMarc082() {
+    public function testDDCClassificationWithoutAssigner() {
         $out1 = $this->parseRecordData('
             <marc:datafield tag="082" ind1="0" ind2="4">
                 <marc:subfield code="a">333.914/02[U]</marc:subfield>
@@ -269,12 +273,28 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('ddc', $klass['system']);
         $this->assertEquals('333.91402', $klass['number']);
         $this->assertEquals('23', $klass['edition']);
-        $this->assertArrayNotHasKey('assigning_agency', $klass);
+        $this->assertNull($klass['assigner']);
 
         $this->assertCount(0, $out2->classifications);
     }
 
-    public function testMarc084() {
+    public function testDDCClassificationWithAssigner() {
+        $out = $this->parseRecordData('
+            <marc:datafield tag="082" ind1="7" ind2="4">
+                <marc:subfield code="a">639.3</marc:subfield>
+                <marc:subfield code="q">NO-OsNB</marc:subfield>
+                <marc:subfield code="2">5/nor</marc:subfield>
+            </marc:datafield>
+        ');
+
+        $klass = $out->classifications[0];
+        $this->assertEquals('ddc', $klass['system']);
+        $this->assertEquals('639.3', $klass['number']);
+        $this->assertEquals('5/nor', $klass['edition']);
+        $this->assertEquals('NO-OsNB', $klass['assigner']);
+    }
+
+    public function testOtherClassifications() {
         $out1 = $this->parseRecordData('
             <marc:datafield tag="084" ind1=" " ind2=" ">
                 <marc:subfield code="a">62.70</marc:subfield>
@@ -297,33 +317,18 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
-        $this->assertCount(4, $out1->classifications); // Not 5! Entries without $2 are ignored!
+        $this->assertCount(4, $out1->classifications); // Not 5 since entries without $2 are ignored!
 
         $this->assertEquals('msc', $out1->classifications[0]['system']);
         $this->assertEquals('62.70', $out1->classifications[0]['number']);
-        $this->assertArrayNotHasKey('assigning_agency', $out1->classifications[0]);
+        $this->assertNull($out1->classifications[0]['edition']);
+        $this->assertNull($out1->classifications[0]['assigner']);
 
         $this->assertEquals('msc', $out1->classifications[1]['system']);
         $this->assertEquals('62G15', $out1->classifications[1]['number']);
-
+        $this->assertNull($out1->classifications[1]['edition']);
+        $this->assertNull($out1->classifications[1]['assigner']);
     }
-
-    public function testMarc082b() {
-        $out = $this->parseRecordData('
-            <marc:datafield tag="082" ind1="7" ind2="4">
-                <marc:subfield code="a">639.3</marc:subfield>
-                <marc:subfield code="q">NO-OsNB</marc:subfield>
-                <marc:subfield code="2">5/nor</marc:subfield>
-            </marc:datafield>
-        ');
-
-        $klass = $out->classifications[0];
-        $this->assertEquals('ddc', $klass['system']);
-        $this->assertEquals('639.3', $klass['number']);
-        $this->assertEquals('5/nor', $klass['edition']);
-        $this->assertEquals('NO-OsNB', $klass['assigning_agency']);
-    }
-
 
     public function testPersonalNameHeadingWithAuthority() {
         $out = $this->parseRecordData('

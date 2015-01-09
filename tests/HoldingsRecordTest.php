@@ -28,6 +28,16 @@ class HoldingsRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('12149361x', $out->id);
     }
 
+    public function testMarc004() {
+        $out1 = $this->parseRecordData('
+            <marc:controlfield tag="004">841149003</marc:controlfield>
+        ');
+        $out2 = $this->parseRecordData('');
+
+        $this->assertEquals('841149003', $out1->bibliographic_record);
+        $this->assertNull($out2->bibliographic_record);
+    }
+
     public function testMarc009() {
         $out = $this->parseRecordData('
             <marc:controlfield tag="009">kat</marc:controlfield>

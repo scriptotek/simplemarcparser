@@ -80,6 +80,8 @@ class HoldingsRecord extends Record implements JsonableInterface {
 
         $this->id = $data->text('marc:controlfield[@tag="001"]');  // Dokid
 
+        $this->bibliographic_record = $data->text('marc:controlfield[@tag="004"]') ?: null;  // Objektid
+
         $fulltext = array();
         $nonpublic_notes = array();
         $public_notes = array();

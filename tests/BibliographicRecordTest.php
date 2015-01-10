@@ -580,6 +580,14 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
             </marc:datafield>
         ');
 
+        $out4 = $this->parseRecordData('
+            <marc:datafield tag="600" ind1="1" ind2="4">
+                <marc:subfield code="a">Walpole, Robert</marc:subfield>
+                <marc:subfield code="d">1676-1745</marc:subfield>
+                <marc:subfield code="c">Earl of Orford</marc:subfield>
+            </marc:datafield>
+        ');
+
         $this->assertCount(1, $out1->subjects);
         $this->assertEquals('person', $out1->subjects[0]['type']);
         $this->assertEquals('Støre, Jonas Gahr (1960-)', $out1->subjects[0]['term']);
@@ -588,9 +596,15 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertEquals('Zacchaeus (Biblical character)', $out2->subjects[0]['term']);
         $this->assertNull($out2->subjects[0]['id']);
+        $this->assertEquals('lcsh', $out2->subjects[0]['vocabulary']);
 
         $this->assertEquals('Pushkin, Aleksandr Sergeevich (1799-1837)' . Record::$subfieldSeparator . 'Museums' . Record::$subfieldSeparator . 'Russia (Federation)' . Record::$subfieldSeparator . 'Moscow' . Record::$subfieldSeparator . 'Maps', $out3->subjects[0]['term']);
         $this->assertNull($out3->subjects[0]['id']);
+        $this->assertEquals('lcsh', $out3->subjects[0]['vocabulary']);
+
+        $this->assertEquals('Walpole, Robert (Earl of Orford, 1676-1745)', $out4->subjects[0]['term']);
+        $this->assertNull($out4->subjects[0]['id']);
+        $this->assertNull($out4->subjects[0]['vocabulary']);
     }
 
     public function testMarc610() {

@@ -372,7 +372,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
      * @return array
      */
     function parseSubjectAddedEntry(QuiteSimpleXmlElement &$node) {
-        $out = array('term' => '');
+        $out = array('term' => '', 'vocabulary' => null);
         $vocabularies = array(
             '0' => 'lcsh',
             '1' => 'lccsh', // LC subject headings for children's literature
@@ -747,7 +747,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
                     // normalizing to try aligning records with different
                     // punctuation standards (US vs UK)
                     if (count($qualifiers) != 0) {
-                        $name = "$name (" . implode(',', $qualifiers) . ")";
+                        $name = "$name (" . implode(', ', $qualifiers) . ")";
                     }
                     $tmp['term'] = $name . $tmp['term'];
                     $tmp['type'] = 'person';

@@ -830,7 +830,12 @@ class BibliographicRecord extends Record implements JsonableInterface {
 
                     foreach ($node->all('marc:subfield[@code="a"]') as $emne) {
                         $tmp['term'] = trim($emne, '.');
-                        array_push($subjects, $tmp);
+                        if ($tmp['type'] == 'genre') {
+                            unset($tmp['type']);
+                            array_push($genres, $tmp);
+                        } else {
+                            array_push($subjects, $tmp);
+                        }
                     }
 
                     break;

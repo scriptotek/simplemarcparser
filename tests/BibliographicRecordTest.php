@@ -712,7 +712,7 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertCount(0, $out4->subjects);
     }
 
-        public function testMarc653() {
+    public function testUncontrolledSubjects() {
         $out1 = $this->parseRecordData('
             <marc:datafield tag="653" ind1="1" ind2=" ">
                 <marc:subfield code="a">fuel cells</marc:subfield>
@@ -727,8 +727,21 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('power generation', $out1->subjects[2]['term']);
     }
 
+    public function testUncontrolledGenre() {
+        $out2 = $this->parseRecordData('
+            <marc:datafield tag="653" ind1="1" ind2="6">
+                <marc:subfield code="a">comics</marc:subfield>
+            </marc:datafield>
+        ');
+
+        $this->assertCount(0, $out2->subjects);
+        $this->assertCount(1, $out2->genres);
+        $this->assertEquals('comics', $out2->genres[0]['term']);
+        $this->assertNull($out2->genres[0]['vocabulary']);
+    }
+
     // Example: 133027287
-    public function testMarc655() {
+    public function testControlledGenre() {
         $out1 = $this->parseRecordData('
             <marc:datafield tag="655" ind1=" " ind2="7">
                 <marc:subfield code="a">Populærvitenskap</marc:subfield>

@@ -712,6 +712,21 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertCount(0, $out4->subjects);
     }
 
+        public function testMarc653() {
+        $out1 = $this->parseRecordData('
+            <marc:datafield tag="653" ind1="1" ind2=" ">
+                <marc:subfield code="a">fuel cells</marc:subfield>
+                <marc:subfield code="a">molten carbonate</marc:subfield>
+                <marc:subfield code="a">power generation</marc:subfield>
+            </marc:datafield>
+        ');
+
+        $this->assertCount(3, $out1->subjects);
+        $this->assertEquals('fuel cells', $out1->subjects[0]['term']);
+        $this->assertEquals('molten carbonate', $out1->subjects[1]['term']);
+        $this->assertEquals('power generation', $out1->subjects[2]['term']);
+    }
+
     // Example: 133027287
     public function testMarc655() {
         $out1 = $this->parseRecordData('

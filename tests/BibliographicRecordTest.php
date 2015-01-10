@@ -294,6 +294,16 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('NO-OsNB', $klass['assigner']);
     }
 
+    public function testInvalidDdcvalue() {
+        $out = $this->parseRecordData('
+            <marc:datafield tag="082" ind1="0" ind2="4">
+                <marc:subfield code="a">0-86217-075-3</marc:subfield>
+            </marc:datafield>
+        ');
+
+        $this->assertCount(0, $out->classifications);
+    }
+
     public function testOtherClassifications() {
         $out1 = $this->parseRecordData('
             <marc:datafield tag="084" ind1=" " ind2=" ">

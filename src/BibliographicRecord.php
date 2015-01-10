@@ -508,8 +508,11 @@ class BibliographicRecord extends Record implements JsonableInterface {
                         if (count($val) > 2) $t = preg_replace('/' . $val[1] . '/', $val[2], $t);
                         if (!empty($t)) $cl[$val[0]] = $t;
                     }
-
-                    $classifications[] = $cl;
+                    if (isset($cl['number'])) {
+                        $classifications[] = $cl;
+                    } else {
+                        // Invalid value in $a, should we trigger some event to allow logging?
+                    }
                     break;
 
                 // 084 - Other Classification Number (R)

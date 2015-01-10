@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Contracts\JsonableInterface;
 use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
+use Carbon\Carbon;
 
 /**
  * @property int       $id                 Local record identifier
@@ -38,8 +39,8 @@ use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
  * @property array     $classifications
  * @property int       $pages
  * @property int       $year
- * @property Carbon\Carbon    $modified
- * @property Carbon\Carbon    $created
+ * @property Carbon    $modified
+ * @property Carbon    $created
  */
 class BibliographicRecord extends Record implements JsonableInterface {
 
@@ -341,10 +342,34 @@ class BibliographicRecord extends Record implements JsonableInterface {
         $this->electronic = $online;
     }
 
+    function addClassification($node, &$classifications, $fields, $system = null, $edition = null, $assigner = null)
+    {
+        $cl = array('system' => $system, 'edition' => $edition, 'number' => null, 'assigner' => $assigner);
+        foreach ($fields as $key => $val) {
+            $t = $node->text('marc:subfield[@code="' . $key . '"]');
+            if (!is_array($val)) $val = array($val);
+            if (count($val) > 2) $t = preg_replace('/' . $val[1] . '/', $val[2], $t);
+            if (!empty($t)) $cl[$val[0]] = $t;
+        }
+
+        if (is_null($cl['system'])) {
+            return;
+            // Invalid value in $a, should we trigger some event to allow logging?
+        }
+
+        if (is_null($cl['number'])) {
+            return;
+            // Invalid value in $a, should we trigger some event to allow logging?
+        }
+
+        $classifications[] = $cl;
+    }
+
     /**
      * Parses common elements in subject added entry fields 600-655
      *
      * @param \Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement $node
+     * @return array
      */
     function parseSubjectAddedEntry(QuiteSimpleXmlElement &$node) {
         $out = array('term' => '');
@@ -458,84 +483,55 @@ class BibliographicRecord extends Record implements JsonableInterface {
 
                 // 060 - National Library of Medicine Call Number (R)
                 case 60:
-                    $cl = array('system' => 'nlm', 'edition' => null, 'assigner' => null);
-
-                    $map = array(
-                        'a' => 'number'
+                    $this->addClassification(
+                        $node,
+                        $classifications,
+                        array(
+                            'a' => 'number'
+                        ),
+                        $system = 'nlm',
+                        $assigner = ($node->attr('ind2') == '0') ? 'DNLM' : null
                     );
-                    foreach ($map as $key => $val) {
-                        $t = $node->text('marc:subfield[@code="' . $key . '"]');
-                        if (!is_array($val)) $val = array($val);
-                        if (count($val) > 2) $t = preg_replace('/' . $val[1] . '/', $val[2], $t);
-                        if (!empty($t)) $cl[$val[0]] = $t;
-                    }
-
-                    $ind2 = $node->attr('ind2');
-                    $cl['assigner'] = ($ind2 == '0') ? 'DNLM' : null;
-                    $classifications[] = $cl;
                     break;
 
                 // 080 - Universal Decimal Classification Number (R)
                 case 80:
-                    $cl = array('system' => 'udc', 'edition' => null, 'assigner' => null);
-
-                    $map = array(
-                        'a' => array('number', '^.*?([0-9.\/:()]+).*$', '\1'),
-                        '2' => 'edition',
+                    $this->addClassification(
+                        $node,
+                        $classifications,
+                        array(
+                            'a' => array('number', '^.*?([0-9.\/:()]+).*$', '\1'),
+                            '2' => 'edition',
+                        ),
+                        $system = 'udc'
                     );
-                    foreach ($map as $key => $val) {
-                        $t = $node->text('marc:subfield[@code="' . $key . '"]');
-                        if (!is_array($val)) $val = array($val);
-                        if (count($val) > 2) $t = preg_replace('/' . $val[1] . '/', $val[2], $t);
-                        if (!empty($t)) $cl[$val[0]] = $t;
-                    }
-
-                    $classifications[] = $cl;
                     break;
 
                 // 082 - Dewey Decimal Classification Number (R)
                 case 82:
-                    $cl = array('system' => 'ddc', 'edition' => null, 'assigner' => null);
-
-                    $map = array(
-                        'a' => array('number', '^.*?([0-9.]+)\/?([0-9.]*).*$', '\1\2'),
-                        '2' => 'edition',
-                        'q' => 'assigner'
+                    $this->addClassification(
+                        $node,
+                        $classifications,
+                        array(
+                            'a' => array('number', '^.*?([0-9.]+)\/?([0-9.]*).*$', '\1\2'),
+                            '2' => 'edition',
+                            'q' => 'assigner'
+                        ),
+                        $system = 'ddc'
                     );
-                    foreach ($map as $key => $val) {
-                        $t = $node->text('marc:subfield[@code="' . $key . '"]');
-                        if (!is_array($val)) $val = array($val);
-                        if (count($val) > 2) $t = preg_replace('/' . $val[1] . '/', $val[2], $t);
-                        if (!empty($t)) $cl[$val[0]] = $t;
-                    }
-                    if (isset($cl['number'])) {
-                        $classifications[] = $cl;
-                    } else {
-                        // Invalid value in $a, should we trigger some event to allow logging?
-                    }
                     break;
 
                 // 084 - Other Classification Number (R)
                 case 84:
-                    $cl = array('edition' => null, 'assigner' => null);
-
-                    $map = array(
-                        'a' => 'number',
-                        '2' => 'system',
-                        'q' => 'assigner'
+                    $this->addClassification(
+                        $node,
+                        $classifications,
+                        array(
+                            'a' => 'number',
+                            '2' => 'system',
+                            'q' => 'assigner'
+                        )
                     );
-                    foreach ($map as $key => $val) {
-                        $t = $node->text('marc:subfield[@code="' . $key . '"]');
-                        if (!is_array($val)) $val = array($val);
-                        if (count($val) > 2) $t = preg_replace('/' . $val[1] . '/', $val[2], $t);
-                        if (!empty($t)) $cl[$val[0]] = $t;
-                    }
-
-                    // Only add classifications with a system assigned. 
-                    // "Local classification" is deprecated!
-                    if (isset($cl['system'])) {
-                        $classifications[] = $cl;
-                    }
                     break;
 
                 /*

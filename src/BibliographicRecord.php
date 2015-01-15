@@ -447,6 +447,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
         $series = array();
         $notes = array();
         $isbns = array();
+        $issns = array();
 
         // Relationships
         $preceding = array();
@@ -472,6 +473,14 @@ class BibliographicRecord extends Record implements JsonableInterface {
                     $isbn = preg_replace('/^([0-9\-xX]+).*$/', '\1', $isbn);
                     if (empty($isbn)) break;
                     array_push($isbns, $isbn);
+                    break;
+
+                // 022 - International Standard Serial Number (R)
+                case 22:                                                            // Test added
+                    $issn = $node->text('marc:subfield[@code="a"]');
+                    $issn = preg_replace('/^([0-9\-xX]+).*$/', '\1', $issn);
+                    if (empty($issn)) break;
+                    array_push($issns, $issn);
                     break;
 
                 // 040 - Cataloging Source (NR)
@@ -1041,6 +1050,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
         }
 
         $this->isbns = $isbns;
+        $this->issns = $issns;
         $this->series = $series;
         $this->creators = $creators;
         $this->meetings = $meetings;

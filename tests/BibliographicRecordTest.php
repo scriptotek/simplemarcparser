@@ -189,6 +189,20 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertCount(0, $out2->isbns);
     }
 
+    public function testIssn() {
+        $out1 = $this->parseRecordData('
+            <marc:datafield tag="022" ind1=" " ind2=" ">
+                <marc:subfield code="a">1089-7690</marc:subfield>
+            </marc:datafield>
+        ');
+        $out2 = $this->parseRecordData('');
+
+        $this->assertCount(1, $out1->issns);
+        $this->assertEquals('1089-7690', $out1->issns[0]);
+
+        $this->assertCount(0, $out2->issns);
+    }
+
     public function testCanceledIsbn() {
         // 020 $z : Cancelled/invalid ISBN
         $out = $this->parseRecordData('
@@ -958,6 +972,7 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
             'is_series' => false,
             'is_multivolume' => false,
             'isbns' => array(),
+            'issns' => array(),
             'series' => array(),
             'creators' => array(),
             'meetings' => array(),

@@ -98,7 +98,7 @@ class HoldingsRecordTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertEquals(1, count($out->fulltext));
         $ft = $out->fulltext[0];
-        $this->assertEquals('NB Digital', $ft['provider']);
+        $this->assertEquals('NB Digital', $ft['linktext']);
         $this->assertEquals('http://urn.nb.no/URN:NBN:no-nb_digibok_2012071308172', $ft['url']);
         $this->assertEquals('Elektronisk reproduksjon. Tilgjengelig på NBs lesesal', $ft['comment']);
     }

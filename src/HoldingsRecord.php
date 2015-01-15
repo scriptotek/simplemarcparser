@@ -118,7 +118,7 @@ class HoldingsRecord extends Record implements JsonableInterface {
                     if (in_array($description, array('Fulltekst','Fulltext'))) {
                         $fulltext[] = array(
                             'url' => $node->text('marc:subfield[@code="u"]'),
-                            'provider' => $node->text('marc:subfield[@code="y"]'),
+                            'linktext' => $node->text('marc:subfield[@code="y"]'),
                             'comment' => $node->text('marc:subfield[@code="z"]')
                         );
                     }

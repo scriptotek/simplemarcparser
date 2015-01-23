@@ -896,9 +896,9 @@ class BibliographicRecord extends Record implements JsonableInterface {
                     $part_of = isset($part_of) ? $part_of : array();
                     $part_of['relationship'] = $node->text('marc:subfield[@code="i"]');
                     $part_of['title'] = $node->text('marc:subfield[@code="t"]');
-                    $part_of['issn'] = $node->text('marc:subfield[@code="x"]');
-                    $part_of['isbn'] = $node->text('marc:subfield[@code="z"]');
-                    $part_of['volume'] = $node->text('marc:subfield[@code="v"]');
+                    $part_of['issn'] = $node->text('marc:subfield[@code="x"]') ?: null;
+                    $part_of['isbn'] = $node->text('marc:subfield[@code="z"]') ?: null;
+                    $part_of['volume'] = $node->text('marc:subfield[@code="v"]') ?: null;
                     $this->parseAuthority($node->text('marc:subfield[@code="w"]'), $part_of);
 
                     break;

@@ -824,6 +824,7 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('042457270', $out->part_of['id']);
         $this->assertEquals('NO-TrBIB', $out->part_of['vocabulary']);
         $this->assertEquals('0126137609', $out->part_of['isbn']);
+        $this->assertNull($out->part_of['issn']);
         $this->assertEquals('Scattering', $out->part_of['title']);
         $this->assertEquals('Inkludert i', $out->part_of['relationship']);
 

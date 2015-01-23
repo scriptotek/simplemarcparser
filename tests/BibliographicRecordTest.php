@@ -910,9 +910,12 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
                 <marc:subfield code="v">94-13</marc:subfield>
                 <marc:subfield code="w">(NO-TrBIB)812037006</marc:subfield>
             </marc:datafield>
+            <marc:datafield tag="830" ind1=" " ind2="0">
+                <marc:subfield code="a">Muirhead library of philosophy</marc:subfield>
+            </marc:datafield>
         ');
 
-        $this->assertCount(2, $out->series);
+        $this->assertCount(3, $out->series);
         $this->assertEquals('Physica mathematica Universitatis Osloensis', $out->series[0]['title']);
         $this->assertEquals('32', $out->series[0]['volume']);
         $this->assertEquals('922367817', $out->series[0]['id']);
@@ -920,6 +923,10 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('Report series (Universitetet i Oslo. Fysisk institutt) (trykt utg.)', $out->series[1]['title']);
         $this->assertEquals('94-13', $out->series[1]['volume']);
         $this->assertEquals('812037006', $out->series[1]['id']);
+
+        $this->assertEquals('Muirhead library of philosophy', $out->series[2]['title']);
+        $this->assertNull($out->series[2]['volume']);
+        $this->assertNull($out->series[2]['id']);
     }
 
     public function testMarc956() {

@@ -983,8 +983,8 @@ class BibliographicRecord extends Record implements JsonableInterface {
                 case 830:
                     $serie = array(
                         'title' => $node->text('marc:subfield[@code="a"]'),
-                        'id' => preg_replace('/\(NO-TrBIB\)/', '', $node->text('marc:subfield[@code="w"]')),
-                        'volume' => $node->text('marc:subfield[@code="v"]')
+                        'id' => preg_replace('/\(NO-TrBIB\)/', '', $node->text('marc:subfield[@code="w"]')) ?: null,
+                        'volume' => $node->text('marc:subfield[@code="v"]') ?: null
                     );
                     $series[] = $serie;
                     break;

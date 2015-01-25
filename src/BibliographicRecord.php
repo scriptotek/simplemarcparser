@@ -83,6 +83,20 @@ class BibliographicRecord extends Record implements JsonableInterface {
                 'c' => 'Combination ', // in a combination of two or more of the other defined types
                 'd' => 'No writing system',
             ),
+            'h' => array(
+                'a' => 'Aperture card',
+                'b' => 'Microfilm cartridge',
+                'c' => 'Microfilm cassette',
+                'd' => 'Microfilm reel',
+                'e' => 'Microfiche',
+                'f' => 'Microfiche cassette',
+                'g' => 'Microopaque',
+                'h' => 'Microfilm slip',
+                'j' => 'Microfilm roll',
+                'u' => 'Microform', // Unspecified
+                'z' => 'Microform', // Other
+                '|' => 'Microform', // No attempt to code
+            ),
             'o' => array(
                 'u' => 'Kit',
                 '|' => 'Kit',

@@ -56,6 +56,10 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testMaterialIsMusicCD() {
+        // LDR/06="j" : Musical sound recording
+        // LDR/07="a" : Monographic component part
+        // 007/0="s" : Sound recording
+        // 007/1="d" : Sound disc
         $out = $this->parseRecordData('
             <marc:leader>99999cja a2299999 c 4500</marc:leader>
             <marc:controlfield tag="001">040262626</marc:controlfield>
@@ -63,8 +67,38 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
             <marc:controlfield tag="008">040209s20uu    xx#|||| |    |||||||und|d</marc:controlfield>
         ');
 
-        $this->assertEquals('Music CD', $out->material);
+        $this->assertEquals('Music CD track', $out->material);
         $this->assertFalse($out->electronic);
+    }
+
+    public function testMaterialIsSoundCassette() {
+        // LDR/06="j" : Musical sound recording
+        // LDR/07="m" : Monograph/Item
+        // 007/0="s" : Sound recording
+        // 007/1="s" : Sound cassette
+        $out = $this->parseRecordData('
+            <marc:leader>99999cjm a2299999 c 4500</marc:leader>
+            <marc:controlfield tag="001">943188679</marc:controlfield>
+            <marc:controlfield tag="007">ss |||||||||||</marc:controlfield>
+            <marc:controlfield tag="008">091211s1993    xx#|||| |    |||||||nno| </marc:controlfield>
+        ');
+
+        $this->assertEquals('Sound cassette', $out->material);
+    }
+
+    public function testMaterialIsSoundCassetteTrack() {
+        // LDR/06="j" : Musical sound recording
+        // LDR/07="a" : Monographic component part
+        // 007/0="s" : Sound recording
+        // 007/1="s" : Sound cassette
+        $out = $this->parseRecordData('
+            <marc:leader>99999cja a2299999 c 4500</marc:leader>
+            <marc:controlfield tag="001">030323959</marc:controlfield>
+            <marc:controlfield tag="007">ss |||||||||||</marc:controlfield>
+            <marc:controlfield tag="008">030214s1998    xx#|||| |    |||||||nno|d</marc:controlfield>
+        ');
+
+        $this->assertEquals('Sound cassette track', $out->material);
     }
 
     public function testMaterialIsPrintedPeriodical() {

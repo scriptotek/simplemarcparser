@@ -332,6 +332,9 @@ class BibliographicRecord extends Record implements JsonableInterface {
                 $material = 'Sheet music';
             } else {
                 $material = $this->getMaterialSubtypeFrom007($f007[0], $f007[1], $material);
+                if (array_get($ldr, 7) == 'a') {
+                    $material .= ' track';
+                }
             }
 
         } else if ($material == 'Series') {

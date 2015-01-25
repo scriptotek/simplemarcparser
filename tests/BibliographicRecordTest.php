@@ -127,6 +127,30 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse($out->electronic);
     }
 
+    public function testMaterialIsNewspaper() {
+        // 007/1-2=ta : regular print, 008/21=n : newspaper
+        $out = $this->parseRecordData('
+            <marc:leader>99999cas a2299999 c 4500</marc:leader>
+            <marc:controlfield tag="001">930112849</marc:controlfield>
+            <marc:controlfield tag="007">ta</marc:controlfield>
+            <marc:controlfield tag="008">141210c18689999xx#d||n||    ||||||0nob|d</marc:controlfield>
+        ');
+
+        $this->assertEquals('Newspaper', $out->material);
+    }
+
+    public function testMaterialIsNewspaperOnMicroform() {
+        // 007/0=h : microform, 008/21=n : newspaper
+        $out = $this->parseRecordData('
+            <marc:leader>99999cas a2299999 c 4500</marc:leader>
+            <marc:controlfield tag="001">022446451</marc:controlfield>
+            <marc:controlfield tag="007">hu ||||||||||</marc:controlfield>
+            <marc:controlfield tag="008">081218uuuuuuuuuxx#|||n||    ||||||0rus|d</marc:controlfield>
+        ');
+
+        $this->assertEquals('Newspaper on microform', $out->material);
+    }
+
     public function testMarc001() {
         $out = $this->parseRecordData('
             <marc:controlfield tag="001">12149361x</marc:controlfield>

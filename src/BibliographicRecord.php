@@ -336,12 +336,18 @@ class BibliographicRecord extends Record implements JsonableInterface {
 
         } else if ($material == 'Series') {
             switch ($f008[21]) {
-                case 'p':
-                    $material = 'Periodical';
-                    break;
 
                 case 'm':
                     $material = 'Series';  // Monographic series (merk: skiller ikke mellom 'flerbindsverk' og 'serieinnførsel')
+                    break;
+
+                case 'n':
+                    $material = 'Newspaper';
+                    if ($f007[0] == 'h') $material .= ' on microform';
+                    break;
+
+                case 'p':
+                    $material = 'Periodical';
                     break;
 
             }

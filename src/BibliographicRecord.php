@@ -265,6 +265,13 @@ class BibliographicRecord extends Record implements JsonableInterface {
         $this->material = $material;
         $this->electronic = false;
 
+        $this->debug = array(
+            'ldr06' => array_get($ldr, 6),
+            'ldr07' => array_get($ldr, 7),
+            'f7_01' => array_get($f007, 0),
+            'f7_02' => array_get($f007, 1),
+        );
+
         if (count($ldr) < 8) return;
         if (count($f007) < 2) return;
 

@@ -1048,6 +1048,7 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
             'notes' => array(),
             'material' => 'Unknown',
             'electronic' => false,
+            'debug' => array('ldr06' => null, 'ldr07' => null,'f7_01' => null,'f7_02' => null,),
           )
         );
 

@@ -486,6 +486,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
         $notes = array();
         $isbns = array();
         $issns = array();
+        $alternativeTitles = array();
 
         // Relationships
         $preceding = array();
@@ -636,27 +637,24 @@ class BibliographicRecord extends Record implements JsonableInterface {
                     break;
 
                 case 130:
-                    $author = array(
-                        'name' => $node->text('marc:subfield[@code="a"]'),
-                    );
-                    $author['normalizedName'] = $author['name'];
-                    $spl = explode(', ', $author['name']);
-                    if (count($spl) == 2) {
-                        $author['name'] = $spl[1] . ' ' . $spl[0];
-                    }
-                    $this->parseRelator($node, $author, 'uniform_title');
-                    $this->parseAuthority($node->text('marc:subfield[@code="0"]'), $author);
+                    // Uniform title
 
-                    $creators[] = $author;
+                    // TODO: Need a more robust way to prefer 130 over 245
+                    //       Currently we depend on 130 coming before 245.
+                    $this->title = $node->text('marc:subfield[@code="a"]');
                     break;
 
                 // 245 : Title Statement (NR)
                 case 245:
                     $title = rtrim($node->text('marc:subfield[@code="a"]'), " \t\n\r\0\x0B:-");
                     $subtitle = $node->text('marc:subfield[@code="b"]');
-                    $this->title = $title;
                     if (!empty($subtitle)) {
-                        $this->title .= ' : ' . $subtitle;
+                        $title .= ' : ' . $subtitle;
+                    }
+                    if (isset($this->title)) { // If not already set by 130
+                        $alternativeTitles[] = $title;
+                    } else {
+                        $this->title = $title;
                     }
                     /*
                     if (preg_match('/elektronisk ressurs/', $node->text('marc:subfield[@code="h"]'))) {
@@ -679,6 +677,15 @@ class BibliographicRecord extends Record implements JsonableInterface {
                     if ($medium !== '') $this->medium = $medium;
 
                     break;
+
+                // 246 : Varying Form of Title (R)
+                case 246:
+                    $title = rtrim($node->text('marc:subfield[@code="a"]'), " \t\n\r\0\x0B:-");
+                    $subtitle = $node->text('marc:subfield[@code="b"]');
+                    if (!empty($subtitle)) {
+                        $title .= ' : ' . $subtitle;
+                    }
+                    $alternativeTitles[] = $title;
 
                 case 250:
                     $this->edition = $node->text('marc:subfield[@code="a"]');
@@ -1087,6 +1094,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
             $this->other_form = $other_form;
         }
 
+        $this->alternativeTitles = $alternativeTitles;
         $this->isbns = $isbns;
         $this->issns = $issns;
         $this->series = $series;

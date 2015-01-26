@@ -554,6 +554,27 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('x90051629', $out->meetings[0]['id']);
     }
 
+    public function testMarc130UniformTitle()
+    {
+        // Example from 871157233
+        $out = $this->parseRecordData('
+            <marc:datafield tag="130" ind1="0" ind2=" ">
+                <marc:subfield code="a">Årbok (Foreningen til norske fortidsminnesmerkers bevaring, trykt utg.)</marc:subfield>
+            </marc:datafield>
+            <marc:datafield tag="245" ind1="1" ind2="0">
+                <marc:subfield code="a">Årbok ...</marc:subfield>
+                <marc:subfield code="c">Foreningen til norske fortidsminnesmerkers bevaring</marc:subfield>
+            </marc:datafield>
+            <marc:datafield tag="246" ind1="1" ind2="8">
+                <marc:subfield code="a">Fortidsminnesmerker.</marc:subfield>
+            </marc:datafield>
+        ');
+
+        $this->assertEquals('Årbok (Foreningen til norske fortidsminnesmerkers bevaring, trykt utg.)', $out->title);
+        $this->assertEquals('Årbok ...', $out->alternativeTitles[0]);
+        $this->assertEquals('Fortidsminnesmerker.', $out->alternativeTitles[1]);
+    }
+
     public function testMarc245() {
         // Colon should be trimmed off title
         $out = $this->parseRecordData('
@@ -1125,6 +1146,7 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
             'material' => 'Unknown',
             'electronic' => false,
             'debug' => array('ldr06' => null, 'ldr07' => null,'f7_01' => null,'f7_02' => null,),
+            'alternativeTitles' => array(),
           )
         );
 

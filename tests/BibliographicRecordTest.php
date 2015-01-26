@@ -19,7 +19,14 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         return new BibliographicRecord($dom);
     }
 
+    /***********************************************************************************
+     * Leader/06-07 = am : Language material, Monograph/Item
+     ***********************************************************************************/
+
     public function testMaterialIsPrintedBook() {
+        // LDR/06 = a  : Language material [Type of record]
+        // LDR/07 = m  : Monograph/Item
+        // 007    = ta : Text, Regular print
         $out = $this->parseRecordData('
             <marc:leader>99999 am a2299999 c 4500</marc:leader>
             <marc:controlfield tag="001">131381679</marc:controlfield>
@@ -31,23 +38,11 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse($out->electronic);
     }
 
-    public function testMaterialIsArticle() {
-        // LDR/06="a" : Language material
-        // LDR/07="a" : Monographic component part
-        // 007/00="t" : Text
-        // 007/01="a" : Regular print
-        $out = $this->parseRecordData('
-            <marc:leader>99999caa a2299999 c 4500</marc:leader>
-            <marc:controlfield tag="001">952657872</marc:controlfield>
-            <marc:controlfield tag="007">ta</marc:controlfield>
-            <marc:controlfield tag="008">100112s1995    xx#||||||    |000|u|nob|d</marc:controlfield>
-        ');
-
-        $this->assertEquals('Article', $out->material);
-        $this->assertFalse($out->electronic);
-    }
-
     public function testMaterialIsElectronicBook() {
+        // LDR/06 = a  : Language material [Type of record]
+        // LDR/07 = m  : Monograph/Item [Bibliographic level]
+        // 007    = cr : Electronic Resource, Remote [Physical description]
+        // 008/23 = o  : Online [Form of item]
         $out = $this->parseRecordData('
             <marc:leader>99999 am a22999997c 4500</marc:leader>
             <marc:controlfield tag="001">133788229</marc:controlfield>
@@ -60,6 +55,10 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testMaterialIsThesis() {
+        // LDR/06 = a  : Language material [Type of record]
+        // LDR/07 = m  : Monograph/Item [Bibliographic level]
+        // 007    = ta : Text, Regular print [Physical description]
+        // 008/24 = m  : Theses [Nature of contents]
         $out = $this->parseRecordData('
             <marc:leader>99999cam a22999997c 4500</marc:leader>
             <marc:controlfield tag="001">980016495</marc:controlfield>
@@ -71,53 +70,34 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse($out->electronic);
     }
 
-    public function testMaterialIsMusicCD() {
-        // LDR/06="j" : Musical sound recording
-        // LDR/07="a" : Monographic component part
-        // 007/0="s" : Sound recording
-        // 007/1="d" : Sound disc
+    /***********************************************************************************
+     * Leader/06-07 = aa : Language material, Monographic component part
+     ***********************************************************************************/
+
+    public function testMaterialIsArticle() {
+        // LDR/06 = a  : Language material [Type of record]
+        // LDR/07 = a  : Monographic component part
+        // 007    = ta : Text, Regular print [Physical description]
         $out = $this->parseRecordData('
-            <marc:leader>99999cja a2299999 c 4500</marc:leader>
-            <marc:controlfield tag="001">040262626</marc:controlfield>
-            <marc:controlfield tag="007">sd f||||||||||</marc:controlfield>
-            <marc:controlfield tag="008">040209s20uu    xx#|||| |    |||||||und|d</marc:controlfield>
+            <marc:leader>99999caa a2299999 c 4500</marc:leader>
+            <marc:controlfield tag="001">952657872</marc:controlfield>
+            <marc:controlfield tag="007">ta</marc:controlfield>
+            <marc:controlfield tag="008">100112s1995    xx#||||||    |000|u|nob|d</marc:controlfield>
         ');
 
-        $this->assertEquals('Music CD track', $out->material);
+        $this->assertEquals('Article', $out->material);
         $this->assertFalse($out->electronic);
     }
 
-    public function testMaterialIsSoundCassette() {
-        // LDR/06="j" : Musical sound recording
-        // LDR/07="m" : Monograph/Item
-        // 007/0="s" : Sound recording
-        // 007/1="s" : Sound cassette
-        $out = $this->parseRecordData('
-            <marc:leader>99999cjm a2299999 c 4500</marc:leader>
-            <marc:controlfield tag="001">943188679</marc:controlfield>
-            <marc:controlfield tag="007">ss |||||||||||</marc:controlfield>
-            <marc:controlfield tag="008">091211s1993    xx#|||| |    |||||||nno| </marc:controlfield>
-        ');
-
-        $this->assertEquals('Sound cassette', $out->material);
-    }
-
-    public function testMaterialIsSoundCassetteTrack() {
-        // LDR/06="j" : Musical sound recording
-        // LDR/07="a" : Monographic component part
-        // 007/0="s" : Sound recording
-        // 007/1="s" : Sound cassette
-        $out = $this->parseRecordData('
-            <marc:leader>99999cja a2299999 c 4500</marc:leader>
-            <marc:controlfield tag="001">030323959</marc:controlfield>
-            <marc:controlfield tag="007">ss |||||||||||</marc:controlfield>
-            <marc:controlfield tag="008">030214s1998    xx#|||| |    |||||||nno|d</marc:controlfield>
-        ');
-
-        $this->assertEquals('Sound cassette track', $out->material);
-    }
+    /***********************************************************************************
+     * Leader/06-07 = as : Language material, Serial
+     ***********************************************************************************/
 
     public function testMaterialIsPrintedPeriodical() {
+        // LDR/06 = a  : Language material [Type of record]
+        // LDR/07 = s  : Serial [Bibliographic level]
+        // 007    = ta : Text, Regular print [Physical description]
+        // 008/21 = p  : Periodical [Type of continuing resource]
         $out = $this->parseRecordData('
             <marc:leader>99999 as a2299999 c 4500</marc:leader>
             <marc:controlfield tag="001">981315402</marc:controlfield>
@@ -130,6 +110,11 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testMaterialIsElectronicPeriodical() {
+        // LDR/06 = a  : Language material [Type of record]
+        // LDR/07 = s  : Serial [Bibliographic level]
+        // 007    = cr : Electronic Resource, Remote [Physical description]
+        // 008/21 = p  : Periodical [Type of continuing resource]
+        // 008/23 = o  : Online [Form of item]
         $out = $this->parseRecordData('
             <marc:leader>99999 as a22999997c 4500</marc:leader>
             <marc:controlfield tag="001">080880762</marc:controlfield>
@@ -142,6 +127,10 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testMaterialIsPrintedSeries() {
+        // LDR/06 = a  : Language material [Type of record]
+        // LDR/07 = s  : Serial [Bibliographic level]
+        // 007    = ta : Text, Regular print [Physical description]
+        // 008/21 = m  : Monographic series [Type of continuing resource]
         $out = $this->parseRecordData('
             <marc:leader>99999 as a2299999 c 4500</marc:leader>
             <marc:controlfield tag="001">801065968</marc:controlfield>
@@ -153,32 +142,11 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse($out->electronic);
     }
 
-    public function testMaterialIsSheetMusic() {
-        $out = $this->parseRecordData('
-            <marc:leader>99999 cm a2299999 c 4500</marc:leader>
-            <marc:controlfield tag="001">890302278</marc:controlfield>
-            <marc:controlfield tag="007">ta</marc:controlfield>
-            <marc:controlfield tag="008">140625s1955    |||||a|||    |||||||und|d</marc:controlfield>
-        ');
-
-        $this->assertEquals('Sheet music', $out->material);
-        $this->assertFalse($out->electronic);
-    }
-
-    public function testMaterialIsKit() {
-        $out = $this->parseRecordData('
-            <marc:leader>99999 oa a2299999 c 4500</marc:leader>
-            <marc:controlfield tag="001">020299729</marc:controlfield>
-            <marc:controlfield tag="007">o|</marc:controlfield>
-            <marc:controlfield tag="008">020205s1986    ||||||| |    |||||b|eng|d</marc:controlfield>
-        ');
-
-        $this->assertEquals('Kit', $out->material);
-        $this->assertFalse($out->electronic);
-    }
-
     public function testMaterialIsNewspaper() {
-        // 007/1-2=ta : regular print, 008/21=n : newspaper
+        // LDR/06 = a  : Language material [Type of record]
+        // LDR/07 = s  : Serial [Bibliographic level]
+        // 007    = ta : Text, regular print  [Physical description]
+        // 008/21 = n  : Newspaper [Type of continuing resource]
         $out = $this->parseRecordData('
             <marc:leader>99999cas a2299999 c 4500</marc:leader>
             <marc:controlfield tag="001">930112849</marc:controlfield>
@@ -190,7 +158,10 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testMaterialIsNewspaperOnMicroform() {
-        // 007/0=h : microform, 008/21=n : newspaper
+        // LDR/06 = a  : Language material [Type of record]
+        // LDR/07 = s  : Serial [Bibliographic level]
+        // 007    = hu : Microform, Unspecified [Physical description]
+        // 008/21 = n  : Newspaper [Type of continuing resource]
         $out = $this->parseRecordData('
             <marc:leader>99999cas a2299999 c 4500</marc:leader>
             <marc:controlfield tag="001">022446451</marc:controlfield>
@@ -199,6 +170,95 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         ');
 
         $this->assertEquals('Newspaper on microform', $out->material);
+    }
+
+    /***********************************************************************************
+     * Leader/06-07 = jm : Musical sound recording, Monograph/Item
+     ***********************************************************************************/
+
+    public function testMaterialIsSoundCassette() {
+        // LDR/06 = j  : Musical sound recording [Type of record]
+        // LDR/07 = m  : Monograph/Item [Bibliographic level]
+        // 007    = ss : Sound recording, Sound cassette [Physical description]
+        $out = $this->parseRecordData('
+            <marc:leader>99999cjm a2299999 c 4500</marc:leader>
+            <marc:controlfield tag="001">943188679</marc:controlfield>
+            <marc:controlfield tag="007">ss |||||||||||</marc:controlfield>
+            <marc:controlfield tag="008">091211s1993    xx#|||| |    |||||||nno| </marc:controlfield>
+        ');
+
+        $this->assertEquals('Sound cassette', $out->material);
+    }
+
+    /***********************************************************************************
+     * Leader/06-07 = ja : Musical sound recording, Monographic component part
+     ***********************************************************************************/
+
+    public function testMaterialIsMusicCDTrack() {
+        // LDR/06 = j  : Musical sound recording [Type of record]
+        // LDR/07 = a  : Monographic component part [Bibliographic level]
+        // 007    = sd : Sound recording, Sound disc [Physical description]
+        $out = $this->parseRecordData('
+            <marc:leader>99999cja a2299999 c 4500</marc:leader>
+            <marc:controlfield tag="001">040262626</marc:controlfield>
+            <marc:controlfield tag="007">sd f||||||||||</marc:controlfield>
+            <marc:controlfield tag="008">040209s20uu    xx#|||| |    |||||||und|d</marc:controlfield>
+        ');
+
+        $this->assertEquals('Music CD track', $out->material);
+        $this->assertFalse($out->electronic);
+    }
+
+    public function testMaterialIsSoundCassetteTrack() {
+        // LDR/06 = j  : Musical sound recording [Type of record]
+        // LDR/07 = a  : Monographic component part [Bibliographic level]
+        // 007    = ss : Sound recording, Sound cassette [Physical description]
+        $out = $this->parseRecordData('
+            <marc:leader>99999cja a2299999 c 4500</marc:leader>
+            <marc:controlfield tag="001">030323959</marc:controlfield>
+            <marc:controlfield tag="007">ss |||||||||||</marc:controlfield>
+            <marc:controlfield tag="008">030214s1998    xx#|||| |    |||||||nno|d</marc:controlfield>
+        ');
+
+        $this->assertEquals('Sound cassette track', $out->material);
+    }
+
+    /***********************************************************************************
+     * Leader/06-07 = cm : Notated music, Monograph/Item
+     ***********************************************************************************/
+
+    public function testMaterialIsSheetMusic() {
+        // LDR/06 = c  : Notated music [Type of record]
+        // LDR/07 = m  : Monograph/Item [Bibliographic level]
+        // 007    = ta : Text, Regular print [Physical description]
+        $out = $this->parseRecordData('
+            <marc:leader>99999 cm a2299999 c 4500</marc:leader>
+            <marc:controlfield tag="001">890302278</marc:controlfield>
+            <marc:controlfield tag="007">ta</marc:controlfield>
+            <marc:controlfield tag="008">140625s1955    |||||a|||    |||||||und|d</marc:controlfield>
+        ');
+
+        $this->assertEquals('Sheet music', $out->material);
+        $this->assertFalse($out->electronic);
+    }
+
+    /***********************************************************************************
+     * Leader/06-07 = cm : Notated music, Monograph/Item
+     ***********************************************************************************/
+
+    public function testMaterialIsKit() {
+        // LDR/06 = o  : Kit [Type of record]
+        // LDR/07 = a  : Monographic component part [Bibliographic level]
+        // 007    = o| : Kit, No attempt to code [Physical description]
+        $out = $this->parseRecordData('
+            <marc:leader>99999 oa a2299999 c 4500</marc:leader>
+            <marc:controlfield tag="001">020299729</marc:controlfield>
+            <marc:controlfield tag="007">o|</marc:controlfield>
+            <marc:controlfield tag="008">020205s1986    ||||||| |    |||||b|eng|d</marc:controlfield>
+        ');
+
+        $this->assertEquals('Kit', $out->material);
+        $this->assertFalse($out->electronic);
     }
 
     public function testMarc001() {

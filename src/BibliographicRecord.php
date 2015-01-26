@@ -361,10 +361,18 @@ class BibliographicRecord extends Record implements JsonableInterface {
                     break;
 
             }
+            if (array_get($ldr, 7) == 'a') {
+                $material = 'Article';
+            }
+
         } else if ($material == 'Book') {
             if (isset($natureOfContents[$f008[24]])) {
                 // Slight simplification
                 $material = $natureOfContents[$f008[24]];
+            }
+            if (array_get($ldr, 7) == 'a') {
+                $material = 'Article';
+                // or Article/Chapter ?
             }
         }
 

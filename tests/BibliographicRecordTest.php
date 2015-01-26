@@ -31,6 +31,22 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse($out->electronic);
     }
 
+    public function testMaterialIsArticle() {
+        // LDR/06="a" : Language material
+        // LDR/07="a" : Monographic component part
+        // 007/00="t" : Text
+        // 007/01="a" : Regular print
+        $out = $this->parseRecordData('
+            <marc:leader>99999caa a2299999 c 4500</marc:leader>
+            <marc:controlfield tag="001">952657872</marc:controlfield>
+            <marc:controlfield tag="007">ta</marc:controlfield>
+            <marc:controlfield tag="008">100112s1995    xx#||||||    |000|u|nob|d</marc:controlfield>
+        ');
+
+        $this->assertEquals('Article', $out->material);
+        $this->assertFalse($out->electronic);
+    }
+
     public function testMaterialIsElectronicBook() {
         $out = $this->parseRecordData('
             <marc:leader>99999 am a22999997c 4500</marc:leader>

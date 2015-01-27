@@ -15,6 +15,7 @@ use Carbon\Carbon;
  * @property string    $lccn
  * @property string    $catalogingRules
  * @property string    $title
+ * @property string    $alternativeTitles
  * @property string    $part_no
  * @property string    $part_name
  * @property string    $part_of
@@ -29,6 +30,7 @@ use Carbon\Carbon;
  * @property string    $preceding
  * @property string    $succeeding
  * @property string[]  $isbns
+ * @property string[]  $issns
  * @property string[]  $notes
  * @property array     $series
  * @property array     $other_form
@@ -37,6 +39,7 @@ use Carbon\Carbon;
  * @property array     $subjects
  * @property array     $genres
  * @property array     $classifications
+ * @property array     $debug
  * @property int       $pages
  * @property int       $year
  * @property Carbon    $modified

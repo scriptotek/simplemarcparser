@@ -10,8 +10,6 @@ class Parser {
 
     public function parse(QuiteSimpleXmlElement $record) {
 
-        $output = array();
-
         $leader = $record->text('marc:leader');
 
         //99999 ai a22999997c 4500

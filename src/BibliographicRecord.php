@@ -649,23 +649,35 @@ class BibliographicRecord extends Record implements JsonableInterface {
 
                 // 245 : Title Statement (NR)
                 case 245:
-                    $title = rtrim($node->text('marc:subfield[@code="a"]'), " \t\n\r\0\x0B:-");
-                    $subtitle = $node->text('marc:subfield[@code="b"]');
-                    if (!empty($subtitle)) {
-                        $title .= ' : ' . $subtitle;
+                    $title = rtrim($node->text('marc:subfield[@code="a"]'), " /");
+                    $subtitle = rtrim($node->text('marc:subfield[@code="b"]'), " /");
+                    
+                    // In records formulated according to ISBD principles, subfield $a includes 
+                    // all the information up to and including the first mark of ISBD punctuation 
+                    // (e.g., an equal sign (=), a colon (:), a semicolon (;), or a slash (/)) or 
+                    // the medium designator (e.g., [microform]).
+
+                    //   : portion of title
+                    //   = parallel title
+                    //   ; other title ? 
+
+                    $isbdCode = substr($title, strlen($title) - 1);
+                    if ($isbdCode == '=') {
+                        $alternativeTitles[] = $subtitle;
+                        $title = rtrim($node->text('marc:subfield[@code="a"]'), " =");
+                    } else {
+                        // TODO: Cover more of the cases on
+                        //  http://www.loc.gov/marc/bibliographic/bd245.html
+                        $title .= ' ' . $subtitle;                        
                     }
+
+                    $title = trim($title);
+
                     if (isset($this->title)) { // If not already set by 130
                         $alternativeTitles[] = $title;
                     } else {
                         $this->title = $title;
                     }
-                    /*
-                    if (preg_match('/elektronisk ressurs/', $node->text('marc:subfield[@code="h"]'))) {
-                        $this->electronic = true;
-                    } else {
-                        $this->electronic = false;
-                    }
-                    */
 
                     // $n : Number of part/section of a work (R)
                     $part_no = $node->text('marc:subfield[@code="n"]');
@@ -683,8 +695,20 @@ class BibliographicRecord extends Record implements JsonableInterface {
 
                 // 246 : Varying Form of Title (R)
                 case 246:
-                    $title = rtrim($node->text('marc:subfield[@code="a"]'), " \t\n\r\0\x0B:-");
+                    // Note: The second indicator gives the type of title:
+                    // 0 - Portion of title
+                    // 1 - Parallel title
+                    // 2 - Distinctive title
+                    // 3 - Other title
+                    // 4 - Cover title
+                    // 5 - Added title page title
+                    // 6 - Caption title
+                    // 7 - Running title
+                    // 8 - Spine title
+                    $title = rtrim($node->text('marc:subfield[@code="a"]'), " :-");
                     $subtitle = $node->text('marc:subfield[@code="b"]');
+                    // TODO: Cover more of the cases on
+                    //  http://www.loc.gov/marc/bibliographic/bd246.html
                     if (!empty($subtitle)) {
                         $title .= ' : ' . $subtitle;
                     }
@@ -1097,7 +1121,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
             $this->other_form = $other_form;
         }
 
-        $this->alternativeTitles = $alternativeTitles;
+        $this->alternativeTitles = array_unique($alternativeTitles);
         $this->isbns = $isbns;
         $this->issns = $issns;
         $this->series = $series;

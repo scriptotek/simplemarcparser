@@ -576,11 +576,10 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testMarc245() {
-        // Colon should be trimmed off title
         $out = $this->parseRecordData('
             <marc:datafield tag="245" ind1="1" ind2="0">
                 <marc:subfield code="a">Evolusjon :</marc:subfield>
-                <marc:subfield code="b">naturens kulturhistorie</marc:subfield>
+                <marc:subfield code="b">naturens kulturhistorie /</marc:subfield>
                 <marc:subfield code="c">Markus Lindholm</marc:subfield>
                 <marc:subfield code="h">[videoopptak]</marc:subfield>
             </marc:datafield>
@@ -588,6 +587,23 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertEquals('Evolusjon : naturens kulturhistorie', $out->title);
         $this->assertEquals('[videoopptak]', $out->medium);
+    }
+
+    public function testMarc245WithParallelTitle() {
+        $out = $this->parseRecordData('
+            <marc:datafield tag="245" ind1="0" ind2="0">
+                <marc:subfield code="a">Byggekunst =</marc:subfield>
+                <marc:subfield code="b">The Norwegian review of architecture</marc:subfield>
+                <marc:subfield code="c">Norske arkitekters landsforbund</marc:subfield>
+            </marc:datafield>
+            <marc:datafield tag="246" ind1="3" ind2="1">
+                <marc:subfield code="a">The Norwegian review of architecture</marc:subfield>
+            </marc:datafield>
+        ');
+
+        $this->assertEquals('Byggekunst', $out->title);
+        $this->assertCount(1, $out->alternativeTitles); // even though it's specified both in 245 b and 246
+        $this->assertEquals('The Norwegian review of architecture', $out->alternativeTitles[0]);
     }
 
     public function testMarc245part() {

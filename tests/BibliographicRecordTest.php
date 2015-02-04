@@ -589,19 +589,22 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('[videoopptak]', $out->medium);
     }
 
-    public function testMarc245WithParallelTitle() {
+    public function testMarc245WithSubtitleAndParallelTitle() {
+        // Source: 070715092
         $out = $this->parseRecordData('
             <marc:datafield tag="245" ind1="0" ind2="0">
-                <marc:subfield code="a">Byggekunst =</marc:subfield>
-                <marc:subfield code="b">The Norwegian review of architecture</marc:subfield>
-                <marc:subfield code="c">Norske arkitekters landsforbund</marc:subfield>
+                <marc:subfield code="a">Arkitektur N :</marc:subfield>
+                <marc:subfield code="b">byggekunst, landskap, interiør = The Norwegian review of architecture</marc:subfield>
+            </marc:datafield>
+            <marc:datafield tag="246" ind1="3" ind2="1">
+                <marc:subfield code="a">The Norwegian review of architecture</marc:subfield>
             </marc:datafield>
             <marc:datafield tag="246" ind1="3" ind2="1">
                 <marc:subfield code="a">The Norwegian review of architecture</marc:subfield>
             </marc:datafield>
         ');
 
-        $this->assertEquals('Byggekunst', $out->title);
+        $this->assertEquals('Arkitektur N : byggekunst, landskap, interiør', $out->title);
         $this->assertCount(1, $out->alternativeTitles); // even though it's specified both in 245 b and 246
         $this->assertEquals('The Norwegian review of architecture', $out->alternativeTitles[0]);
     }

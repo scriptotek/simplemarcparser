@@ -649,29 +649,27 @@ class BibliographicRecord extends Record implements JsonableInterface {
 
                 // 245 : Title Statement (NR)
                 case 245:
-                    $title = rtrim($node->text('marc:subfield[@code="a"]'), " /");
-                    $subtitle = rtrim($node->text('marc:subfield[@code="b"]'), " /");
+                    $title = $node->text('marc:subfield[@code="a"]') . ' ' . $node->text('marc:subfield[@code="b"]');
+                    $title = rtrim($title, ' /');
                     
-                    // In records formulated according to ISBD principles, subfield $a includes 
-                    // all the information up to and including the first mark of ISBD punctuation 
-                    // (e.g., an equal sign (=), a colon (:), a semicolon (;), or a slash (/)) or 
-                    // the medium designator (e.g., [microform]).
-
-                    //   : portion of title
-                    //   = parallel title
-                    //   ; other title ? 
-
-                    $isbdCode = substr($title, strlen($title) - 1);
-                    if ($isbdCode == '=') {
-                        $alternativeTitles[] = $subtitle;
-                        $title = rtrim($node->text('marc:subfield[@code="a"]'), " =");
-                    } else {
-                        // TODO: Cover more of the cases on
-                        //  http://www.loc.gov/marc/bibliographic/bd245.html
-                        $title .= ' ' . $subtitle;                        
+                    $titleParts = preg_split("/(:|=)/", $title, -1, PREG_SPLIT_DELIM_CAPTURE);
+                    $isbdCode = ':';
+                    $title = '';
+                    foreach ($titleParts as $titlePart) {
+                        $titlePart = trim($titlePart);
+                        if (is_null($isbdCode)) {
+                            $isbdCode = $titlePart;
+                        } else {
+                            if ($isbdCode == '=') {
+                                $alternativeTitles[] = $titlePart;
+                            } else { // isbdCode == ':' or ';'
+                                // TODO: Cover more cases explicitly?
+                                //  http://www.loc.gov/marc/bibliographic/bd245.html
+                                $title = empty($title) ? $titlePart : "$title $isbdCode $titlePart";
+                            }
+                            $isbdCode = null;
+                        }
                     }
-
-                    $title = trim($title);
 
                     if (isset($this->title)) { // If not already set by 130
                         $alternativeTitles[] = $title;

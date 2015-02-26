@@ -651,7 +651,16 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         // TODO
     }
 
-    public function testMarc260c() {
+  public function testMarc260a() {
+    $out1 = $this->parseRecordData('
+            <marc:datafield tag="260" ind1=" " ind2=" ">
+                <marc:subfield code="a">Place of publication</marc:subfield>
+            </marc:datafield>
+        ');
+    $this->assertEquals('Place of publication', $out1->placeOfPublication);
+  }
+
+  public function testMarc260c() {
         $out1 = $this->parseRecordData('
             <marc:datafield tag="260" ind1=" " ind2=" ">
                 <marc:subfield code="c">c2013</marc:subfield>

@@ -21,6 +21,7 @@ use Carbon\Carbon;
  * @property string    $part_of
  * @property string    $medium
  * @property string    $edition
+ * @property string    $placeOfPublication
  * @property string    $publisher
  * @property string    $extent
  * @property string    $contents
@@ -717,6 +718,7 @@ class BibliographicRecord extends Record implements JsonableInterface {
                     break;
 
                 case 260:
+                    $this->placeOfPublication = $node->text('marc:subfield[@code="a"]');
                     $this->publisher = $node->text('marc:subfield[@code="b"]');
                     $y = preg_replace('/^.*?([0-9]{4}).*$/', '\1', $node->first('marc:subfield[@code="c"]'));
                     $this->year = $y ? intval($y) : null;

@@ -1,6 +1,5 @@
 <?php namespace Scriptotek\SimpleMarcParser;
 
-use Illuminate\Support\Contracts\JsonableInterface;
 use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
 use Carbon\Carbon;
 
@@ -26,7 +25,7 @@ use Carbon\Carbon;
  * @property string   $vocabulary
  * @property string   $altLabels
  */
-class AuthorityRecord extends Record implements JsonableInterface {
+class AuthorityRecord extends Record {
 
     // http://www.loc.gov/marc/authority/ad008.html
     public static $cat_rules = array(

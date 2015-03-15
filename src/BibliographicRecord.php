@@ -1,6 +1,5 @@
 <?php namespace Scriptotek\SimpleMarcParser;
 
-use Illuminate\Support\Contracts\JsonableInterface;
 use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
 use Carbon\Carbon;
 
@@ -46,7 +45,7 @@ use Carbon\Carbon;
  * @property Carbon    $modified
  * @property Carbon    $created
  */
-class BibliographicRecord extends Record implements JsonableInterface {
+class BibliographicRecord extends Record {
 
 
     /**

@@ -1,6 +1,5 @@
 <?php namespace Scriptotek\SimpleMarcParser;
 
-use Illuminate\Support\Contracts\JsonableInterface;
 use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
 
 /**
@@ -21,7 +20,7 @@ use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
  * @property Carbon\Carbon    $modified
  * @property Carbon\Carbon    $created
  */
-class HoldingsRecord extends Record implements JsonableInterface {
+class HoldingsRecord extends Record {
 
     // 859 $f: Use restrictions / Tilgjengelighet
     // Ref: http://www.bibsys.no/files/out/biblev/utlaanstatus-marc21.pdf

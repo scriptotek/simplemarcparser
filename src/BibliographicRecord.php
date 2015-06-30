@@ -461,7 +461,9 @@ class BibliographicRecord extends Record {
     /**
      * @param \Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement $data
      */
-    public function __construct(QuiteSimpleXmlElement $data) {
+    public function __construct(QuiteSimpleXmlElement $data = null) {
+
+        if (is_null($data)) return;
 
         $this->parseMaterial($data);
 

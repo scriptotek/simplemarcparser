@@ -23,6 +23,11 @@ class AuthorityRecordTest extends \PHPUnit_Framework_TestCase {
         return new AuthorityRecord($dom);
     }
 
+    public function testEmptyRecord() {
+        $rec = new AuthorityRecord;
+        $this->assertNull($rec->id);
+    }
+
     public function testMarc001() {
         $rec = $this->parseRecordData('
             <marc:controlfield tag="001">12149361x</marc:controlfield>

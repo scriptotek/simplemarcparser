@@ -63,7 +63,9 @@ class AuthorityRecord extends Record {
     /**
      * @param \Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement $data
      */
-    public function __construct(QuiteSimpleXmlElement $data) {
+    public function __construct(QuiteSimpleXmlElement $data = null) {
+
+        if (is_null($data)) return;
 
         $altLabels = array();
 

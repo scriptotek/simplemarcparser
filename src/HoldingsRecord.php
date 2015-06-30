@@ -75,7 +75,9 @@ class HoldingsRecord extends Record {
     /**
      * @param \Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement $data
      */
-    public function __construct(QuiteSimpleXmlElement $data) {
+    public function __construct(QuiteSimpleXmlElement $data = null) {
+
+        if (is_null($data)) return;
 
         $this->id = $data->text('marc:controlfield[@tag="001"]');  // Dokid
 

@@ -19,6 +19,11 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         return new BibliographicRecord($dom);
     }
 
+    public function testEmptyRecord() {
+        $rec = new BibliographicRecord;
+        $this->assertNull($rec->id);
+    }
+
     /***********************************************************************************
      * Leader/06-07 = am : Language material, Monograph/Item
      ***********************************************************************************/

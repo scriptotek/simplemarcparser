@@ -58,4 +58,17 @@ class ParserTest extends \PHPUnit_Framework_TestCase {
 
     }
 
+    public function testSimpleXmlElement()
+    {
+        $dom = new \SimpleXMLElement('<?xml version="1.0"?>
+            <record xmlns="http://www.loc.gov/MARC21/slim">
+              <leader>99999 ai a22999997c 4500</leader>
+            </record>');
+        $dom->registerXPathNamespace('marc', 'http://www.loc.gov/MARC21/slim');
+
+        $parser = new Parser;
+        $out = $parser->parse($dom);
+        $this->assertInstanceOf('Scriptotek\SimpleMarcParser\BibliographicRecord', $out);
+    }
+
 }

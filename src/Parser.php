@@ -1,5 +1,6 @@
 <?php namespace Scriptotek\SimpleMarcParser;
 
+use SimpleXmlElement;
 use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
 
 class Parser {
@@ -8,7 +9,18 @@ class Parser {
 
     }
 
-    public function parse(QuiteSimpleXmlElement $record) {
+    /**
+     * @param QuiteSimpleXmlElement|SimpleXmlElement $record
+     */
+    public function parse($record) {
+
+        if ($record instanceof QuiteSimpleXmlElement) {
+            // OK
+        } elseif ($record instanceof SimpleXmlElement) {
+            $record = new QuiteSimpleXmlElement($record);
+        } else {
+            throw new \Exception('Invalid type given to Parser->parse. Expected SimpleXmlElement or QuiteSimpleXmlElement', 1); 
+        }
 
         $leader = $record->text('marc:leader');
 

@@ -5,7 +5,6 @@ namespace Scriptotek\SimpleMarcParser;
 require 'vendor/autoload.php';
 use Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement;
 
-
 class ParserTest extends \PHPUnit_Framework_TestCase
 {
     // http://sru.bibsys.no/search/authority?version=1.2&operation=searchRetrieve&startRecord=1&maximumRecords=10&query=rec.identifier%3D%22x90061718%22&recordSchema=marcxchange

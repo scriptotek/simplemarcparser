@@ -1,7 +1,9 @@
-<?php namespace Scriptotek\SimpleMarcParser;
+<?php
 
-use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
+namespace Scriptotek\SimpleMarcParser;
+
 use Carbon\Carbon;
+use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
 
 /**
  * @property int       $id                 Local record identifier
@@ -51,6 +53,7 @@ class BibliographicRecord extends Record
      * @param string $x1
      * @param string $x2
      * @param string $default
+     *
      * @return string
      */
     public function getMaterialSubtypeFrom007($x1, $x2, $default = 'Unknown')
@@ -333,7 +336,6 @@ class BibliographicRecord extends Record
         } elseif ($material == 'Visual') {
             $material = $this->getMaterialSubtypeFrom007($f007[0], $f007[1], $material);
 
-
             if (isset($f007[4]) && isset($videoFormats[$f007[4]])) {
                 $material = $videoFormats[$f007[4]]; // DVD, Blu-ray
             }
@@ -413,9 +415,10 @@ class BibliographicRecord extends Record
     }
 
     /**
-     * Parses common elements in subject added entry fields 600-655
+     * Parses common elements in subject added entry fields 600-655.
      *
      * @param \Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement $node
+     *
      * @return array
      */
     public function parseSubjectAddedEntry(QuiteSimpleXmlElement &$node)
@@ -462,6 +465,7 @@ class BibliographicRecord extends Record
                 $out['term'] .= self::$subfieldSeparator . $subdiv;
             }
         }
+
         return $out;
     }
 
@@ -555,7 +559,7 @@ class BibliographicRecord extends Record
                         $node,
                         $classifications,
                         array(
-                            'a' => 'number'
+                            'a' => 'number',
                         ),
                         $system = 'nlm',
                         $assigner = ($node->attr('ind2') == '0') ? 'DNLM' : null
@@ -583,7 +587,7 @@ class BibliographicRecord extends Record
                         array(
                             'a' => array('number', '^.*?([0-9.]+)\/?([0-9.]*).*$', '\1\2'),
                             '2' => 'edition',
-                            'q' => 'assigner'
+                            'q' => 'assigner',
                         ),
                         $system = 'ddc'
                     );
@@ -597,7 +601,7 @@ class BibliographicRecord extends Record
                         array(
                             'a' => 'number',
                             '2' => 'system',
-                            'q' => 'assigner'
+                            'q' => 'assigner',
                         )
                     );
                     break;
@@ -668,8 +672,8 @@ class BibliographicRecord extends Record
                 case 245:
                     $title = $node->text('marc:subfield[@code="a"]') . ' ' . $node->text('marc:subfield[@code="b"]');
                     $title = rtrim($title, ' /');
-                    
-                    $titleParts = preg_split("/(:|=)/", $title, -1, PREG_SPLIT_DELIM_CAPTURE);
+
+                    $titleParts = preg_split('/(:|=)/', $title, -1, PREG_SPLIT_DELIM_CAPTURE);
                     $isbdCode = ':';
                     $title = '';
                     foreach ($titleParts as $titlePart) {
@@ -726,7 +730,7 @@ class BibliographicRecord extends Record
                     // 6 - Caption title
                     // 7 - Running title
                     // 8 - Spine title
-                    $title = rtrim($node->text('marc:subfield[@code="a"]'), " :-");
+                    $title = rtrim($node->text('marc:subfield[@code="a"]'), ' :-');
                     $subtitle = $node->text('marc:subfield[@code="b"]');
                     // TODO: Cover more of the cases on
                     //  http://www.loc.gov/marc/bibliographic/bd246.html
@@ -749,7 +753,7 @@ class BibliographicRecord extends Record
 
                 case 300:
                     $this->extent = $node->text('marc:subfield[@code="a"]');
-                    
+
                     # 2.5B2 "327 s.", 2.5B4 "48 [i.e. 96] s.", 2.5B7 "[93] s."
                     preg_match(
                         '/\[?([0-9]+)\]? (s.|p.|pp.)/',
@@ -812,7 +816,7 @@ class BibliographicRecord extends Record
                     // </datafield>
                     $this->summary = array(
                         'assigning_source' => $node->text('marc:subfield[@code="c"]'),
-                        'text' => $node->text('marc:subfield[@code="a"]')
+                        'text' => $node->text('marc:subfield[@code="a"]'),
                     );
                     break;
 
@@ -853,7 +857,7 @@ class BibliographicRecord extends Record
                     // normalizing to try aligning records with different
                     // punctuation standards (US vs UK)
                     if (count($qualifiers) != 0) {
-                        $name = "$name (" . implode(', ', $qualifiers) . ")";
+                        $name = "$name (" . implode(', ', $qualifiers) . ')';
                     }
                     $tmp['term'] = $name . $tmp['term'];
                     $tmp['type'] = 'person';
@@ -1081,7 +1085,7 @@ class BibliographicRecord extends Record
                     $serie = array(
                         'title' => $node->text('marc:subfield[@code="a"]'),
                         'id' => preg_replace('/\(NO-TrBIB\)/', '', $node->text('marc:subfield[@code="w"]')) ?: null,
-                        'volume' => $node->text('marc:subfield[@code="v"]') ?: null
+                        'volume' => $node->text('marc:subfield[@code="v"]') ?: null,
                     );
                     $series[] = $serie;
                     break;

@@ -1,4 +1,6 @@
-<?php namespace Scriptotek\SimpleMarcParser;
+<?php
+
+namespace Scriptotek\SimpleMarcParser;
 
 use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
 
@@ -122,7 +124,7 @@ class HoldingsRecord extends Record
                         $fulltext[] = array(
                             'url' => $node->text('marc:subfield[@code="u"]'),
                             'linktext' => $node->text('marc:subfield[@code="y"]'),
-                            'comment' => $node->text('marc:subfield[@code="z"]')
+                            'comment' => $node->text('marc:subfield[@code="z"]'),
                         );
                     }
                     break;
@@ -133,15 +135,15 @@ class HoldingsRecord extends Record
                     // 859 $f: Use restrictions / Tilgjengelighet
                     $x = $node->text('marc:subfield[@code="f"]');
                     if ($x !== '') {
-                        if (isset(HoldingsRecord::$m859_f[$x])) {
-                            $this->use_restrictions = HoldingsRecord::$m859_f[$x];
+                        if (isset(self::$m859_f[$x])) {
+                            $this->use_restrictions = self::$m859_f[$x];
                         }
                     }
 
                     $x = $node->text('marc:subfield[@code="h"]');
                     if ($x !== '') {
-                        if (isset(HoldingsRecord::$m859_h[$x])) {
-                            $this->circulation_status = HoldingsRecord::$m859_h[$x];
+                        if (isset(self::$m859_h[$x])) {
+                            $this->circulation_status = self::$m859_h[$x];
                         }
                     }
 

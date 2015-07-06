@@ -1,7 +1,9 @@
-<?php namespace Scriptotek\SimpleMarcParser;
+<?php
 
-use SimpleXmlElement;
+namespace Scriptotek\SimpleMarcParser;
+
 use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
+use SimpleXmlElement;
 
 class Parser
 {

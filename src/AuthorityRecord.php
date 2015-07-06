@@ -1,7 +1,9 @@
-<?php namespace Scriptotek\SimpleMarcParser;
+<?php
 
-use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
+namespace Scriptotek\SimpleMarcParser;
+
 use Carbon\Carbon;
+use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
 
 /**
  * @property int      $id                 Local record identifier
@@ -12,7 +14,6 @@ use Carbon\Carbon;
  * @property string   $language
  * @property string   $transcribingAgency
  * @property string   $modifyingAgency
- *
  * @property string   $agency
  * @property string[] $genders
  * @property string   $gender
@@ -20,7 +21,6 @@ use Carbon\Carbon;
  * @property string   $label
  * @property string   $birth
  * @property string   $death
- *
  * @property string   $term
  * @property string   $vocabulary
  * @property string   $altLabels
@@ -49,6 +49,7 @@ class AuthorityRecord extends Record
 
     /**
      * @param string $value
+     *
      * @return string
      */
     public function normalize_name($value)
@@ -57,6 +58,7 @@ class AuthorityRecord extends Record
         if (count($spl) == 2) {
             return $spl[1] . ' ' . $spl[0];
         }
+
         return $value;
     }
 
@@ -191,7 +193,6 @@ class AuthorityRecord extends Record
         foreach ($data->all('marc:datafield[@tag="411"]') as $field) {
             $altLabels[] = $field->text('marc:subfield[@code="a"]');
         }
-
 
         // TODO: rest
 

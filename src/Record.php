@@ -1,4 +1,6 @@
-<?php namespace Scriptotek\SimpleMarcParser;
+<?php
+
+namespace Scriptotek\SimpleMarcParser;
 
 use Carbon\Carbon;
 use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
@@ -14,7 +16,8 @@ class Record
         if (isset($this->data[$name])) {
             return $this->data[$name];
         }
-        return null;
+
+        return;
     }
 
     public function __set($name, $value)
@@ -42,10 +45,11 @@ class Record
     /**
      * Convert the object to its JSON representation.
      *
-     * @param  int  $options
+     * @param int $options
+     *
      * @return string
      */
-    public function toJson($options=0)
+    public function toJson($options = 0)
     {
         return json_encode($this->toArray(), $options);
     }
@@ -66,13 +70,14 @@ class Record
      * The time requires 8 numeric characters in the pattern hhmmss.f,
      * expressed in terms of the 24-hour (00-23) clock.
      *
-     * @param  string $value
+     * @param string $value
+     *
      * @return Carbon|null
      */
     protected function parseDateTime($value)
     {
         if (strlen($value) == 6) {
-            return Carbon::createFromFormat('ymdHis', $value. '000000');
+            return Carbon::createFromFormat('ymdHis', $value . '000000');
         }
         if (strlen($value) == 8) {
             return Carbon::createFromFormat('YmdHis', $value . '000000');
@@ -86,8 +91,8 @@ class Record
      * Parse a "name node", personal or corporate, main or added, that
      * might have authority information encapsulated.
      *
-     * @param  string $authority
-     * @param  array &$out
+     * @param string $authority
+     * @param array  &$out
      */
     protected function parseAuthority($authority, &$out)
     {
@@ -105,11 +110,11 @@ class Record
      * Parse a "name node", personal or corporate, main or added, that
      * might have relators encapsulated.
      *
-     * @param  QuiteSimpleXmlElement &$node
-     * @param  array &$out
-     * @param  string $default
+     * @param QuiteSimpleXmlElement &$node
+     * @param array                 &$out
+     * @param string                $default
      */
-    protected function parseRelator(&$node, &$out, $default=null)
+    protected function parseRelator(&$node, &$out, $default = null)
     {
         $relterm = $node->text('marc:subfield[@code="e"]');
         $relcode = $node->text('marc:subfield[@code="4"]');
@@ -125,7 +130,8 @@ class Record
     /**
      * Parse a "relationship node", one that have links to other records encapsulated.
      *
-     * @param  QuiteSimpleXmlElement $node
+     * @param QuiteSimpleXmlElement $node
+     *
      * @return array
      */
     protected function parseRelationship($node)

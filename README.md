@@ -4,6 +4,7 @@ SimpleMarcParser
 [![Build Status](http://img.shields.io/travis/scriptotek/simplemarcparser.svg?style=flat-square)](https://travis-ci.org/scriptotek/simplemarcparser)
 [![Coverage Status](http://img.shields.io/coveralls/scriptotek/simplemarcparser.svg?style=flat-square)](https://coveralls.io/r/scriptotek/simplemarcparser?branch=master)
 [![Code Quality](http://img.shields.io/scrutinizer/g/scriptotek/simplemarcparser/master.svg?style=flat-square)](https://scrutinizer-ci.com/g/scriptotek/simplemarcparser/?branch=master)
+[![StyleCI](https://styleci.io/repos/14246253/shield)](https://styleci.io/repos/14246253)
 [![Latest Stable Version](http://img.shields.io/packagist/v/scriptotek/simplemarcparser.svg?style=flat-square)](https://packagist.org/packages/scriptotek/simplemarcparser)
 [![Total Downloads](http://img.shields.io/packagist/dt/scriptotek/simplemarcparser.svg?style=flat-square)](https://packagist.org/packages/scriptotek/simplemarcparser)
 

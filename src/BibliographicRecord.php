@@ -45,9 +45,8 @@ use Carbon\Carbon;
  * @property Carbon    $modified
  * @property Carbon    $created
  */
-class BibliographicRecord extends Record {
-
-
+class BibliographicRecord extends Record
+{
     /**
      * @param string $x1
      * @param string $x2
@@ -56,7 +55,7 @@ class BibliographicRecord extends Record {
      */
     public function getMaterialSubtypeFrom007($x1, $x2, $default = 'Unknown')
     {
-         $f007values = array(
+        $f007values = array(
             'a' => array(
                 'd' => 'Atlas',
                 'g' => 'Diagram',
@@ -136,15 +135,15 @@ class BibliographicRecord extends Record {
     {
         // See http://www.loc.gov/marc/ldr06guide.html
 
-        // The Leader/06 (Type of record) character position contains a one-character 
+        // The Leader/06 (Type of record) character position contains a one-character
         // alphabetic code that differentiates MARC records created for various types of
         // content and materials.
 
         // The 008 field contains character positions that provide coded information about
         // the record as a whole and about special bibliographic aspects of the item cataloged.
 
-        // Field 006 (Fixed-length data elements - Additional material characteristics) 
-        // permits coding for additional aspects of an electronic resource (including any 
+        // Field 006 (Fixed-length data elements - Additional material characteristics)
+        // permits coding for additional aspects of an electronic resource (including any
         // computer file aspects) if the 007 and 008 fields do not adequately describe it.
 
         // leader[6] : Type of record
@@ -275,16 +274,20 @@ class BibliographicRecord extends Record {
             'f7_02' => array_get($f007, 1),
         );
 
-        if (count($ldr) < 8) return;
-        if (count($f007) < 2) return;
+        if (count($ldr) < 8) {
+            return;
+        }
+        if (count($f007) < 2) {
+            return;
+        }
 
         switch ($ldr[6]) {
 
             case 'a':
-                if (in_array($ldr[7], array('a','c','d','m'))) {
+                if (in_array($ldr[7], array('a', 'c', 'd', 'm'))) {
                     $material = 'Book';
                 }
-                if (in_array($ldr[7], array('b','i','s'))) {
+                if (in_array($ldr[7], array('b', 'i', 's'))) {
                     $material = 'Series';
                 }
                 break;
@@ -327,17 +330,14 @@ class BibliographicRecord extends Record {
 
         if ($material == 'File') {
             $material = $this->getMaterialSubtypeFrom007($f007[0], $f007[1], $material);
-
-
-        } else if ($material == 'Visual') {
+        } elseif ($material == 'Visual') {
             $material = $this->getMaterialSubtypeFrom007($f007[0], $f007[1], $material);
 
 
             if (isset($f007[4]) && isset($videoFormats[$f007[4]])) {
-                $material = $videoFormats[$f007[4]]; // DVD, Blu-ray            
+                $material = $videoFormats[$f007[4]]; // DVD, Blu-ray
             }
-
-        } else if ($material == 'Music') {
+        } elseif ($material == 'Music') {
             if ($f007[0] == 't') {
                 $material = 'Sheet music';
             } else {
@@ -346,8 +346,7 @@ class BibliographicRecord extends Record {
                     $material .= ' track';
                 }
             }
-
-        } else if ($material == 'Series') {
+        } elseif ($material == 'Series') {
             switch ($f008[21]) {
 
                 case 'm':
@@ -356,7 +355,9 @@ class BibliographicRecord extends Record {
 
                 case 'n':
                     $material = 'Newspaper';
-                    if ($f007[0] == 'h') $material .= ' on microform';
+                    if ($f007[0] == 'h') {
+                        $material .= ' on microform';
+                    }
                     break;
 
                 case 'p':
@@ -367,8 +368,7 @@ class BibliographicRecord extends Record {
             if (array_get($ldr, 7) == 'a') {
                 $material = 'Article';
             }
-
-        } else if ($material == 'Book') {
+        } elseif ($material == 'Book') {
             if (isset($natureOfContents[$f008[24]])) {
                 // Slight simplification
                 $material = $natureOfContents[$f008[24]];
@@ -383,14 +383,20 @@ class BibliographicRecord extends Record {
         $this->electronic = $online;
     }
 
-    function addClassification($node, &$classifications, $fields, $system = null, $edition = null, $assigner = null)
+    public function addClassification($node, &$classifications, $fields, $system = null, $edition = null, $assigner = null)
     {
         $cl = array('system' => $system, 'edition' => $edition, 'number' => null, 'assigner' => $assigner);
         foreach ($fields as $key => $val) {
             $t = $node->text('marc:subfield[@code="' . $key . '"]');
-            if (!is_array($val)) $val = array($val);
-            if (count($val) > 2) $t = preg_replace('/' . $val[1] . '/', $val[2], $t);
-            if (!empty($t)) $cl[$val[0]] = $t;
+            if (!is_array($val)) {
+                $val = array($val);
+            }
+            if (count($val) > 2) {
+                $t = preg_replace('/' . $val[1] . '/', $val[2], $t);
+            }
+            if (!empty($t)) {
+                $cl[$val[0]] = $t;
+            }
         }
 
         if (is_null($cl['system'])) {
@@ -412,7 +418,8 @@ class BibliographicRecord extends Record {
      * @param \Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement $node
      * @return array
      */
-    function parseSubjectAddedEntry(QuiteSimpleXmlElement &$node) {
+    public function parseSubjectAddedEntry(QuiteSimpleXmlElement &$node)
+    {
         $out = array('term' => '', 'vocabulary' => null);
         $vocabularies = array(
             '0' => 'lcsh',
@@ -461,9 +468,11 @@ class BibliographicRecord extends Record {
     /**
      * @param \Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement $data
      */
-    public function __construct(QuiteSimpleXmlElement $data = null) {
-
-        if (is_null($data)) return;
+    public function __construct(QuiteSimpleXmlElement $data = null)
+    {
+        if (is_null($data)) {
+            return;
+        }
 
         $this->parseMaterial($data);
 
@@ -515,7 +524,9 @@ class BibliographicRecord extends Record {
                 case 20:                                                            // Test added
                     $isbn = $node->text('marc:subfield[@code="a"]');
                     $isbn = preg_replace('/^([0-9\-xX]+).*$/', '\1', $isbn);
-                    if (empty($isbn)) break;
+                    if (empty($isbn)) {
+                        break;
+                    }
                     array_push($isbns, $isbn);
                     break;
 
@@ -523,14 +534,18 @@ class BibliographicRecord extends Record {
                 case 22:                                                            // Test added
                     $issn = $node->text('marc:subfield[@code="a"]');
                     $issn = preg_replace('/^([0-9\-xX]+).*$/', '\1', $issn);
-                    if (empty($issn)) break;
+                    if (empty($issn)) {
+                        break;
+                    }
                     array_push($issns, $issn);
                     break;
 
                 // 040 - Cataloging Source (NR)
                 case 40:                                                            // Test added
                     $x = $node->text('marc:subfield[@code="e"]');
-                    if ($x) $this->catalogingRules = $x;
+                    if ($x) {
+                        $this->catalogingRules = $x;
+                    }
                     // Value from http://www.loc.gov/standards/sourcelist/descriptive-conventions.html
                     break;
 
@@ -681,15 +696,21 @@ class BibliographicRecord extends Record {
 
                     // $n : Number of part/section of a work (R)
                     $part_no = $node->text('marc:subfield[@code="n"]');
-                    if ($part_no !== '') $this->part_no = $part_no;
+                    if ($part_no !== '') {
+                        $this->part_no = $part_no;
+                    }
 
                     // $p : Name of part/section of a work (R)
                     $part_name = $node->text('marc:subfield[@code="p"]');
-                    if ($part_name !== '') $this->part_name = $part_name;
+                    if ($part_name !== '') {
+                        $this->part_name = $part_name;
+                    }
 
                     // $h : Medium (NR)
                     $medium = $node->text('marc:subfield[@code="h"]');
-                    if ($medium !== '') $this->medium = $medium;
+                    if ($medium !== '') {
+                        $this->medium = $medium;
+                    }
 
                     break;
 
@@ -735,7 +756,9 @@ class BibliographicRecord extends Record {
                         $node->text('marc:subfield[@code="a"]'),
                         $matches
                     );
-                    if ($matches) $this->pages = intval($matches[1]);
+                    if ($matches) {
+                        $this->pages = intval($matches[1]);
+                    }
 
                     # 2.5B6 Eks: "s. 327-698" (flerbindsverk)
                     preg_match(
@@ -743,7 +766,9 @@ class BibliographicRecord extends Record {
                         $node->text('marc:subfield[@code="a"]'),
                         $matches
                     );
-                    if ($matches) $this->pages = intval($matches[3]) - intval($matches[2]) + 1;
+                    if ($matches) {
+                        $this->pages = intval($matches[3]) - intval($matches[2]) + 1;
+                    }
                     break;
 
                 /*
@@ -796,11 +821,9 @@ class BibliographicRecord extends Record {
 
                     if ($data->has('marc:datafield[@tag="780"]')) {
                         $preceding['note'] = $node->text('marc:subfield[@code="a"]');
-
-                    } else if ($data->has('marc:datafield[@tag="785"]')) {
+                    } elseif ($data->has('marc:datafield[@tag="785"]')) {
                         $succeeding['note'] = $node->text('marc:subfield[@code="a"]');
-
-                    } else if ($data->has('marc:datafield[@tag="773"]')) {
+                    } elseif ($data->has('marc:datafield[@tag="773"]')) {
                         $part_of['note'] = $node->text('marc:subfield[@code="a"]');
                     }
                     break;
@@ -1082,8 +1105,8 @@ class BibliographicRecord extends Record {
                         $this->cover_image = $node->text('marc:subfield[@code="u"]');
 
                         // Silly hack to get larger images from Bibsys:
-                        $this->cover_image = str_replace('mini','stor',$this->cover_image);
-                        $this->cover_image = str_replace('LITE','STOR',$this->cover_image);
+                        $this->cover_image = str_replace('mini', 'stor', $this->cover_image);
+                        $this->cover_image = str_replace('LITE', 'STOR', $this->cover_image);
                     }
                     if (in_array($description, array('Beskrivelse fra forlaget (kort)', 'Beskrivelse fra forlaget (lang)'))) {
                         $this->description = $node->text('marc:subfield[@code="u"]');
@@ -1134,5 +1157,4 @@ class BibliographicRecord extends Record {
         $this->classifications = $classifications;
         $this->notes = $notes;
     }
-
 }

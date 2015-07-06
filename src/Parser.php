@@ -3,23 +3,23 @@
 use SimpleXmlElement;
 use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
 
-class Parser {
-
-    public function __construct() {
-
+class Parser
+{
+    public function __construct()
+    {
     }
 
     /**
      * @param QuiteSimpleXmlElement|SimpleXmlElement $record
      */
-    public function parse($record) {
-
+    public function parse($record)
+    {
         if ($record instanceof QuiteSimpleXmlElement) {
             // OK
         } elseif ($record instanceof SimpleXmlElement) {
             $record = new QuiteSimpleXmlElement($record);
         } else {
-            throw new \Exception('Invalid type given to Parser->parse. Expected SimpleXmlElement or QuiteSimpleXmlElement', 1); 
+            throw new \Exception('Invalid type given to Parser->parse. Expected SimpleXmlElement or QuiteSimpleXmlElement', 1);
         }
 
         $leader = $record->text('marc:leader');
@@ -46,15 +46,13 @@ class Parser {
                 return new BibliographicRecord($record);
             case 'z':
                 return new AuthorityRecord($record);
-            case 'u': // Unknown 
-            case 'v': // Multipart item holdings 
-            case 'x': // Single-part item holdings 
-            case 'y': // Serial item holdings 
+            case 'u': // Unknown
+            case 'v': // Multipart item holdings
+            case 'x': // Single-part item holdings
+            case 'y': // Serial item holdings
                 return new HoldingsRecord($record);
             default:
                 throw new ParserException("Unknown record type.\n\n------------------------\n" . $record->asXML() . "\n------------------------");
         }
-
     }
-
 }

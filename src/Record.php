@@ -3,23 +3,25 @@
 use Carbon\Carbon;
 use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
 
-class Record {
-
+class Record
+{
     protected $data;
 
     public static $subfieldSeparator = '--';
 
-    public function __get($name) {
+    public function __get($name)
+    {
         if (isset($this->data[$name])) {
             return $this->data[$name];
         }
         return null;
     }
 
-    public function __set($name, $value) {
+    public function __set($name, $value)
+    {
         if (is_null($value)) {
             unset($this->data[$name]);
-        } else if (is_string($value) && empty($value)) {
+        } elseif (is_string($value) && empty($value)) {
             unset($this->data[$name]);
         } else {
             $this->data[$name] = $value;
@@ -27,8 +29,9 @@ class Record {
         // }
     }
 
-    public function __isset($name) {
-       return isset($this->data[$name]);
+    public function __isset($name)
+    {
+        return isset($this->data[$name]);
     }
 
     public function __unset($name)
@@ -59,8 +62,8 @@ class Record {
 
     /**
      * Parse a *Representation of Dates and Times* (ISO 8601).
-     * The date requires 8 numeric characters in the pattern yyyymmdd. 
-     * The time requires 8 numeric characters in the pattern hhmmss.f, 
+     * The date requires 8 numeric characters in the pattern yyyymmdd.
+     * The time requires 8 numeric characters in the pattern hhmmss.f,
      * expressed in terms of the 24-hour (00-23) clock.
      *
      * @param  string $value
@@ -68,9 +71,15 @@ class Record {
      */
     protected function parseDateTime($value)
     {
-        if (strlen($value) == 6) return Carbon::createFromFormat('ymdHis', $value. '000000');
-        if (strlen($value) == 8) return Carbon::createFromFormat('YmdHis', $value . '000000');
-        if (strlen($value) == 16) return Carbon::createFromFormat('YmdHis', substr($value, 0, 14)); // skip decimal fraction
+        if (strlen($value) == 6) {
+            return Carbon::createFromFormat('ymdHis', $value. '000000');
+        }
+        if (strlen($value) == 8) {
+            return Carbon::createFromFormat('YmdHis', $value . '000000');
+        }
+        if (strlen($value) == 16) {
+            return Carbon::createFromFormat('YmdHis', substr($value, 0, 14));
+        } // skip decimal fraction
     }
 
     /**
@@ -80,7 +89,8 @@ class Record {
      * @param  string $authority
      * @param  array &$out
      */
-    protected function parseAuthority($authority, &$out) {
+    protected function parseAuthority($authority, &$out)
+    {
         if (!empty($authority)) {
             $out['id'] = $authority;
             if (preg_match('/\((.*?)\)(.*)/', $authority, $matches)) {
@@ -99,7 +109,8 @@ class Record {
      * @param  array &$out
      * @param  string $default
      */
-    protected function parseRelator(&$node, &$out, $default=null) {
+    protected function parseRelator(&$node, &$out, $default=null)
+    {
         $relterm = $node->text('marc:subfield[@code="e"]');
         $relcode = $node->text('marc:subfield[@code="4"]');
         if (!empty($relcode)) {
@@ -107,7 +118,7 @@ class Record {
         } elseif (!empty($relterm)) {
             $out['role'] = $relterm;
         } elseif (!is_null($default)) {
-            $out['role'] = $default;            
+            $out['role'] = $default;
         }
     }
 
@@ -122,21 +133,30 @@ class Record {
         $rel = array();
 
         $x = preg_replace('/\(.*?\)/', '', $node->text('marc:subfield[@code="w"]'));
-        if (!empty($x)) $rel['id'] = $x;
+        if (!empty($x)) {
+            $rel['id'] = $x;
+        }
 
         $x = $node->text('marc:subfield[@code="t"]');
-        if (!empty($x)) $rel['title'] = $x;
+        if (!empty($x)) {
+            $rel['title'] = $x;
+        }
 
         $x = $node->text('marc:subfield[@code="g"]');
-        if (!empty($x)) $rel['parts'] = $x;
+        if (!empty($x)) {
+            $rel['parts'] = $x;
+        }
 
         $x = $node->text('marc:subfield[@code="x"]');
-        if (!empty($x)) $rel['issn'] = $x;
+        if (!empty($x)) {
+            $rel['issn'] = $x;
+        }
 
         $x = $node->text('marc:subfield[@code="z"]');
-        if (!empty($x)) $rel['isbn'] = $x;
+        if (!empty($x)) {
+            $rel['isbn'] = $x;
+        }
 
         return $rel;
     }
-
 }

@@ -25,8 +25,8 @@ use Carbon\Carbon;
  * @property string   $vocabulary
  * @property string   $altLabels
  */
-class AuthorityRecord extends Record {
-
+class AuthorityRecord extends Record
+{
     // http://www.loc.gov/marc/authority/ad008.html
     public static $cat_rules = array(
         'a' => 'Earlier rules',
@@ -42,8 +42,8 @@ class AuthorityRecord extends Record {
         'c' => 'mesh', // Medical Subject Headings
         'd' => 'atg', // National Agricultural Library subject authority file (?)
         'k' => 'cash', // Canadian Subject Headings
-        'r' => 'aat', // Art and Architecture Thesaurus 
-        's' => 'sears', // Sears List of Subject Heading 
+        'r' => 'aat', // Art and Architecture Thesaurus
+        's' => 'sears', // Sears List of Subject Heading
         'v' => 'rvm', // Répertoire de vedettes-matière
     );
 
@@ -63,16 +63,18 @@ class AuthorityRecord extends Record {
     /**
      * @param \Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement $data
      */
-    public function __construct(QuiteSimpleXmlElement $data = null) {
-
-        if (is_null($data)) return;
+    public function __construct(QuiteSimpleXmlElement $data = null)
+    {
+        if (is_null($data)) {
+            return;
+        }
 
         $altLabels = array();
 
         // 001: Control number
         $this->id = $data->text('marc:controlfield[@tag="001"]');
 
-        // 003: MARC code for the agency whose system control number is 
+        // 003: MARC code for the agency whose system control number is
         // contained in field 001 (Control Number)
         // See http://www.loc.gov/marc/authority/ecadorg.html
         $this->agency = $data->text('marc:controlfield[@tag="003"]');
@@ -87,14 +89,14 @@ class AuthorityRecord extends Record {
         $r = substr($f008, 11, 1);
         $this->vocabulary = isset(self::$vocabularies[$r]) ? self::$vocabularies[$r] : null;
 
-        // 040: 
+        // 040:
         $source = $data->first('marc:datafield[@tag="040"]');
         if ($source) {
             $this->catalogingAgency = $source->text('marc:subfield[@code="a"]') ?: null;
             $this->language = $source->text('marc:subfield[@code="b"]') ?: null;
             $this->transcribingAgency = $source->text('marc:subfield[@code="c"]') ?: null;
             $this->modifyingAgency = $source->text('marc:subfield[@code="d"]') ?: null;
-            $this->vocabulary = $source->text('marc:subfield[@code="f"]') ?: $this->vocabulary;            
+            $this->vocabulary = $source->text('marc:subfield[@code="f"]') ?: $this->vocabulary;
         }
 
         // 100: Personal name (NR)
@@ -133,7 +135,7 @@ class AuthorityRecord extends Record {
             $this->class = 'topicalTerm';
             $this->term = $field->text('marc:subfield[@code="a"]');
             $label = $field->text('marc:subfield[@code="a"]');
-            foreach ($field->all('marc:subfield[@code="x"]') as $s) { 
+            foreach ($field->all('marc:subfield[@code="x"]') as $s) {
                 $label .= ' : ' . $s;
             }
             foreach ($field->all('marc:subfield[@code="v"]') as $s) {
@@ -195,7 +197,6 @@ class AuthorityRecord extends Record {
 
         $this->altLabels = $altLabels;
     }
-
 }
 
 /*

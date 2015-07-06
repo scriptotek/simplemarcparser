@@ -20,12 +20,12 @@ use Danmichaelo\QuiteSimpleXmlElement\QuiteSimpleXmlElement;
  * @property Carbon\Carbon    $modified
  * @property Carbon\Carbon    $created
  */
-class HoldingsRecord extends Record {
-
+class HoldingsRecord extends Record
+{
     // 859 $f: Use restrictions / Tilgjengelighet
     // Ref: http://www.bibsys.no/files/out/biblev/utlaanstatus-marc21.pdf
     //      http://norzig.no/profiles/holdings2.html#tab1
-    static $m859_f = array(
+    public static $m859_f = array(
         '1' => 'Not for loan',
         '2' => 'In-library use only',
         '3' => 'Overnight only',
@@ -44,7 +44,7 @@ class HoldingsRecord extends Record {
     // 859 $h: Circulation status  / Utlånsstatus
     // Ref: http://www.bibsys.no/files/out/biblev/utlaanstatus-marc21.pdf
     //      http://norzig.no/profiles/holdings2.html#tab2
-    static $m859_h = array(
+    public static $m859_h = array(
         '0' => 'Available',
         '1' => 'Circulation status undefined',
         '2' => 'On order',
@@ -75,9 +75,11 @@ class HoldingsRecord extends Record {
     /**
      * @param \Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement $data
      */
-    public function __construct(QuiteSimpleXmlElement $data = null) {
-
-        if (is_null($data)) return;
+    public function __construct(QuiteSimpleXmlElement $data = null)
+    {
+        if (is_null($data)) {
+            return;
+        }
 
         $this->id = $data->text('marc:controlfield[@tag="001"]');  // Dokid
 
@@ -116,7 +118,7 @@ class HoldingsRecord extends Record {
 
                 case 856:
                     $description = $node->text('marc:subfield[@code="3"]');
-                    if (in_array($description, array('Fulltekst','Fulltext'))) {
+                    if (in_array($description, array('Fulltekst', 'Fulltext'))) {
                         $fulltext[] = array(
                             'url' => $node->text('marc:subfield[@code="u"]'),
                             'linktext' => $node->text('marc:subfield[@code="y"]'),
@@ -166,5 +168,4 @@ class HoldingsRecord extends Record {
         $this->nonpublic_notes = $nonpublic_notes;
         $this->public_notes = $public_notes;
     }
-
 }

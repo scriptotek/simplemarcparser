@@ -1,12 +1,13 @@
-<?php namespace Scriptotek\SimpleMarcParser;
+<?php
+
+namespace Scriptotek\SimpleMarcParser;
 
 require 'vendor/autoload.php';
-use Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement;
-use Scriptotek\SimpleMarcParser\AuthorityRecord;
 use Carbon\Carbon;
+use Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement;
 
-class AuthorityRecordTest extends \PHPUnit_Framework_TestCase {
-
+class AuthorityRecordTest extends \PHPUnit_Framework_TestCase
+{
     // http://sru.bibsys.no/search/authority?version=1.2&operation=searchRetrieve&startRecord=1&maximumRecords=10&query=rec.identifier%3D%22x90061718%22&recordSchema=marcxchange
     // http://sru.bibsys.no/search/authority?version=1.2&operation=searchRetrieve&startRecord=1&maximumRecords=10&query=rec.identifier%3D%22x13038487%22&recordSchema=marcxchange
 
@@ -17,18 +18,20 @@ class AuthorityRecordTest extends \PHPUnit_Framework_TestCase {
                 ' . $data . '
             </marc:record>');
         $dom->registerXPathNamespaces(array(
-            'marc' => 'http://www.loc.gov/MARC21/slim'
+            'marc' => 'http://www.loc.gov/MARC21/slim',
         ));
 
         return new AuthorityRecord($dom);
     }
 
-    public function testEmptyRecord() {
-        $rec = new AuthorityRecord;
+    public function testEmptyRecord()
+    {
+        $rec = new AuthorityRecord();
         $this->assertNull($rec->id);
     }
 
-    public function testMarc001() {
+    public function testMarc001()
+    {
         $rec = $this->parseRecordData('
             <marc:controlfield tag="001">12149361x</marc:controlfield>
         ');
@@ -36,7 +39,8 @@ class AuthorityRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('12149361x', $rec->id);
     }
 
-    public function testMarc003() {
+    public function testMarc003()
+    {
         $rec = $this->parseRecordData('
            <marc:controlfield tag="003">NO-TrBIB</marc:controlfield>
         ');
@@ -44,18 +48,20 @@ class AuthorityRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('NO-TrBIB', $rec->agency);
     }
 
-    public function testMarc005() {
+    public function testMarc005()
+    {
         $rec = $this->parseRecordData('
            <marc:controlfield tag="005">20090407000000.0</marc:controlfield>
         ');
 
         $this->assertEquals(
-            Carbon::create(2009, 4, 7, 0, 0, 0), 
+            Carbon::create(2009, 4, 7, 0, 0, 0),
             $rec->modified
         );
     }
 
-    public function testMarc008() {
+    public function testMarc008()
+    {
         $rec = $this->parseRecordData('
            <marc:controlfield tag="008">090407n adznnaabn| |a|ana| </marc:controlfield>
         ');
@@ -65,7 +71,8 @@ class AuthorityRecordTest extends \PHPUnit_Framework_TestCase {
     }
 
     // 040 - Cataloging Source (NR)
-    public function testMarc040() {
+    public function testMarc040()
+    {
         $rec1 = $this->parseRecordData('
            <marc:datafield tag="040" ind1=" " ind2=" ">
               <marc:subfield code="a">NO-OsNB</marc:subfield>
@@ -83,8 +90,8 @@ class AuthorityRecordTest extends \PHPUnit_Framework_TestCase {
     }
 
     // 100, 400 - Person
-    public function testPerson() {
-
+    public function testPerson()
+    {
         $rec1 = $this->parseRecordData('
            <marc:datafield tag="100" ind1="1" ind2=" ">
               <marc:subfield code="a">Bakke, Dagfinn</marc:subfield>
@@ -117,7 +124,8 @@ class AuthorityRecordTest extends \PHPUnit_Framework_TestCase {
     }
 
     // 110, 410 - Corporation
-    public function testCorporation() {
+    public function testCorporation()
+    {
         $rec1 = $this->parseRecordData('
           <marc:datafield tag="110" ind1="2" ind2=" ">
             <marc:subfield code="a">Universitetsbiblioteket i Oslo</marc:subfield>
@@ -144,7 +152,8 @@ class AuthorityRecordTest extends \PHPUnit_Framework_TestCase {
     }
 
     // 111, 411 - Meeting
-    public function testMeeting() {
+    public function testMeeting()
+    {
         $rec1 = $this->parseRecordData('
           <marc:datafield tag="111" ind1="2" ind2=" ">
             <marc:subfield code="a">VM på ski</marc:subfield>
@@ -173,7 +182,8 @@ class AuthorityRecordTest extends \PHPUnit_Framework_TestCase {
     }
 
     // 150 - Topical Term (NR)
-    public function testMarc150() {
+    public function testMarc150()
+    {
         $rec1 = $this->parseRecordData('
            <marc:datafield tag="150" ind1=" " ind2=" ">
               <marc:subfield code="a">Fotomikrografi</marc:subfield>
@@ -186,7 +196,8 @@ class AuthorityRecordTest extends \PHPUnit_Framework_TestCase {
     }
 
     // 375 - Gender (R)
-    public function testMarc375() {
+    public function testMarc375()
+    {
         $rec1 = $this->parseRecordData('
            <marc:datafield tag="375" ind1=" " ind2=" ">
               <marc:subfield code="a">male</marc:subfield>
@@ -230,11 +241,10 @@ class AuthorityRecordTest extends \PHPUnit_Framework_TestCase {
             'altLabels' => array(
               'Rishøi, Ingvild Hedemann',
               'Hedemann Rishøi, Ingvild',
-            )
+            ),
           )
         );
 
         $this->assertJsonStringEqualsJsonString($expected, $rec1->toJson());
     }
-
 }

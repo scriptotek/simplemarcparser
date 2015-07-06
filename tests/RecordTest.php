@@ -1,12 +1,13 @@
-<?php namespace Scriptotek\SimpleMarcParser;
+<?php
 
+namespace Scriptotek\SimpleMarcParser;
 
-class RecordTest extends \PHPUnit_Framework_TestCase {
-
+class RecordTest extends \PHPUnit_Framework_TestCase
+{
     public function testIsset()
     {
-        $rec = new Record;
-        $rec->key = "value";
+        $rec = new Record();
+        $rec->key = 'value';
 
         $this->assertFalse(isset($rec->someRandomStuff));
         $this->assertTrue(isset($rec->key));
@@ -15,18 +16,17 @@ class RecordTest extends \PHPUnit_Framework_TestCase {
 
     public function testSerializations()
     {
-        $rec = new Record;
-        $rec->key = "value";
+        $rec = new Record();
+        $rec->key = 'value';
 
         $this->assertEquals(array('key' => 'value'), $rec->toArray());
         $this->assertJsonStringEqualsJsonString(json_encode(array('key' => 'value')), $rec->toJson());
-
     }
 
     public function testMagicMethods()
     {
-        $rec = new Record;
-        $rec->lalala = "humdidum";
+        $rec = new Record();
+        $rec->lalala = 'humdidum';
 
         $this->assertTrue(isset($rec->lalala));
         $this->assertFalse(isset($rec->humdidum));
@@ -34,5 +34,4 @@ class RecordTest extends \PHPUnit_Framework_TestCase {
         unset($rec->lalala);
         $this->assertFalse(isset($rec->lalala));
     }
-
 }

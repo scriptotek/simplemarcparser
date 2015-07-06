@@ -1,11 +1,13 @@
-<?php namespace Scriptotek\SimpleMarcParser;
+<?php
+
+namespace Scriptotek\SimpleMarcParser;
 
 require 'vendor/autoload.php';
-use Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement;
 use Carbon\Carbon;
+use Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement;
 
-class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
-
+class BibliographicRecordTest extends \PHPUnit_Framework_TestCase
+{
     private function parseRecordData($data)
     {
         $dom = new QuiteSimpleXMLElement('<?xml version="1.0"?>
@@ -13,14 +15,15 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
                 ' . $data . '
             </marc:record>');
         $dom->registerXPathNamespaces(array(
-            'marc' => 'http://www.loc.gov/MARC21/slim'
+            'marc' => 'http://www.loc.gov/MARC21/slim',
         ));
 
         return new BibliographicRecord($dom);
     }
 
-    public function testEmptyRecord() {
-        $rec = new BibliographicRecord;
+    public function testEmptyRecord()
+    {
+        $rec = new BibliographicRecord();
         $this->assertNull($rec->id);
     }
 
@@ -28,7 +31,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
      * Leader/06-07 = am : Language material, Monograph/Item
      ***********************************************************************************/
 
-    public function testMaterialIsPrintedBook() {
+    public function testMaterialIsPrintedBook()
+    {
         // LDR/06 = a  : Language material [Type of record]
         // LDR/07 = m  : Monograph/Item
         // 007    = ta : Text, Regular print
@@ -43,7 +47,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse($out->electronic);
     }
 
-    public function testMaterialIsElectronicBook() {
+    public function testMaterialIsElectronicBook()
+    {
         // LDR/06 = a  : Language material [Type of record]
         // LDR/07 = m  : Monograph/Item [Bibliographic level]
         // 007    = cr : Electronic Resource, Remote [Physical description]
@@ -59,7 +64,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($out->electronic);
     }
 
-    public function testMaterialIsThesis() {
+    public function testMaterialIsThesis()
+    {
         // LDR/06 = a  : Language material [Type of record]
         // LDR/07 = m  : Monograph/Item [Bibliographic level]
         // 007    = ta : Text, Regular print [Physical description]
@@ -79,7 +85,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
      * Leader/06-07 = aa : Language material, Monographic component part
      ***********************************************************************************/
 
-    public function testMaterialIsArticle() {
+    public function testMaterialIsArticle()
+    {
         // LDR/06 = a  : Language material [Type of record]
         // LDR/07 = a  : Monographic component part
         // 007    = ta : Text, Regular print [Physical description]
@@ -98,7 +105,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
      * Leader/06-07 = as : Language material, Serial
      ***********************************************************************************/
 
-    public function testMaterialIsPrintedPeriodical() {
+    public function testMaterialIsPrintedPeriodical()
+    {
         // LDR/06 = a  : Language material [Type of record]
         // LDR/07 = s  : Serial [Bibliographic level]
         // 007    = ta : Text, Regular print [Physical description]
@@ -114,7 +122,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse($out->electronic);
     }
 
-    public function testMaterialIsElectronicPeriodical() {
+    public function testMaterialIsElectronicPeriodical()
+    {
         // LDR/06 = a  : Language material [Type of record]
         // LDR/07 = s  : Serial [Bibliographic level]
         // 007    = cr : Electronic Resource, Remote [Physical description]
@@ -131,7 +140,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($out->electronic);
     }
 
-    public function testMaterialIsPrintedSeries() {
+    public function testMaterialIsPrintedSeries()
+    {
         // LDR/06 = a  : Language material [Type of record]
         // LDR/07 = s  : Serial [Bibliographic level]
         // 007    = ta : Text, Regular print [Physical description]
@@ -147,7 +157,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse($out->electronic);
     }
 
-    public function testMaterialIsNewspaper() {
+    public function testMaterialIsNewspaper()
+    {
         // LDR/06 = a  : Language material [Type of record]
         // LDR/07 = s  : Serial [Bibliographic level]
         // 007    = ta : Text, regular print  [Physical description]
@@ -162,7 +173,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('Newspaper', $out->material);
     }
 
-    public function testMaterialIsNewspaperOnMicroform() {
+    public function testMaterialIsNewspaperOnMicroform()
+    {
         // LDR/06 = a  : Language material [Type of record]
         // LDR/07 = s  : Serial [Bibliographic level]
         // 007    = hu : Microform, Unspecified [Physical description]
@@ -181,7 +193,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
      * Leader/06-07 = jm : Musical sound recording, Monograph/Item
      ***********************************************************************************/
 
-    public function testMaterialIsSoundCassette() {
+    public function testMaterialIsSoundCassette()
+    {
         // LDR/06 = j  : Musical sound recording [Type of record]
         // LDR/07 = m  : Monograph/Item [Bibliographic level]
         // 007    = ss : Sound recording, Sound cassette [Physical description]
@@ -199,7 +212,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
      * Leader/06-07 = ja : Musical sound recording, Monographic component part
      ***********************************************************************************/
 
-    public function testMaterialIsMusicCDTrack() {
+    public function testMaterialIsMusicCDTrack()
+    {
         // LDR/06 = j  : Musical sound recording [Type of record]
         // LDR/07 = a  : Monographic component part [Bibliographic level]
         // 007    = sd : Sound recording, Sound disc [Physical description]
@@ -214,7 +228,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse($out->electronic);
     }
 
-    public function testMaterialIsSoundCassetteTrack() {
+    public function testMaterialIsSoundCassetteTrack()
+    {
         // LDR/06 = j  : Musical sound recording [Type of record]
         // LDR/07 = a  : Monographic component part [Bibliographic level]
         // 007    = ss : Sound recording, Sound cassette [Physical description]
@@ -232,7 +247,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
      * Leader/06-07 = cm : Notated music, Monograph/Item
      ***********************************************************************************/
 
-    public function testMaterialIsSheetMusic() {
+    public function testMaterialIsSheetMusic()
+    {
         // LDR/06 = c  : Notated music [Type of record]
         // LDR/07 = m  : Monograph/Item [Bibliographic level]
         // 007    = ta : Text, Regular print [Physical description]
@@ -251,7 +267,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
      * Leader/06-07 = cm : Notated music, Monograph/Item
      ***********************************************************************************/
 
-    public function testMaterialIsKit() {
+    public function testMaterialIsKit()
+    {
         // LDR/06 = o  : Kit [Type of record]
         // LDR/07 = a  : Monographic component part [Bibliographic level]
         // 007    = o| : Kit, No attempt to code [Physical description]
@@ -266,7 +283,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse($out->electronic);
     }
 
-    public function testMarc001() {
+    public function testMarc001()
+    {
         $out = $this->parseRecordData('
             <marc:controlfield tag="001">12149361x</marc:controlfield>
         ');
@@ -274,7 +292,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('12149361x', $out->id);
     }
 
-    public function testModified() {
+    public function testModified()
+    {
         $out1 = $this->parseRecordData('
             <marc:controlfield tag="005">19970411</marc:controlfield>
         ');
@@ -286,7 +305,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(Carbon::create(1994, 2, 23, 15, 10, 47), $out2->modified);
     }
 
-    public function testCreated() {
+    public function testCreated()
+    {
         $out1 = $this->parseRecordData('
             <marc:controlfield tag="008">970411s1996 000 u|eng d</marc:controlfield>
         ');
@@ -302,7 +322,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(Carbon::create(2069, 1, 1, 0, 0, 0), $out3->created);
     }
 
-    public function testMarc010() {
+    public function testMarc010()
+    {
         $out = $this->parseRecordData('
             <marc:datafield tag="010" ind1=" " ind2=" ">
                 <marc:subfield code="a">  2012011618</marc:subfield>
@@ -312,7 +333,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('2012011618', $out->lccn);
     }
 
-    public function testIsbn() {
+    public function testIsbn()
+    {
         // Should strip off comments, but leave hyphens
         $out1 = $this->parseRecordData('
             <marc:datafield tag="020" ind1=" " ind2=" ">
@@ -328,7 +350,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertCount(0, $out2->isbns);
     }
 
-    public function testIssn() {
+    public function testIssn()
+    {
         $out1 = $this->parseRecordData('
             <marc:datafield tag="022" ind1=" " ind2=" ">
                 <marc:subfield code="a">1089-7690</marc:subfield>
@@ -342,7 +365,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertCount(0, $out2->issns);
     }
 
-    public function testCanceledIsbn() {
+    public function testCanceledIsbn()
+    {
         // 020 $z : Cancelled/invalid ISBN
         $out = $this->parseRecordData('
             <marc:datafield tag="020" ind1=" " ind2=" ">
@@ -354,7 +378,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertCount(0, $out->isbns);
     }
 
-    public function testIsbnWithX() {
+    public function testIsbnWithX()
+    {
         // Test that X-s are preserved
         $out = $this->parseRecordData('
             <marc:datafield tag="020" ind1=" " ind2=" ">
@@ -365,7 +390,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('1-85723-457-X', $out->isbns[0]);
     }
 
-    public function testMarc040() {
+    public function testMarc040()
+    {
         $out1 = $this->parseRecordData('
             <marc:datafield tag="040" ind1=" " ind2=" ">
                 <marc:subfield code="e">katreg</marc:subfield>
@@ -381,7 +407,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('rda', $out2->catalogingRules);
     }
 
-    public function testNLMClassification() {
+    public function testNLMClassification()
+    {
         $out1 = $this->parseRecordData('
             <marc:datafield tag="060" ind1="1" ind2="4">
                 <marc:subfield code="a">QH 305.M26</marc:subfield>
@@ -396,7 +423,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertNull($klass['assigner']);
     }
 
-    public function testUDCClassification() {
+    public function testUDCClassification()
+    {
         $out1 = $this->parseRecordData('
             <marc:datafield tag="080" ind1=" " ind2=" ">
                 <marc:subfield code="a">551.2:51(02)</marc:subfield>
@@ -412,7 +440,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertNull($klass['assigner']);
     }
 
-    public function testDDCClassificationWithoutAssigner() {
+    public function testDDCClassificationWithoutAssigner()
+    {
         $out1 = $this->parseRecordData('
             <marc:datafield tag="082" ind1="0" ind2="4">
                 <marc:subfield code="a">333.914/02[U]</marc:subfield>
@@ -431,7 +460,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertCount(0, $out2->classifications);
     }
 
-    public function testDDCClassificationWithAssigner() {
+    public function testDDCClassificationWithAssigner()
+    {
         $out = $this->parseRecordData('
             <marc:datafield tag="082" ind1="7" ind2="4">
                 <marc:subfield code="a">639.3</marc:subfield>
@@ -447,7 +477,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('NO-OsNB', $klass['assigner']);
     }
 
-    public function testInvalidDdcvalue() {
+    public function testInvalidDdcvalue()
+    {
         $out = $this->parseRecordData('
             <marc:datafield tag="082" ind1="0" ind2="4">
                 <marc:subfield code="a">0-86217-075-3</marc:subfield>
@@ -457,7 +488,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertCount(0, $out->classifications);
     }
 
-    public function testOtherClassifications() {
+    public function testOtherClassifications()
+    {
         $out1 = $this->parseRecordData('
             <marc:datafield tag="084" ind1=" " ind2=" ">
                 <marc:subfield code="a">62.70</marc:subfield>
@@ -493,7 +525,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertNull($out1->classifications[1]['assigner']);
     }
 
-    public function testPersonalNameHeadingWithAuthority() {
+    public function testPersonalNameHeadingWithAuthority()
+    {
         $out = $this->parseRecordData('
             <marc:datafield tag="100" ind1="1" ind2=" ">
                 <marc:subfield code="a">Bjerkestrand, Bernt</marc:subfield>
@@ -532,7 +565,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('aut', $out->creators[0]['role']);
     }
 
-    public function testMarc110() {
+    public function testMarc110()
+    {
         $out = $this->parseRecordData('
            <marc:datafield tag="110" ind1="2" ind2=" ">
                 <marc:subfield code="a">Norge</marc:subfield>
@@ -545,7 +579,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('x90051067', $out->creators[0]['id']);
     }
 
-    public function testMarc111() {
+    public function testMarc111()
+    {
 
         // Example from 863012868
         $out = $this->parseRecordData('
@@ -580,7 +615,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('Fortidsminnesmerker.', $out->alternativeTitles[1]);
     }
 
-    public function testMarc245() {
+    public function testMarc245()
+    {
         $out = $this->parseRecordData('
             <marc:datafield tag="245" ind1="1" ind2="0">
                 <marc:subfield code="a">Evolusjon :</marc:subfield>
@@ -594,7 +630,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('[videoopptak]', $out->medium);
     }
 
-    public function testMarc245WithSubtitleAndParallelTitle() {
+    public function testMarc245WithSubtitleAndParallelTitle()
+    {
         // Source: 070715092
         $out = $this->parseRecordData('
             <marc:datafield tag="245" ind1="0" ind2="0">
@@ -614,7 +651,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('The Norwegian review of architecture', $out->alternativeTitles[0]);
     }
 
-    public function testMarc245part() {
+    public function testMarc245part()
+    {
         $out1 = $this->parseRecordData('
             <marc:datafield tag="245" ind1="0" ind2="0">
                 <marc:subfield code="a">No ordinary genius</marc:subfield>
@@ -646,7 +684,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('[lydopptak]', $out3->medium);
     }
 
-    public function testMarc250() {
+    public function testMarc250()
+    {
         $out = $this->parseRecordData('
            <marc:datafield tag="250" ind1=" " ind2=" ">
                 <marc:subfield code="a">2. utg.</marc:subfield>
@@ -656,16 +695,18 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         // TODO
     }
 
-  public function testMarc260a() {
-    $out1 = $this->parseRecordData('
+    public function testMarc260a()
+    {
+        $out1 = $this->parseRecordData('
             <marc:datafield tag="260" ind1=" " ind2=" ">
                 <marc:subfield code="a">Place of publication</marc:subfield>
             </marc:datafield>
         ');
-    $this->assertEquals('Place of publication', $out1->placeOfPublication);
-  }
+        $this->assertEquals('Place of publication', $out1->placeOfPublication);
+    }
 
-  public function testMarc260c() {
+    public function testMarc260c()
+    {
         $out1 = $this->parseRecordData('
             <marc:datafield tag="260" ind1=" " ind2=" ">
                 <marc:subfield code="c">c2013</marc:subfield>
@@ -686,7 +727,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertNull($out3->year);
     }
 
-    public function testMarc300() {
+    public function testMarc300()
+    {
         $out1 = $this->parseRecordData('
             <marc:datafield tag="300" ind1=" " ind2=" ">
                 <marc:subfield code="a">353 s.</marc:subfield>
@@ -733,7 +775,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(104, $out5->pages);
     }
 
-    public function testMarc500() {
+    public function testMarc500()
+    {
         $out = $this->parseRecordData('
             <marc:datafield tag="500" ind1=" " ind2=" ">
                 <marc:subfield code="a">Forts.som: Acoustical imaging. 8(1980)</marc:subfield>
@@ -744,7 +787,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('Forts.som: Acoustical imaging. 8(1980)', $out->notes[0]);
     }
 
-    public function testMarc502() {
+    public function testMarc502()
+    {
         $out = $this->parseRecordData('
             <marc:datafield tag="502" ind1=" " ind2=" ">
                 <marc:subfield code="a">Avhandling (Doktorgrad) - Aachen Technische Hochschule.</marc:subfield>
@@ -755,7 +799,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('Avhandling (Doktorgrad) - Aachen Technische Hochschule.', $out->notes[0]);
     }
 
-    public function testMarc600() {
+    public function testMarc600()
+    {
         $out1 = $this->parseRecordData('
             <marc:datafield tag="600" ind1="1" ind2="4">
                 <marc:subfield code="a">Støre, Jonas Gahr</marc:subfield>
@@ -809,7 +854,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertNull($out4->subjects[0]['vocabulary']);
     }
 
-    public function testMarc610() {
+    public function testMarc610()
+    {
         $out1 = $this->parseRecordData('
             <marc:datafield tag="610" ind1="1" ind2="0">
                 <marc:subfield code="a">United States.</marc:subfield>
@@ -842,7 +888,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('NO-TrBIB', $out2->subjects[0]['vocabulary']);
     }
 
-    public function testMarc611() {
+    public function testMarc611()
+    {
         $out1 = $this->parseRecordData('
             <marc:datafield tag="611" ind1="2" ind2="0">
                 <marc:subfield code="a">International Congress of Writers for the Defense of Culture
@@ -863,7 +910,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('Paris, France', $out1->subjects[0]['place']);
     }
 
-    public function testMarc650() {
+    public function testMarc650()
+    {
         $out1 = $this->parseRecordData('
             <marc:datafield tag="650" ind1=" " ind2="7">
                 <marc:subfield code="a">Sjømat</marc:subfield>
@@ -914,7 +962,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertCount(0, $out4->subjects);
     }
 
-    public function testUncontrolledSubjects() {
+    public function testUncontrolledSubjects()
+    {
         $out1 = $this->parseRecordData('
             <marc:datafield tag="653" ind1="1" ind2=" ">
                 <marc:subfield code="a">fuel cells</marc:subfield>
@@ -929,7 +978,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('power generation', $out1->subjects[2]['term']);
     }
 
-    public function testUncontrolledGenre() {
+    public function testUncontrolledGenre()
+    {
         $out2 = $this->parseRecordData('
             <marc:datafield tag="653" ind1="1" ind2="6">
                 <marc:subfield code="a">comics</marc:subfield>
@@ -943,7 +993,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
     }
 
     // Example: 133027287
-    public function testControlledGenre() {
+    public function testControlledGenre()
+    {
         $out1 = $this->parseRecordData('
             <marc:datafield tag="655" ind1=" " ind2="7">
                 <marc:subfield code="a">Populærvitenskap</marc:subfield>
@@ -958,7 +1009,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('Populærvitenskap', $out1->genres[0]['term']);
     }
 
-    public function testMarc700() {
+    public function testMarc700()
+    {
         $out1 = $this->parseRecordData('
             <marc:datafield tag="700" ind1="1" ind2=" ">
                 <marc:subfield code="a">Almås, Karl Andreas</marc:subfield>
@@ -976,8 +1028,9 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('NO-TrBIB', $out1->creators[0]['vocabulary']);
     }
 
-    public function testMarc710() {
-        // Here, 'dgg' is  'Degree granting institution' used 
+    public function testMarc710()
+    {
+        // Here, 'dgg' is  'Degree granting institution' used
         // http://www.loc.gov/marc/relators/relacode.html
         $out = $this->parseRecordData('
             <marc:datafield tag="710" ind1="2" ind2=" ">
@@ -991,7 +1044,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         // TODO
     }
 
-    public function testPartOf() {
+    public function testPartOf()
+    {
         $out = $this->parseRecordData('
             <marc:datafield tag="245" ind1="0" ind2="0">
                 <marc:subfield code="a">Scattering</marc:subfield>
@@ -1019,7 +1073,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertNull($out2->part_of);
     }
 
-    public function testMarc776() {
+    public function testMarc776()
+    {
         $out = $this->parseRecordData('
             <marc:datafield tag="776" ind1="0" ind2=" ">
                 <marc:subfield code="w">(NO-TrBIB)022991026</marc:subfield>
@@ -1029,7 +1084,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('022991026', $out->other_form['id']);
     }
 
-    public function testPreceding() {
+    public function testPreceding()
+    {
         $out = $this->parseRecordData('
             <marc:datafield tag="780" ind1="0" ind2="0">
                 <marc:subfield code="w">(NO-TrBIB)920713874</marc:subfield>
@@ -1046,7 +1102,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
     /*
      * Expect simplification of 'Merged with'
      */
-    public function testSucceedingMergedWith() {
+    public function testSucceedingMergedWith()
+    {
         $out = $this->parseRecordData('
             <marc:datafield tag="580" ind1=" " ind2=" ">
                 <marc:subfield code="a">
@@ -1085,7 +1142,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('1(1999)', $out->succeeding['items'][0]['parts']);
     }
 
-    public function testMarc830() {
+    public function testMarc830()
+    {
         $out = $this->parseRecordData('
             <marc:datafield tag="830" ind1=" " ind2=" ">
                 <marc:subfield code="a">Physica mathematica Universitatis Osloensis</marc:subfield>
@@ -1118,7 +1176,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertNull($out->series[2]['id']);
     }
 
-    public function testMarc956() {
+    public function testMarc956()
+    {
         $out = $this->parseRecordData('
             <marc:datafield tag="956" ind1="4" ind2="2">
                 <marc:subfield code="3">Omslagsbilde</marc:subfield>
@@ -1130,7 +1189,8 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
         // TODO
     }
 
-    public function testMarc991() {
+    public function testMarc991()
+    {
         $out1 = $this->parseRecordData('');
 
         $out2 = $this->parseRecordData('
@@ -1153,7 +1213,6 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertFalse($out3->is_series);
         $this->assertTrue($out3->is_multivolume);
-
     }
 
     public function testJson()
@@ -1178,12 +1237,11 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase {
             'notes' => array(),
             'material' => 'Unknown',
             'electronic' => false,
-            'debug' => array('ldr06' => null, 'ldr07' => null,'f7_01' => null,'f7_02' => null,),
+            'debug' => array('ldr06' => null, 'ldr07' => null, 'f7_01' => null, 'f7_02' => null),
             'alternativeTitles' => array(),
           )
         );
 
         $this->assertJsonStringEqualsJsonString($expected, $rec1->toJson());
     }
-
 }

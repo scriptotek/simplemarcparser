@@ -1,12 +1,13 @@
-<?php namespace Scriptotek\SimpleMarcParser;
+<?php
+
+namespace Scriptotek\SimpleMarcParser;
 
 require 'vendor/autoload.php';
-use Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement;
-use Scriptotek\SimpleMarcParser\HoldingsRecord;
 use Carbon\Carbon;
+use Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement;
 
-class HoldingsRecordTest extends \PHPUnit_Framework_TestCase {
-
+class HoldingsRecordTest extends \PHPUnit_Framework_TestCase
+{
     private function parseRecordData($data)
     {
         $dom = new QuiteSimpleXMLElement('<?xml version="1.0"?>
@@ -14,18 +15,20 @@ class HoldingsRecordTest extends \PHPUnit_Framework_TestCase {
                 ' . $data . '
             </marc:record>');
         $dom->registerXPathNamespaces(array(
-            'marc' => 'http://www.loc.gov/MARC21/slim'
+            'marc' => 'http://www.loc.gov/MARC21/slim',
         ));
 
         return new HoldingsRecord($dom);
     }
 
-    public function testEmptyRecord() {
-        $rec = new HoldingsRecord;
+    public function testEmptyRecord()
+    {
+        $rec = new HoldingsRecord();
         $this->assertNull($rec->id);
     }
 
-    public function testMarc001() {
+    public function testMarc001()
+    {
         $out = $this->parseRecordData('
             <marc:controlfield tag="001">12149361x</marc:controlfield>
         ');
@@ -33,7 +36,8 @@ class HoldingsRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('12149361x', $out->id);
     }
 
-    public function testMarc004() {
+    public function testMarc004()
+    {
         $out1 = $this->parseRecordData('
             <marc:controlfield tag="004">841149003</marc:controlfield>
         ');
@@ -43,7 +47,8 @@ class HoldingsRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertNull($out2->bibliographic_record);
     }
 
-    public function testMarc009() {
+    public function testMarc009()
+    {
         $out = $this->parseRecordData('
             <marc:controlfield tag="009">kat</marc:controlfield>
         ');
@@ -51,7 +56,8 @@ class HoldingsRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('kat', $out->status);
     }
 
-    public function testMarc852full() {
+    public function testMarc852full()
+    {
         $out = $this->parseRecordData('
             <marc:datafield tag="852" ind1=" " ind2=" ">
                 <marc:subfield code="a">HIT</marc:subfield>
@@ -73,7 +79,8 @@ class HoldingsRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('(tapt?)', $out->public_notes[0]);
     }
 
-    public function testMarc852minimal() {
+    public function testMarc852minimal()
+    {
         $out = $this->parseRecordData('
             <marc:datafield tag="852" ind1=" " ind2=" ">
                 <marc:subfield code="a">HIT</marc:subfield>
@@ -91,7 +98,8 @@ class HoldingsRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertCount(0, $out->nonpublic_notes);
     }
 
-    public function testMarc856() {
+    public function testMarc856()
+    {
         $out = $this->parseRecordData('
             <marc:datafield tag="856" ind1="4" ind2="0">
                 <marc:subfield code="3">Fulltekst</marc:subfield>
@@ -108,8 +116,8 @@ class HoldingsRecordTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('Elektronisk reproduksjon. Tilgjengelig på NBs lesesal', $ft['comment']);
     }
 
-    public function testMarc859f() {
-
+    public function testMarc859f()
+    {
         $out = $this->parseRecordData('
             <marc:datafield tag="859" ind1=" " ind2=" ">
                 <marc:subfield code="f">0</marc:subfield>
@@ -125,11 +133,10 @@ class HoldingsRecordTest extends \PHPUnit_Framework_TestCase {
             ');
             $this->assertEquals($value, $out->use_restrictions);
         }
-
     }
 
-    public function testMarc859h() {
-
+    public function testMarc859h()
+    {
         foreach (HoldingsRecord::$m859_h as $key => $value) {
             $out = $this->parseRecordData('
                 <marc:datafield tag="859" ind1=" " ind2=" ">
@@ -138,22 +145,20 @@ class HoldingsRecordTest extends \PHPUnit_Framework_TestCase {
             ');
             $this->assertEquals($value, $out->circulation_status);
         }
-
     }
 
-    public function testMarc866() {
-
+    public function testMarc866()
+    {
         $out = $this->parseRecordData('
             <marc:datafield tag="866" ind1="3" ind2="0">
                 <marc:subfield code="a">1(1969/70)-34(1997/99)</marc:subfield>
             </marc:datafield>
         ');
         $this->assertEquals('1(1969/70)-34(1997/99)', $out->holdings);
-
     }
 
-    public function testMarc876() {
-
+    public function testMarc876()
+    {
         $out = $this->parseRecordData('
             <marc:datafield tag="876" ind1=" " ind2=" ">
                 <marc:subfield code="d">20130620</marc:subfield>
@@ -184,5 +189,4 @@ class HoldingsRecordTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertJsonStringEqualsJsonString($expected, $rec1->toJson());
     }
-
 }

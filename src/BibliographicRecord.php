@@ -713,6 +713,7 @@ class BibliographicRecord extends Record {
                         $title .= ' : ' . $subtitle;
                     }
                     $alternativeTitles[] = $title;
+                    break;
 
                 case 250:
                     $this->edition = $node->text('marc:subfield[@code="a"]');

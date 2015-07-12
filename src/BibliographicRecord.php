@@ -454,7 +454,7 @@ class BibliographicRecord extends Record
         $subdivtypes = array(
             'v' => 'form',
             'x' => 'general',
-            'y' => 'chronological',
+            'y' => 'chronologic',
             'z' => 'geographic',
         );
         foreach ($node->all('marc:subfield') as $subdiv) {
@@ -906,7 +906,7 @@ class BibliographicRecord extends Record
                     $tmp = $this->parseSubjectAddedEntry($node);
 
                     $emne = $node->text('marc:subfield[@code="a"]');
-                    $tmp['type'] = 'chronological';
+                    $tmp['type'] = 'chronologic';
                     $tmp['term'] = trim($emne, '.') . $tmp['term'];
 
                     array_push($subjects, $tmp);
@@ -917,7 +917,7 @@ class BibliographicRecord extends Record
 
                     $emne = $node->text('marc:subfield[@code="a"]');
                     $tmp['term'] = trim($emne, '.') . $tmp['term'];
-                    $tmp['type'] = 'topical';
+                    $tmp['type'] = 'topic';
 
                     array_push($subjects, $tmp);
                     break;
@@ -937,11 +937,11 @@ class BibliographicRecord extends Record
 
                     $ind2 = $node->attr('ind2');
                     $types = array(
-                        '0' => 'topical',
+                        '0' => 'topic',
                         '1' => 'person',
                         '2' => 'corporate',
                         '3' => 'meeting',
-                        '4' => 'chronological',
+                        '4' => 'chronologic',
                         '5' => 'geographic',
                         '6' => 'genre',
                     );

@@ -938,7 +938,7 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase
         $out4 = $this->parseRecordData('');
 
         $this->assertCount(1, $out1->subjects);
-        $this->assertEquals('topical', $out1->subjects[0]['type']);
+        $this->assertEquals('topic', $out1->subjects[0]['type']);
         $this->assertEquals('tekord', $out1->subjects[0]['vocabulary']);
         $this->assertEquals('NTUB12641', $out1->subjects[0]['id']);
         $this->assertEquals('Sjømat' . Record::$subfieldSeparator . 'Norge', $out1->subjects[0]['term']);
@@ -955,7 +955,7 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Historie', $out3->subjects[0]['parts'][0]['value']);
         $this->assertEquals('form', $out3->subjects[0]['parts'][0]['type']);
         $this->assertEquals('1900-    ', $out3->subjects[0]['parts'][1]['value']);
-        $this->assertEquals('chronological', $out3->subjects[0]['parts'][1]['type']);
+        $this->assertEquals('chronologic', $out3->subjects[0]['parts'][1]['type']);
         $this->assertEquals('Tyskland', $out3->subjects[0]['parts'][2]['value']);
         $this->assertEquals('geographic', $out3->subjects[0]['parts'][2]['type']);
 

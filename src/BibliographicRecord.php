@@ -911,12 +911,23 @@ class BibliographicRecord extends Record
 
                     array_push($subjects, $tmp);
                     break;
+
                 case 650:
                     $tmp = $this->parseSubjectAddedEntry($node);
 
                     $emne = $node->text('marc:subfield[@code="a"]');
                     $tmp['term'] = trim($emne, '.') . $tmp['term'];
                     $tmp['type'] = 'topical';
+
+                    array_push($subjects, $tmp);
+                    break;
+
+                case 651:
+                    $tmp = $this->parseSubjectAddedEntry($node);
+
+                    $emne = $node->text('marc:subfield[@code="a"]');
+                    $tmp['type'] = 'geographic';
+                    $tmp['term'] = trim($emne, '.') . $tmp['term'];
 
                     array_push($subjects, $tmp);
                     break;

@@ -962,6 +962,20 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(0, $out4->subjects);
     }
 
+    public function testMarc651()
+    {
+        $out1 = $this->parseRecordData('
+            <marc:datafield tag="651" ind1=" " ind2="7">
+                <marc:subfield code="a">Frankrike</marc:subfield>
+                <marc:subfield code="2">no-ubo-mn</marc:subfield>
+            </marc:datafield>
+        ');
+
+        $this->assertCount(1, $out1->subjects);
+        $this->assertEquals('geographic', $out1->subjects[0]['type']);
+        $this->assertEquals('no-ubo-mn', $out1->subjects[0]['vocabulary']);
+    }
+
     public function testUncontrolledSubjects()
     {
         $out1 = $this->parseRecordData('

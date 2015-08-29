@@ -16,11 +16,12 @@ class Parser
      */
     public function parse($record)
     {
-        if ($record instanceof QuiteSimpleXmlElement) {
-            // OK
-        } elseif ($record instanceof SimpleXmlElement) {
+        if ($record instanceof SimpleXmlElement)
+        {
             $record = new QuiteSimpleXmlElement($record);
-        } else {
+        }
+        elseif (!$record instanceof QuiteSimpleXmlElement)
+        {
             throw new \Exception('Invalid type given to Parser->parse. Expected SimpleXmlElement or QuiteSimpleXmlElement', 1);
         }
 

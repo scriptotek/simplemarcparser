@@ -11,6 +11,10 @@ SimpleMarcParser
 `SimpleMarcParser` is currently a minimal MARC21/XML parser for use with `QuiteSimpleXMLElement`,
 with support for the MARC21 Bibliographic, Authority and Holdings formats.
 
+**Note:** This project is not actively developed anymore, but I will still process issues. The aim
+of this project was to produce “simple” JSON representations of MARC21 records.
+I'm now working on [php-marc](https://github.com/scriptotek/php-marc), a wrapper for File_MARC.
+
 ## Example:
 
 ```php

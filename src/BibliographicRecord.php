@@ -494,6 +494,7 @@ class BibliographicRecord extends Record
         // 008: Extract *some* information
         $f008 = $data->text('marc:controlfield[@tag="008"]');
         $this->created = $this->parseDateTime(substr($f008, 0, 6));
+        $this->language = substr($f008, 35, 3);
 
         $creators = array();
         $meetings = array();

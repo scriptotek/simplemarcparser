@@ -292,6 +292,15 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('12149361x', $out->id);
     }
 
+    public function testLanguage()
+    {
+        $out = $this->parseRecordData('
+            <marc:controlfield tag="008">110727s1883    xx#||||||    |000|u|fre|d</marc:controlfield>
+        ');
+
+        $this->assertEquals('fre', $out->language);
+    }
+
     public function testModified()
     {
         $out1 = $this->parseRecordData('
@@ -1238,6 +1247,7 @@ class BibliographicRecordTest extends \PHPUnit_Framework_TestCase
         $expected = json_encode(
           array(
             'id' => '12149361x',
+            'language' => false,
             'is_series' => false,
             'is_multivolume' => false,
             'isbns' => array(),

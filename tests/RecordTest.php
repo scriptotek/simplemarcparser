@@ -2,7 +2,9 @@
 
 namespace Scriptotek\SimpleMarcParser;
 
-class RecordTest extends \PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class RecordTest extends TestCase
 {
     public function testIsset()
     {

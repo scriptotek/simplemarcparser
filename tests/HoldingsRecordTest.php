@@ -5,8 +5,9 @@ namespace Scriptotek\SimpleMarcParser;
 require 'vendor/autoload.php';
 use Carbon\Carbon;
 use Danmichaelo\QuiteSimpleXMLElement\QuiteSimpleXMLElement;
+use PHPUnit\Framework\TestCase;
 
-class HoldingsRecordTest extends \PHPUnit_Framework_TestCase
+class HoldingsRecordTest extends TestCase
 {
     private function parseRecordData($data)
     {

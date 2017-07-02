@@ -273,7 +273,7 @@ class BibliographicRecord extends Record
         $this->debug = array(
             'ldr06' => array_get($ldr, 6),
             'ldr07' => array_get($ldr, 7),
-            'f7_01' => array_get($f007, 0),
+            'f7_01' => array_get($f007, 0) ?: null,
             'f7_02' => array_get($f007, 1),
         );
 

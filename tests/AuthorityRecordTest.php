@@ -130,6 +130,7 @@ class AuthorityRecordTest extends TestCase
         $rec1 = $this->parseRecordData('
           <marc:datafield tag="110" ind1="2" ind2=" ">
             <marc:subfield code="a">Universitetsbiblioteket i Oslo</marc:subfield>
+            <marc:subfield code="b">Avdeling for metadata</marc:subfield>
           </marc:datafield>
           <marc:datafield tag="410" ind1=" " ind2=" ">
             <marc:subfield code="a">UBO</marc:subfield>
@@ -145,7 +146,7 @@ class AuthorityRecordTest extends TestCase
         ');
 
         $this->assertEquals('corporation', $rec1->class);
-        $this->assertEquals('Universitetsbiblioteket i Oslo', $rec1->label);
+        $this->assertEquals('Universitetsbiblioteket i Oslo : Avdeling for metadata', $rec1->label);
         $this->assertCount(3, $rec1->altLabels);
         $this->assertContains('UBO', $rec1->altLabels);
         $this->assertContains('Royal University Library (Oslo)', $rec1->altLabels);

@@ -106,6 +106,11 @@ class AuthorityRecord extends Record
             $this->class = 'person';
             $this->name = $field->text('marc:subfield[@code="a"]');
             $this->label = $this->normalize_name($this->name);
+            $enum = $field->text('marc:subfield[@code="b"]');
+            if (!empty($enum)) {
+                $this->name = "{$this->name} {$enum}";
+                $this->label = "{$this->label} {$enum}";
+            }
             $bd = $field->text('marc:subfield[@code="d"]');
             $bd = explode('-', $bd);
             $this->birth = $bd[0] ?: null;
@@ -116,9 +121,16 @@ class AuthorityRecord extends Record
         foreach ($data->all('marc:datafield[@tag="110"]') as $field) {
             $this->class = 'corporation';
             $this->name = $field->text('marc:subfield[@code="a"]');
+            $subdiv = $field->text('marc:subfield[@code="b"]');
+
             $this->label = ($field->attr('ind1') == '0')  // Inverted name
                 ? $this->normalize_name($this->name)
                 : $this->name;
+
+            if (!empty($subdiv)) {
+                $this->name = "{$this->name} : {$subdiv}";
+                $this->label = "{$this->label} : {$subdiv}";
+            }
         }
 
         // 111: Meeting Name (NR)

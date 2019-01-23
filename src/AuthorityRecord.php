@@ -142,7 +142,15 @@ class AuthorityRecord extends Record
                 : $this->name;
         }
 
-        // 130: Uniform title: Not interested for now
+        // 130: Uniform title
+        foreach ($data->all('marc:datafield[@tag="130"]') as $field) {
+            $this->class = 'uniform_title';
+            $label = $field->text('marc:subfield[@code="a"]');
+            foreach ($field->all('marc:subfield[@code="d"]') as $s) {
+                $label .= ' (' . $s . ')';
+            }
+            $this->name = $label;
+        }
 
         // 150: Topical Term (NR)
         foreach ($data->all('marc:datafield[@tag="150"]') as $field) {
